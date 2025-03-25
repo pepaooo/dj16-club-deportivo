@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Encabezado del formulario -->
+            <div class="text-center mb-4">
+                <i class="bi bi-card-checklist" style="font-size: 3rem; color: #1976d2"></i>
+                <h2 class="mt-2">Nueva Instalación</h2>
+                <p class="text-muted">
+                    Complete la información para crear una nueva instalación.
+                </p>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <!-- Formulario con binding de Thymeleaf -->
+                    <form th:action="@{/instalaciones/create-instalacion}" th:object="${instalacion}" method="post">
+                        <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
+                            Verifique los siguientes inconvenientes
+                            <ul>
+                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+                            </ul>
+                        </div>
+                        <!-- Campo: Nombre -->
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" th:field="*{nombre}" placeholder="Ingrese el nombre" required />
+                            <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                        </div>
+                        <!-- Campo: Descripción -->
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" th:field="*{descripcion}" placeholder="Ingrese la descripción" rows="3" ></textarea>
+                            <div class="text-danger" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+                        </div>
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-end">
+                            <a th:href="@{/instalaciones}" class="btn btn-secondary me-2">
+                                <i class="bi bi-arrow-left-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

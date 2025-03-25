@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido Principal -->
+<div class="container container-custom-details mt-4">
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i
+                    class="bi bi-card-checklist"
+                    style="font-size: 3rem; color: #1976d2"
+            ></i>
+            <h2 class="mt-2">Detalles del Beneficio</h2>
+            <p class="text-muted">
+                Visualiza la información del beneficio en modo solo lectura.
+            </p>
+        </div>
+    </div>
+
+    <!-- Datos del Beneficio -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <!-- Primera Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>ID:</strong>
+                        <span th:text="${beneficio.id}">1</span>
+                    </p>
+                    <p>
+                        <strong>Nombre:</strong>
+                        <span th:text="${beneficio.nombre}">Descuento Tienda</span>
+                    </p>
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>Descripción:</strong>
+                        <span th:text="${beneficio.descripcion}"
+                        >5% de descuento en productos de la tienda.</span
+                        >
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <a class="btn btn-secondary" th:href="@{/beneficios}" >
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+            <a
+                    class="btn btn-warning"
+                    th:href="@{'/beneficios/change?id=' + ${beneficio.id}}">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+            <div style="display:inline-block">
+                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBenefitModal">
+                    <i class="bi bi-trash"></i> Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal para Confirmar Eliminación -->
+<div class="modal fade" id="deleteBenefitModal" tabindex="-1" aria-labelledby="deleteBenefitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 1rem">
+            <div class="modal-header" style="background-color: #f8d7da; border-bottom: none; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                <h5 class="modal-title" id="deleteBenefitModalLabel" style="color: #842029">
+                    <i class="bi bi-exclamation-circle-fill"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="font-size: 1.1rem">
+                <p class="text-left mb-0">
+                    ¿Está seguro de que desea eliminar este beneficio?
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: none; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <form th:action="@{'/beneficios/delete?id=' + ${beneficio.id}}" method="post">
+                    <!-- Incluir token CSRF si es necesario -->
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

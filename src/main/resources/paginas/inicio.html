@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+    <!-- Contenido principal -->
+    <div class="container mt-4">
+        <!-- Jumbotron con dos columnas: texto e imagen -->
+        <div class="row align-items-center p-5 mb-4 bg-light rounded-3">
+            <!-- Columna de texto -->
+            <div class="col-lg-7">
+                <h1 class="display-5 fw-bold">
+                    <i class="bi bi-speedometer2"></i> Bienvenido al SGCD
+                </h1>
+                <p class="fs-4">
+                    Gestione de forma sencilla y eficaz las operaciones de su club
+                    deportivo.
+                </p>
+                <!-- Link principal actualizado para ir a Reservas -->
+                <a class="btn btn-primary btn-lg" th:href="@{/reservas}" role="button">
+                    <i class="bi bi-calendar-check"></i> Ir a Gestión de Reservas
+                </a>
+            </div>
+            <!-- Columna de imagen (visible en pantallas grandes) -->
+            <div class="col-lg-5 d-none d-lg-block">
+                <img
+                        th:src="@{/images/zetong-li-21Lq6wTLURQ-unsplash.jpg}"
+                        alt="Imagen deportiva"
+                        class="img-fluid rounded"
+                />
+            </div>
+        </div>
+        <!-- Tarjetas de acceso a módulos -->
+        <div class="row">
+            <!-- Card para Miembros -->
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-people-fill"></i> Miembros
+                        </h5>
+                        <p class="card-text">
+                            Registro y administración de los miembros del club, incluyendo
+                            pagos y notificaciones.
+                        </p>
+                        <a class="btn btn-outline-primary" th:href="@{/miembros}">
+                            <i class="bi bi-arrow-right-circle"></i> Gestionar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card para Membresías -->
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-card-checklist"></i> Membresías
+                        </h5>
+                        <p class="card-text">
+                            Administración de tipos de membresías y registro de pagos.
+                        </p>
+                        <a class="btn btn-outline-primary" th:href="@{/membresias}">
+                            <i class="bi bi-arrow-right-circle"></i> Gestionar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card para Reportes (en lugar de Reservas) -->
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-bar-chart-line-fill"></i> Reportes
+                        </h5>
+                        <p class="card-text">
+                            Visualice y genere reportes de membresías, reservas y pagos.
+                        </p>
+                        <a class="btn btn-outline-primary" th:href="@{/reportes}">
+                            <i class="bi bi-arrow-right-circle"></i> Gestionar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

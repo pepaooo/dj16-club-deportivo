@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido Principal -->
+<div class="container container-custom-details mt-4">
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i
+                    class="bi bi-card-checklist"
+                    style="font-size: 3rem; color: #1976d2"
+            ></i>
+            <h2 class="mt-2">Detalles de la Instalación</h2>
+            <p class="text-muted">
+                Visualiza la información de la instalación en modo solo lectura.
+            </p>
+        </div>
+    </div>
+
+    <!-- Datos de la Instalación -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <!-- Primera Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>ID:</strong>
+                        <span th:text="${instalacion.id}">1</span>
+                    </p>
+                    <p>
+                        <strong>Nombre:</strong>
+                        <span th:text="${instalacion.nombre}">Cancha 1</span>
+                    </p>
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>Descripción:</strong>
+                        <span th:text="${instalacion.descripcion}"
+                        >Cancha para fútbol rápido</span
+                        >
+                    </p>
+                    <p>
+                        <strong>Estado:</strong>
+                        <span th:text="${instalacion.estado}">Disponible</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <a class="btn btn-secondary" th:href="@{/instalaciones}">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+            <a
+                    class="btn btn-warning"
+                    th:href="@{'/instalaciones/change?id=' + ${instalacion.id}}">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

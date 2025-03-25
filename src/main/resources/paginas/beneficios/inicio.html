@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container container-custom mt-4">
+
+    <!-- Mensaje de éxito -->
+    <div id="alertSuccess" th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Encabezado y botón para Nuevo Beneficio -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2>Gestión de Beneficios</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-primary" th:href="@{/beneficios/new}">
+                <i class="bi bi-plus-circle"></i> Nuevo Beneficio
+            </a>
+        </div>
+    </div>
+
+    <!-- Campo de búsqueda -->
+    <form th:action="@{/beneficios}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input
+                            type="text"
+                            name="q"
+                            class="form-control"
+                            placeholder="Buscar beneficio por nombre o descripción"
+                            th:value="${q}"
+                    />
+                    <button class="btn btn-link" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de Beneficios -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead style="background-color: #e9f5ff; color: #0d6efd">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="beneficio : ${beneficios}">
+                <td th:text="${beneficio.id}">1</td>
+                <td th:text="${beneficio.nombre}">Descuento Tienda</td>
+                <td th:text="${beneficio.descripcion}">
+                    5% de descuento en la tienda.
+                </td>
+                <td>
+                    <a
+                            class="btn btn-outline-primary btn-sm"
+                            th:href="@{'/beneficios/get?id=' + ${beneficio.id}}">
+                        <i class="bi bi-eye"></i> Ver Detalle
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Espera 5 segundos y oculta el alert automáticamente
+    document.addEventListener("DOMContentLoaded", function() {
+        var alertEl = document.getElementById("alertSuccess");
+        if (alertEl) {
+            setTimeout(function() {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+/* Estilos adicionales */
+
+/* Espaciado en el navbar */
+.navbar-nav .nav-item {
+    margin: 0 0.75rem;
+}
+
+/* Estilos personalizados para la tabla */
+.container-custom {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.container-custom-details {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Encabezado de la tabla */
+table thead {
+    background-color: #e9f5ff;
+    color: #0d6efd;
+}
+/* Botón principal personalizado */
+.btn-custom {
+    background-color: #1976d2; /* Azul armonioso */
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease;
+}
+.btn-custom:hover {
+    background-color: #1565c0;
+    color: #fff; /* Forzamos el texto blanco en hover */
+}
+/* Botones de acción: editar */
+.btn-custom-outline {
+    color: #1976d2;
+    border: 1px solid #1976d2;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.btn-custom-outline:hover {
+    background-color: #1976d2;
+    color: #fff;
+}
+/* Botones de acción: eliminar */
+.btn-custom-danger-outline {
+    color: #d32f2f;
+    border: 1px solid #d32f2f;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.btn-custom-danger-outline:hover {
+    background-color: #d32f2f;
+    color: #fff;
+}
+/* Estilos personalizados para estatus */
+.badge-status-activo {
+    background-color: #198754; /* Bootstrap Success */
+    color: #fff;
+}
+.badge-status-vencido {
+    background-color: #ffc107; /* Bootstrap Warning */
+    color: #212529; /* Texto oscuro para mejorar el contraste */
+}
+.badge-status-suspendido {
+    background-color: #6c757d; /* Bootstrap Secondary */
+    color: #fff;
+}
