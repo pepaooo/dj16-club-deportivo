@@ -13,12 +13,6 @@ public class InicioController {
         return "inicio";
     }
 
-    @GetMapping("miembros")
-    public String miembros(Model model) {
-        model.addAttribute("activePage", "/miembros");
-        return "miembros/inicio";
-    }
-
     @GetMapping("reservas")
     public String reservas(Model model) {
         model.addAttribute("activePage", "/reservas");

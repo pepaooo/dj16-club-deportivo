@@ -98,18 +98,18 @@ VALUES
     ('Piscina', 'Piscina semi-olímpica techada', 'Disponible');
 
 INSERT INTO miembro
-(nombre, apellidos, direccion, telefono, correo_electronico, fecha_nacimiento, genero, id_membresia)
+(nombre, apellido_paterno, apellido_materno, direccion, telefono, correo_electronico, fecha_nacimiento, genero, id_membresia)
 VALUES
-    ('Juan', 'Perez', 'Calle 1, Ciudad', '5551234567', 'juan.perez@example.com', '1990-01-01', 'M', 1),
-    ('Maria', 'Lopez', 'Calle 2, Ciudad', '5551234568', 'maria.lopez@example.com', '1992-05-10', 'F', 2),
-    ('Carlos', 'Gomez', 'Calle 3, Ciudad', '5551234569', 'carlos.gomez@example.com', '1985-03-15', 'M', 3),
-    ('Lucia', 'Hernandez', 'Calle 4, Ciudad', '5551234570', 'lucia.hernandez@example.com', '1995-07-20', 'F', 4),
-    ('Miguel', 'Ramirez', 'Calle 5, Ciudad', '5551234571', 'miguel.ramirez@example.com', '1988-11-11', 'M', 5),
-    ('Sofia', 'Martinez', 'Calle 6, Ciudad', '5551234572', 'sofia.martinez@example.com', '1993-12-05', 'F', 6),
-    ('Roberto', 'Jimenez', 'Calle 7, Ciudad', '5551234573', 'roberto.jimenez@example.com', '1980-02-25', 'M', 7),
-    ('Ana', 'Castillo', 'Calle 8, Ciudad', '5551234574', 'ana.castillo@example.com', '1994-09-18', 'F', 8),
-    ('David', 'Garcia', 'Calle 9, Ciudad', '5551234575', 'david.garcia@example.com', '1986-06-30', 'M', 9),
-    ('Elena', 'Morales', 'Calle 10, Ciudad', '5551234576', 'elena.morales@example.com', '1991-04-22', 'F', 10);
+    ('Juan', 'Perez','Perez', 'Calle 1, Ciudad', '5551234567', 'juan.perez@example.com', '1990-01-01', 'M', 1),
+    ('Maria', 'Lopez', 'Lopez', 'Calle 2, Ciudad', '5551234568', 'maria.lopez@example.com', '1992-05-10', 'F', 2),
+    ('Carlos', 'Gomez', 'Gomez', 'Calle 3, Ciudad', '5551234569', 'carlos.gomez@example.com', '1985-03-15', 'M', 3),
+    ('Lucia', 'Hernandez', 'Hernandez', 'Calle 4, Ciudad', '5551234570', 'lucia.hernandez@example.com', '1995-07-20', 'F', 4),
+    ('Miguel', 'Ramirez', 'Ramirez', 'Calle 5, Ciudad', '5551234571', 'miguel.ramirez@example.com', '1988-11-11', 'M', 5),
+    ('Sofia', 'Martinez', 'Martinez', 'Calle 6, Ciudad', '5551234572', 'sofia.martinez@example.com', '1993-12-05', 'F', 6),
+    ('Roberto', 'Jimenez', 'Jimenez', 'Calle 7, Ciudad', '5551234573', 'roberto.jimenez@example.com', '1980-02-25', 'M', 7),
+    ('Ana', 'Castillo', 'Castillo', 'Calle 8, Ciudad', '5551234574', 'ana.castillo@example.com', '1994-09-18', 'F', 8),
+    ('David', 'Garcia', 'Garcia', 'Calle 9, Ciudad', '5551234575', 'david.garcia@example.com', '1986-06-30', 'M', 9),
+    ('Elena', 'Morales', 'Morales', 'Calle 10, Ciudad', '5551234576', 'elena.morales@example.com', '1991-04-22', 'F', 10);
 
 INSERT INTO usuario
 (nombre_usuario, contrasena, estatus, fecha_creacion, ultimo_acceso, id_miembro)

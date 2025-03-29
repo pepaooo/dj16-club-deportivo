@@ -4,117 +4,98 @@
 <head th:replace="~{plantillas/plantilla :: head}"></head>
 <body>
 <header th:replace="~{plantillas/plantilla :: header}"></header>
+
 <!-- Contenido principal -->
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Gestión de Miembros</h2>
-        <!-- Botón principal personalizado -->
-        <a class="btn btn-custom" href="nuevo-miembro.html">
-            <i class="bi bi-plus-circle"></i> Nuevo Miembro
-        </a>
+<div class="container container-custom mt-4">
+
+    <!-- Mensaje de éxito -->
+    <div id="alertSuccess" th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <!-- Panel superior: Tarjetas de resumen y buscador -->
-    <div class="row mb-3">
-        <div class="col-md-8">
-            <div class="row g-2">
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6 class="card-title">Total Miembros</h6>
-                            <p class="card-text">100</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6 class="card-title">Activos</h6>
-                            <p class="card-text">80</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h6 class="card-title">Vencidos</h6>
-                            <p class="card-text">20</p>
-                        </div>
-                    </div>
+    <!-- Encabezado y botón Nuevo Miembro -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2>Gestión de Miembros</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-primary" th:href="@{/miembros/new}">
+                <i class="bi bi-plus-circle"></i> Nuevo Miembro
+            </a>
+        </div>
+    </div>
+
+    <!-- Tarjetas Resumen -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Total Miembros</h6>
+                    <p class="card-text" th:text="${totalMiembros}"></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Buscar miembro"
-                />
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Activos</h6>
+                    <p class="card-text" th:text="${miembrosActivos}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Inactivos</h6>
+                    <p class="card-text" th:text="${miembrosInactivos}"></p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Tabla de miembros -->
+    <!-- Campo de Búsqueda -->
+    <form th:action="@{/miembros}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Buscar miembro por nombre, correo, etc."
+                            th:value="${q}"
+                    />
+                    <button class="btn btn-link" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button></div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de Miembros -->
     <div class="table-responsive">
         <table class="table table-striped table-hover">
-            <thead>
+            <thead style="background-color: #e9f5ff; color: #0d6efd">
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Dirección</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Tipo de Membresía</th>
-                <th>Estatus</th>
+                <th>Apellido paterno</th>
+                <th>Apellido materno</th>
+                <th>Correo</th>
                 <th>Acciones</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>1</td>
-                <td>Juan Pérez</td>
-                <td>Calle Falsa 123</td>
-                <td>123456789</td>
-                <td>juan@example.com</td>
-                <td>Mensual</td>
-                <td><span class="badge badge-status-activo">Activo</span></td>
+            <tr th:each="miembro : ${miembros}">
+                <td th:text="${miembro.id}"></td>
+                <td th:text="${miembro.nombre}"></td>
+                <td th:text="${miembro.apellidoPaterno}"></td>
+                <td th:text="${miembro.apellidoMaterno}"></td>
+                <td th:text="${miembro.correoElectronico}"></td>
                 <td>
-                    <a
-                            class="btn btn-custom-outline btn-sm"
-                            href="editar-miembro.html?id=1"
-                    >
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a
-                            class="btn btn-custom-danger-outline btn-sm"
-                            href="eliminar-miembro.html?id=1"
-                    >
-                        <i class="bi bi-trash"></i> Eliminar
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Ana Gómez</td>
-                <td>Avenida Siempre Viva 742</td>
-                <td>987654321</td>
-                <td>ana@example.com</td>
-                <td>Anual</td>
-                <td><span class="badge badge-status-vencido">Vencido</span></td>
-                <td>
-                    <a
-                            class="btn btn-custom-outline btn-sm"
-                            href="editar-miembro.html?id=2"
-                    >
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a
-                            class="btn btn-custom-danger-outline btn-sm"
-                            href="eliminar-miembro.html?id=2"
-                    >
-                        <i class="bi bi-trash"></i> Eliminar
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{'/miembros/get?id=' + ${miembro.id}}">
+                        <i class="bi bi-eye"></i> Ver Detalle
                     </a>
                 </td>
             </tr>
@@ -122,6 +103,20 @@
         </table>
     </div>
 </div>
+
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Espera 5 segundos y oculta el alert automáticamente
+    document.addEventListener("DOMContentLoaded", function () {
+        var alertEl = document.getElementById("alertSuccess");
+        if (alertEl) {
+            setTimeout(function () {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+</script>
 </body>
 </html>

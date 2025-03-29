@@ -41,13 +41,13 @@
                         >
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/reservas}"
-                        ><i class="bi bi-calendar-check"></i> Reservas</a
-                        >
+                        <a class="nav-link" th:href="@{/pagos}">
+                            <i class="bi bi-currency-dollar"></i> Pagos de Membresía
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/usuarios}"
-                        ><i class="bi bi-person-lines-fill"></i> Usuarios</a
+                        <a class="nav-link" th:href="@{/reservas}"
+                        ><i class="bi bi-calendar-check"></i> Reservas</a
                         >
                     </li>
                     <li class="nav-item">
@@ -64,7 +64,7 @@
                                 data-bs-toggle="dropdown"
                                 aria-expanded="false"
                         >
-                            <i class="bi bi-gear-fill"></i> Catálogos
+                            <i class="bi bi-gear-fill"></i> Administración
                         </a>
                         <div
                                 class="dropdown-menu p-3"
@@ -73,15 +73,37 @@
                         >
                             <h6 class="dropdown-header">Membresías</h6>
                             <a class="dropdown-item" th:href="@{/membresias}">
-                                <i class="bi bi-card-checklist"></i> Membresía
+                                <i class="bi bi-card-checklist"></i> Tipos de membresía
                             </a>
                             <a class="dropdown-item" th:href="@{/beneficios}">
-                                <i class="bi bi-award"></i> Beneficios
+                                <i class="bi bi-award"></i> Beneficios de membresías
+                            </a>
+                            <a class="dropdown-item"  th:href="@{/notificaciones}">
+                                <i class="bi bi-bell"></i> Notificaciones para vencimiento
                             </a>
                             <div class="dropdown-divider"></div>
                             <h6 class="dropdown-header">Instalaciones</h6>
                             <a class="dropdown-item" th:href="@{/instalaciones}">
                                 <i class="bi bi-building"></i> Instalación
+                            </a>
+                            <a class="dropdown-item" th:href="@{/tipo-instalacion}">
+                                <i class="bi bi-layout-text-window-reverse"></i>
+                                TipoInstalación
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <h6 class="dropdown-header">Gestión de Accesos</h6>
+                            <a class="dropdown-item" th:href="@{/usuarios}">
+                                <i class="bi bi-person-lines-fill"></i> Usuarios
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <h6 class="dropdown-header">Monitoreo</h6>
+                            <a class="dropdown-item" th:href="@{/auditoria}">
+                                <i class="bi bi-clock-history"></i> Auditoría y Actividades
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <h6 class="dropdown-header">Configuración</h6>
+                            <a class="dropdown-item" th:href="@{/configuracion}">
+                                <i class="bi bi-sliders"></i> Configuración del sistema
                             </a>
                         </div>
                     </li>

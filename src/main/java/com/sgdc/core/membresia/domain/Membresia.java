@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 
@@ -40,12 +41,12 @@ public class Membresia {
     @Column(name = "duracion_dias", nullable = false)
     private Integer duracionDias;
 
+    @ColumnDefault("'Activo'")
     @Column(name = "estatus", nullable = false)
     private String estatus;
 
     @NotBlank(message = "La descripción de la membresía no puede estar vacía")
-    @Size(max = 255, message = "La descripción de la membresía no puede tener más de 255 caracteres")
-    @Column(name = "descripcion", nullable = false)
+    @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
 }
