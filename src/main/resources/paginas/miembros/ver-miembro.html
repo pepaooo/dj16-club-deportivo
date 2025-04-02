@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido Principal -->
+<div class="container container-custom-details mt-4">
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i
+                    class="bi bi-person-lines-fill"
+                    style="font-size: 3rem; color: #1976d2"
+            ></i>
+            <h2 class="mt-2">Detalles del Miembro</h2>
+            <p class="text-muted">
+                Visualice la información del miembro en modo solo lectura.
+            </p>
+        </div>
+    </div>
+
+    <!-- Información en dos columnas -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <!-- Primera Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>ID:</strong>
+                        <span th:text="${miembro.id}"></span>
+                    </p>
+                    <p>
+                        <strong>Nombre:</strong>
+                        <span th:text="${miembro.nombre}"></span>
+                    </p>
+                    <p>
+                        <strong>Apellido paterno:</strong>
+                        <span th:text="${miembro.apellidoPaterno}"></span>
+                    </p>
+                    <p>
+                        <strong>Apellido materno:</strong>
+                        <span th:text="${miembro.apellidoMaterno}"></span>
+                    </p>
+                    <p>
+                        <strong>Género:</strong>
+                        <span th:text="${miembro.genero.label}"></span>
+                    </p>
+                    <p>
+                        <strong>Dirección:</strong>
+                        <span th:text="${miembro.direccion}"></span>
+                    </p>
+                    <p>
+                        <strong>Teléfono:</strong>
+                        <span th:text="${miembro.telefono}"></span>
+                    </p>
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>Correo Electrónico:</strong>
+                        <span th:text="${miembro.correoElectronico}"></span>
+                    </p>
+                    <p>
+                        <strong>Fecha de nacimiento:</strong>
+                        <span th:text="${miembro.fechaNacimiento}"></span>
+                    </p>
+                    <p>
+                        <strong>Tipo de Membresía:</strong>
+                        <span th:text="${miembro.membresia.nombre}">Mensual</span>
+                    </p>
+                    <p>
+                        <strong>Fecha inscripción:</strong>
+                        <span th:text="${miembro.fechaInscripcion}"></span>
+                    </p>
+                    <p>
+                        <!-- TODO. Implementar la consulta del campo estatus -->
+                        <strong>Estatus:</strong>
+                        <span >Activo</span>
+                    </p>
+                    <p>
+                        <!-- TODO. Implementar la consulta del campo registrado por -->
+                        <strong>Registrado por:</strong>
+                        <span >Admin</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Botones de Acción -->
+        <div class="card-footer text-end">
+            <a class="btn btn-secondary" th:href="@{/miembros}" >
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+            <a class="btn btn-warning"
+               th:href="@{'/miembros/change?id=' + ${miembro.id}}">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

@@ -4,6 +4,7 @@ import com.sgdc.core.membresia.domain.Membresia;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,20 +50,24 @@ public class Miembro {
     @Column(name = "correo_electronico", nullable = false, unique = true, length = 100)
     private String correoElectronico;
 
-    @NotBlank(message = "La fecha de nacimiento del miembro no puede estar vacía")
+    @NotNull(message = "La fecha de nacimiento del miembro no puede estar vacía")
+    @Past(message = "La fecha de nacimiento del miembro no es válida")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
 
-    @NotBlank(message = "El género del miembro no puede estar vacío")
-    @Pattern(regexp = "M|F|O")
+    //@NotBlank(message = "El género del miembro no puede estar vacío")
+    //@Pattern(regexp = "M|F|O")
+    @NotNull(message = "El género del miembro no puede estar vacío")
     @Column(name = "genero", nullable = false, length = 1)
-    private String genero;
+    @Enumerated(EnumType.STRING)
+    private Genero genero;
 
-    @NotBlank(message = "La fecha de inscripción del miembro no puede estar vacía")
+    //@NotBlank(message = "La fecha de inscripción del miembro no puede estar vacía")
     @Column(name = "fecha_inscripcion", nullable = false)
     private LocalDateTime fechaInscripcion;
 
-    @NotNull
+    //@NotNull
     @ManyToOne
     @JoinColumn(name = "id_membresia", nullable = false)
     private Membresia membresia;

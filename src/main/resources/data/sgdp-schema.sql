@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS miembro
     genero             VARCHAR(1)   NOT NULL CHECK (genero IN ('M', 'F', 'O')),
     fecha_inscripcion  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_membresia       INT          NOT NULL,
-    CONSTRAINT uq_miembro UNIQUE (nombre, apellido_paterno, fecha_nacimiento, genero),
+    CONSTRAINT uq_miembro UNIQUE (nombre, apellido_paterno, apellido_materno, fecha_nacimiento, genero),
     CONSTRAINT fk_miembro_tipo_membresia
         FOREIGN KEY (id_membresia) REFERENCES membresia (id_membresia)
 );

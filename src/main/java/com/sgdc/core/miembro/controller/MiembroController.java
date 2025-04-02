@@ -1,5 +1,7 @@
 package com.sgdc.core.miembro.controller;
 
+import com.sgdc.core.membresia.repository.MembresiaRepository;
+import com.sgdc.core.miembro.domain.Genero;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
 import jakarta.validation.Valid;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +30,11 @@ public class MiembroController {
 
     private final MiembroService miembroService;
 
-    public MiembroController(MiembroService miembroService) {
+    private final MembresiaRepository membresiaRepository;
+
+    public MiembroController(MiembroService miembroService, MembresiaRepository membresiaRepository) {
         this.miembroService = miembroService;
+        this.membresiaRepository = membresiaRepository;
     }
 
     @GetMapping
@@ -53,7 +59,10 @@ public class MiembroController {
 
     @GetMapping("get")
     public String getMiembro(@RequestParam(value = "id") Integer idMiembro, Model model) {
+        // TODO. Revisar si las fechas en la base de datos se pueden almacenar en UTC y luego convertirlas a la zona horaria local.
+        // TODO. Revisar si las fechas desplegadas se homologan con base en el formulario de creación/edición
         Optional<Miembro> miembro = miembroService.findById(idMiembro);
+        log.info("getMiembro: {}", miembro);
         model.addAttribute("miembro", miembro.orElse(new Miembro()));
         return "miembros/ver-miembro";
     }
@@ -61,25 +70,41 @@ public class MiembroController {
     @GetMapping("new")
     public String newMiembro(Model model) {
         model.addAttribute("miembro", new Miembro());
-        return "miembros/nueva-miembro";
+        // Agregamos los atributos adicionales al bean necesarios para la vista.
+        model.addAttribute("generos", Genero.values());
+        model.addAttribute("membresias", membresiaRepository.findAll());
+        return "miembros/nuevo-miembro";
     }
 
     @PostMapping("create-miembro")
-    public String createMiembro(@Valid Miembro miembro, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String createMiembro(@Valid Miembro miembro, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         if (bindingResult.hasErrors()) {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
-            return "miembros/nueva-miembro";
+            // Agregamos los atributos necesarios para la vista.
+            model.addAttribute("generos", Genero.values());
+            model.addAttribute("membresias", membresiaRepository.findAll());
+            return "miembros/nuevo-miembro";
         }
 
         try {
-            log.info("Membresía a guardar: {}", miembro);
+            miembro.setFechaInscripcion(LocalDateTime.now());
+            log.info("Miembro a guardar: {}", miembro);
             miembroService.save(miembro);
         } catch (DataIntegrityViolationException e) {
-            log.error("Error de integridad de datos: {}", e.getMessage());
-            bindingResult.rejectValue("nombre", "nombre", "El nombre de la membresía ya existe. Por favor, use otro.");
-            return "miembros/nueva-miembro";
+            String errorMessage = e.getMessage();
+            log.error("Error de integridad de datos: {}", errorMessage);
+            if (errorMessage.contains("uq_miembro")) {
+                // Agregamos un error global que no se asocia a un campo en particular
+                bindingResult.reject("global.error", "El miembro ya existe. Verifique los datos ingresados.");
+            } else if (errorMessage.contains("correo_electronico")) {
+                bindingResult.rejectValue("correoElectronico", "correoElectronico", "El correo electrónico ya existe. Por favor, use otro.");
+            }
+            // Agregamos los atributos necesarios para la vista.
+            model.addAttribute("generos", Genero.values());
+            model.addAttribute("membresias", membresiaRepository.findAll());
+            return "miembros/nuevo-miembro";
         }
 
         redirectAttributes.addFlashAttribute("exito", "La membresía se ha guardado correctamente");
@@ -90,15 +115,21 @@ public class MiembroController {
     public String changeMiembro(@RequestParam(value = "id") Integer idMiembro, Model model) {
         Optional<Miembro> miembro = miembroService.findById(idMiembro);
         model.addAttribute("miembro", miembro.orElse(new Miembro()));
+        // Agregamos los atributos adicionales al bean necesarios para la vista.
+        model.addAttribute("generos", Genero.values());
+        model.addAttribute("membresias", membresiaRepository.findAll());
         return "miembros/editar-miembro";
     }
 
     @PostMapping("change-miembro")
-    public String changeMiembro(@Valid Miembro miembro, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String changeMiembro(@Valid Miembro miembro, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         if (bindingResult.hasErrors()) {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
+            // Agregamos los atributos necesarios para la vista.
+            model.addAttribute("generos", Genero.values());
+            model.addAttribute("membresias", membresiaRepository.findAll());
             return "miembros/editar-miembro";
         }
 
@@ -106,8 +137,17 @@ public class MiembroController {
             log.info("Membresía a guardar: {}", miembro);
             miembroService.save(miembro);
         } catch (DataIntegrityViolationException e) {
-            log.error("Error de integridad de datos: {}", e.getMessage());
-            bindingResult.rejectValue("nombre", "nombre", "El nombre de la membresía ya existe. Por favor, use otro.");
+            String errorMessage = e.getMessage();
+            log.error("Error de integridad de datos: {}", errorMessage);
+            if (errorMessage.contains("uq_miembro")) {
+                // Agregamos un error global que no se asocia a un campo en particular
+                bindingResult.reject("global.error", "El miembro ya existe. Verifique los datos ingresados.");
+            } else if (errorMessage.contains("correo_electronico")) {
+                bindingResult.rejectValue("correoElectronico", "correoElectronico", "El correo electrónico ya existe. Por favor, use otro.");
+            }
+            // Agregamos los atributos necesarios para la vista.
+            model.addAttribute("generos", Genero.values());
+            model.addAttribute("membresias", membresiaRepository.findAll());
             return "miembros/editar-miembro";
         }
 

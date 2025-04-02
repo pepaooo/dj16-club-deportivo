@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <!-- Encabezado del formulario -->
+        <div class="col-md-10 col-lg-8">
+            <div class="text-center">
+                <i class="bi bi-person-plus" style="font-size: 3rem; color: #1976d2"
+                ></i>
+                <h2 class="mt-2">Registrar Nuevo Miembro</h2>
+                <p class="text-muted">
+                    Complete la información a continuación para dar de alta un nuevo miembro.
+                </p>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form th:action="@{/miembros/create-miembro}" th:object="${miembro}" method="post">
+                        <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
+                            Verifique los siguientes inconvenientes
+                            <ul>
+                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+                            </ul>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Campos de la primera columna -->
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre</label>
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="nombre"
+                                            th:field="*{nombre}"
+                                            name="nombre"
+                                            placeholder="Ingrese el nombre"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('nombre')}"
+                                         th:errors="*{nombre}"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="apellidoPaterno" class="form-label"
+                                    >Apellido paterno</label
+                                    >
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="apellidoPaterno"
+                                            th:field="*{apellidoPaterno}"
+                                            name="apellidoPaterno"
+                                            placeholder="Ingrese el apellido paterno"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('apellidoPaterno')}"
+                                         th:errors="*{apellidoPaterno}"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="apellidoMaterno" class="form-label"
+                                    >Apellido materno</label
+                                    >
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="apellidoMaterno"
+                                            th:field="*{apellidoMaterno}"
+                                            name="apellidoMaterno"
+                                            placeholder="Ingrese el apellido materno"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('apellidoMaterno')}"
+                                         th:errors="*{apellidoMaterno}"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Género</label>
+                                    <div>
+                                        <div th:each="gen : ${generos}" class="form-check form-check-inline">
+                                            <input class="form-check-input"
+                                                   type="radio"
+                                                   th:field="*{genero}"
+                                                   th:id="${'genero_' + gen.name()}"
+                                                   th:value="${gen}"
+                                                   required />
+                                            <label class="form-check-label"
+                                                   th:for="${'genero_' + gen.name()}"
+                                                   th:text="${gen.label}">Género</label>
+                                        </div>
+                                    </div>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('genero')}"
+                                         th:errors="*{genero}"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Campos de la segunda columna -->
+                                <div class="mb-3">
+                                    <label for="direccion" class="form-label"
+                                    >Dirección</label
+                                    >
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="direccion"
+                                            th:field="*{direccion}"
+                                            name="direccion"
+                                            placeholder="Ingrese la dirección"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('direccion')}"
+                                         th:errors="*{direccion}"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input
+                                            type="text"
+                                            class="form-control"
+                                            id="telefono"
+                                            th:field="*{telefono}"
+                                            name="telefono"
+                                            placeholder="Ingrese el teléfono"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('telefono')}"
+                                         th:errors="*{telefono}"></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="correoElectronico" class="form-label"
+                                    >Correo Electrónico</label
+                                    >
+                                    <input
+                                            type="email"
+                                            class="form-control"
+                                            id="correoElectronico"
+                                            th:field="*{correoElectronico}"
+                                            name="correoElectronico"
+                                            placeholder="Ingrese el correo electrónico"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('correoElectronico')}"
+                                         th:errors="*{correoElectronico}"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="fechaNacimiento" class="form-label"
+                                    >Fecha de Nacimiento</label
+                                    >
+                                    <input
+                                            type="date"
+                                            class="form-control"
+                                            id="fechaNacimiento"
+                                            th:field="*{fechaNacimiento}"
+                                            name="fechaNacimiento"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('fechaNacimiento')}"
+                                         th:errors="*{fechaNacimiento}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Secciones adicionales (género, tipo de membresía, etc.) pueden ir en una fila completa -->
+                        <div class="mb-3">
+                            <label for="membresia" class="form-label">Tipo de Membresía</label>
+                            <select class="form-select" id="membresia" th:field="*{membresia}" required>
+                                <option value="">Seleccione un tipo</option>
+                                <option th:each="tm : ${membresias}"
+                                        th:value="${tm.id}"
+                                        th:text="${tm.nombre}">
+                                </option>
+                            </select>
+                            <div class="text-danger" th:if="${#fields.hasErrors('membresia')}" th:errors="*{membresia}"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a th:href="@{/miembros}" class="btn btn-secondary me-2">
+                                <i class="bi bi-arrow-left-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>
