@@ -38,12 +38,14 @@ public class MiembroServiceImpl implements MiembroService {
         Specification<Miembro> spec = (root, query, cb) -> {
             // Para atributos de tipo String se hace directamente.
             Expression<String> nombreExpr = cb.lower(root.get("nombre"));
-            Expression<String> apellidosExpr = cb.lower(root.get("apellidos"));
+            Expression<String> apellidoPaternoExpr = cb.lower(root.get("apellidoPaterno"));
+            Expression<String> apellidoMaternoExpr = cb.lower(root.get("apellidoMaterno"));
             Expression<String> correoElectronicoExpr = cb.lower(root.get("correoElectronico"));
 
             return cb.or(
                     cb.like(nombreExpr, pattern),
-                    cb.like(apellidosExpr, pattern),
+                    cb.like(apellidoPaternoExpr, pattern),
+                    cb.like(apellidoMaternoExpr, pattern),
                     cb.like(cb.lower(correoElectronicoExpr), pattern)
             );
         };
