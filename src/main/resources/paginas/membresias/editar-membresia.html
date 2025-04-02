@@ -22,7 +22,7 @@
                     <form th:action="@{/membresias/change-membresia}" th:object="${membresia}" method="post">
                         <!-- Campo oculto para el ID -->
                         <input type="hidden" th:field="*{id}" />
-                        <!-- Campo oculto para el estatus -->
+                        <!-- Campo oculto para propiedades que no están en el formulario. estatus -->
                         <input type="hidden" th:field="*{estatus}" />
 
                         <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
