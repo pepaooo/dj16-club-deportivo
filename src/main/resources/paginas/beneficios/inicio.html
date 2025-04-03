@@ -27,22 +27,16 @@
     </div>
 
     <!-- Campo de búsqueda -->
-    <form th:action="@{/beneficios}" method="get">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <input
-                            type="text"
-                            name="q"
-                            class="form-control"
-                            placeholder="Buscar beneficio por nombre o descripción"
-                            th:value="${q}"
-                    />
-                    <button class="btn btn-link" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </div>
-            </div>
+    <form id="searchForm" th:action="@{/beneficios}" method="get">
+        <div class="input-group mb-3">
+            <input type="text" id="searchInput" name="q" class="form-control" placeholder="Buscar beneficio por nombre o descripción" th:value="${q}" aria-label="Buscar" aria-describedby="search-addon" />
+            <button class="btn btn-primary" type="submit">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+            <!-- Botón de limpiar, inicialmente oculto -->
+            <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                <i class="bi bi-x"></i> Limpiar
+            </button>
         </div>
     </form>
 
@@ -89,6 +83,28 @@
                 bsAlert.close();
             }, 5000);
         }
+    });
+    // Muestra el botón de limpiar si hay texto en el campo de búsqueda
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("searchInput");
+        const clearButton = document.getElementById("clearSearch");
+        const searchForm = document.getElementById("searchForm");
+
+        // Mostrar botón de limpiar si el campo tiene contenido al cargar la página
+        if (searchInput.value.trim() !== "") {
+            clearButton.style.display = "inline-block";
+        }
+
+        // Actualizar visibilidad del botón a medida que se escribe
+        searchInput.addEventListener("input", function() {
+            clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
+        });
+
+        // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
+        clearButton.addEventListener("click", function() {
+            searchInput.value = "";
+            searchForm.submit();
+        });
     });
 </script>
 </body>
