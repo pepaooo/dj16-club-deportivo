@@ -2,7 +2,6 @@ package com.sgdc.core.pagos.domain;
 
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,12 +23,12 @@ public class PagoAjuste {
     @JoinColumn(name = "id_pago", nullable = false)
     private PagoMembresia pagoMembresia;
 
-    @NotNull
-    @DecimalMin(value = "0.00", message = "El monto debe ser mayor o igual a 0.00")
+    @NotNull(message = "El monto no puede estar vacío")
+    //@DecimalMin(value = "0.00", message = "El monto debe ser mayor o igual a 0.00")
     @Column(name = "monto_ajuste", nullable = false, precision = 10, scale = 2)
     private BigDecimal montoAjuste;
 
-    @NotNull
+    //@NotNull
     @Column(name = "fecha_ajuste", nullable = false)
     private LocalDateTime fechaAjuste;
 

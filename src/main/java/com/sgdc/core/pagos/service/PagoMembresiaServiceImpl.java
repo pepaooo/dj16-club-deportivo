@@ -1,6 +1,7 @@
 package com.sgdc.core.pagos.service;
 
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 import com.sgdc.core.pagos.repository.PagoMembresiaRepository;
@@ -10,8 +11,8 @@ import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PagoMembresiaServiceImpl implements PagoMembresiaService {
@@ -28,8 +29,9 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
     }
 
     @Override
-    public Optional<PagoMembresia> findById(Integer id) {
-        return repository.findById(id);
+    public PagoMembresia findById(Integer id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el pago de membresía con ID: " + id));
     }
 
     @Override
@@ -87,4 +89,16 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         }
         return repository.searchResumen(keyword);
     }
+
+    @Override
+    public BigDecimal calcularMontoFinal(PagoMembresia pago, List<PagoAjuste> ajustes) {
+        BigDecimal montoFinal = pago.getMonto() != null ? pago.getMonto() : BigDecimal.ZERO;
+        if (ajustes != null) {
+            for (PagoAjuste ajuste : ajustes) {
+                montoFinal = montoFinal.add(ajuste.getMontoAjuste());
+            }
+        }
+        return montoFinal;
+    }
+
 }

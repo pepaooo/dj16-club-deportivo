@@ -33,7 +33,7 @@
                         <span th:text="${pago.membresia.nombre}"></span>
                     </p>
                     <p>
-                        <strong>Monto:</strong> $<span th:text="${pago.monto}"></span>
+                        <strong>Monto Original:</strong> $<span th:text="${pago.monto}"></span>
                     </p>
                     <p>
                         <strong>Estatus:</strong>
@@ -54,11 +54,15 @@
                         <strong>Fecha Fin:</strong>
                         <span th:text="${#temporals.format(pago.fechaFin, 'yyyy-MM-dd')}"></span>
                     </p>
-                    <p>
-                        <strong>Registrado por:</strong>
-                        <span th:text="${pago.registradoPor.nombre}"></span>
-                    </p>
+<!--                    <p>-->
+<!--                        <strong>Registrado por:</strong>-->
+<!--                        <span th:text="${pago.registradoPor.nombre}"></span>-->
+<!--                    </p>-->
                 </div>
+            </div>
+            <!-- Monto Final -->
+            <div class="alert alert-info mt-3">
+                <strong>Monto Final Cobrado:</strong> $<span th:text="${montoFinal}"></span>
             </div>
         </div>
         <div class="card-footer text-end">
@@ -67,7 +71,7 @@
             </a>
             <a class="btn btn-warning"
                th:if="${pago.estatus == 'Activo'}"
-               th:href="@{'/pagos/change?id=' + ${pago.id}}">
+               th:href="@{'/pagos/ajustar?id=' + ${pago.id}}">
                 <i class="bi bi-pencil-square"></i> Ajustar
             </a>
         </div>

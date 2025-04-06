@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido Principal -->
+<div class="container container-custom mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <!-- Encabezado del formulario -->
+            <div class="text-center mb-4">
+                <i
+                        class="bi bi-arrow-counterclockwise"
+                        style="font-size: 3rem; color: #1976d2"
+                ></i>
+                <h2 class="mt-2">Ajustar Pago de Membresía</h2>
+                <p class="text-muted">
+                    Ingrese el monto del ajuste y la razón para revertir o corregir el
+                    pago. Esta acción registra un ajuste sin modificar el pago
+                    original.
+                </p>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form th:action="@{/pagos/ajustar-pago}" th:object="${ajuste}" method="post">
+                        <!-- Campo oculto para el ID del pago -->
+<!--                        <input type="hidden" th:field="*{pagoMembresia}" />-->
+<!--                        <input type="hidden" th:field="*{pagoMembresia.id}" />-->
+                        <input type="hidden" th:field="*{pagoMembresia.id}" />
+<!--                        <input type="hidden" name="idPagoMembresia" th:value="${pago.id}" />-->
+
+                        <!-- Mostrar errores globales -->
+                        <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
+                            Verifique los siguientes inconvenientes:
+                            <ul>
+                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err.defaultMessage}"></li>
+                            </ul>
+                        </div>
+
+                        <!-- Mostrar información del pago en modo lectura -->
+                        <div class="mb-3">
+                            <label for="miembro" class="form-label">Miembro</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="miembro"
+                                    name="miembro"
+                                    th:value="${pago.miembro.nombre + ' ' + pago.miembro.apellidoPaterno + ' ' + pago.miembro.apellidoMaterno}"
+                                    readonly
+                            />
+                        </div>
+                        <div class="mb-3">
+                            <label for="monto" class="form-label">Monto Original</label>
+                            <input
+                                    type="number"
+                                    step="0.01"
+                                    class="form-control"
+                                    id="monto"
+                                    name="monto"
+                                    th:value="${pago.monto}"
+                                    readonly
+                            />
+                        </div>
+                        <!-- Campo para el monto de ajuste -->
+                        <div class="mb-3">
+                            <label for="montoAjuste" class="form-label">Monto de Ajuste</label>
+                            <input type="number" step="0.01" class="form-control" id="montoAjuste"
+                                   th:field="*{montoAjuste}" placeholder="Ingrese el monto de ajuste" required />
+                            <div class="text-danger" th:if="${#fields.hasErrors('montoAjuste')}"
+                                 th:errors="*{montoAjuste}"></div>
+                        </div>
+                        <!-- Campo para la razón del ajuste -->
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Razón del Ajuste</label>
+                            <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="3"
+                                      placeholder="Describa la razón del ajuste" required></textarea>
+                            <div class="text-danger" th:if="${#fields.hasErrors('descripcion')}"
+                                 th:errors="*{descripcion}"></div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <a th:href="@{/pagos}" class="btn btn-secondary me-2">
+                                <i class="bi bi-arrow-left-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Confirmar Ajuste
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

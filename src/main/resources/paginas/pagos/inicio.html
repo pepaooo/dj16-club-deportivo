@@ -13,6 +13,12 @@
         <span th:text="${exito}"></span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    <!-- Mensaje de error -->
+    <div id="alertError" th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
 
     <!-- Encabezado y botón Nuevo Miembro -->
     <div class="row align-items-center mb-4">
@@ -121,6 +127,14 @@
             setTimeout(function () {
                 // Usa el metodo de Bootstrap para cerrar el alert
                 var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+        var alertErrorEl = document.getElementById("alertError");
+        if (alertErrorEl) {
+            setTimeout(function () {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertErrorEl);
                 bsAlert.close();
             }, 5000);
         }

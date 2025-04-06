@@ -1,6 +1,7 @@
 package com.sgdc.core.pagos.service;
 
 import com.sgdc.core.pagos.domain.PagoAjuste;
+import com.sgdc.core.pagos.exception.PagoInactivoException;
 import com.sgdc.core.pagos.repository.PagoAjusteRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,11 @@ public class PagoAjusteServiceImpl implements PagoAjusteService {
 
     @Override
     public void save(PagoAjuste pagoAjuste) {
-        // Validar el objeto PagoAjuste antes de guardarlo
-        if (pagoAjuste != null) {
-            repository.save(pagoAjuste);
-        } else {
-            throw new IllegalArgumentException("El objeto PagoAjuste no puede ser nulo");
+        // Validamos que el estatus del pago sea "Activo"
+        if (!pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Activo")) {
+            throw new PagoInactivoException("El pago no está activo y no se puede ajustar.");
         }
+        repository.save(pagoAjuste);
     }
 
     @Override

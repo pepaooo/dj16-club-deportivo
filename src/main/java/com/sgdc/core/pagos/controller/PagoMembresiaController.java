@@ -1,14 +1,14 @@
 package com.sgdc.core.pagos.controller;
 
-import com.sgdc.core.membresia.repository.MembresiaRepository;
-import com.sgdc.core.miembro.domain.Genero;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
 import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
+import com.sgdc.core.pagos.exception.PagoInactivoException;
 import com.sgdc.core.pagos.service.PagoAjusteService;
 import com.sgdc.core.pagos.service.PagoMembresiaService;
+import com.sgdc.core.usuarios.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +17,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,10 +38,13 @@ public class PagoMembresiaController {
 
     private final PagoAjusteService pagoAjusteService;
 
-    public PagoMembresiaController(PagoMembresiaService pagoMembresiaService, MiembroService miembroService, PagoAjusteService pagoAjusteService) {
+    private final UsuarioService usuarioService;
+
+    public PagoMembresiaController(PagoMembresiaService pagoMembresiaService, MiembroService miembroService, PagoAjusteService pagoAjusteService, UsuarioService usuarioService) {
         this.pagoMembresiaService = pagoMembresiaService;
         this.miembroService = miembroService;
         this.pagoAjusteService = pagoAjusteService;
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping
@@ -69,9 +70,11 @@ public class PagoMembresiaController {
     public String getPagoMembresia(@RequestParam(value = "id") Integer idPagoMembresia,
                                    @RequestParam(value = "origen", required = false) String origen,
                                    Model model) {
-        Optional<PagoMembresia> pagoMembresia = pagoMembresiaService.findById(idPagoMembresia);
+        PagoMembresia pago = pagoMembresiaService.findById(idPagoMembresia);
         List<PagoAjuste> ajustes = pagoAjusteService.findByPagoMembresiaId(idPagoMembresia);
-        model.addAttribute("pago", pagoMembresia.orElse(new PagoMembresia()));
+        BigDecimal montoFinal = pagoMembresiaService.calcularMontoFinal(pago, ajustes);
+        model.addAttribute("pago", pago);
+        model.addAttribute("montoFinal", montoFinal);
         model.addAttribute("ajustes", ajustes);
         model.addAttribute("origen", origen); // 'miembro' o 'pagos'
         return "pagos/ver-pago";
@@ -112,36 +115,56 @@ public class PagoMembresiaController {
         return "redirect:/pagos";
     }
 
-    @GetMapping("change")
-    public String changePagoMembresia(@RequestParam(value = "id") Integer idPagoMembresia, Model model) {
-        Optional<PagoMembresia> pagoMembresia = pagoMembresiaService.findById(idPagoMembresia);
-        model.addAttribute("pagoMembresia", pagoMembresia.orElse(new PagoMembresia()));
-        return "pagos/editar-pago";
+
+    @GetMapping("ajustar")
+    public String ajustarPagoMembresia(@RequestParam(value = "id") Integer idPagoMembresia, Model model) {
+        PagoMembresia pago = pagoMembresiaService.findById(idPagoMembresia);
+        model.addAttribute("pago", pago);
+
+        // Inicializamos el objeto PagoAjuste y asignamos el pagoMembresia
+        PagoAjuste ajuste = new PagoAjuste();
+        ajuste.setPagoMembresia(pago);
+        model.addAttribute("ajuste", ajuste);
+
+        return "pagos/ajustar-pago";
     }
 
-    @PostMapping("change-pago")
-    public String changePagoMembresia(@Valid PagoMembresia pagoMembresia, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+
+    @PostMapping("ajustar-pago")
+    public String ajustarPagoMembresia(@Valid PagoAjuste ajuste, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        // TODO. Verificar que exista la membresía y que esté activa, evitar que se pueda meter desde la url el id de la membresía
+        log.info("Pago a ajustar: {}", ajuste);
+
+        // Recuperamos el pagoMembresia usando el id recibido
+        PagoMembresia pago = pagoMembresiaService.findById(ajuste.getPagoMembresia().getId());
+        ajuste.setPagoMembresia(pago);
+
         if (bindingResult.hasErrors()) {
+            // TODO. Revisar la implementación de los errores, ya que no se están mostrando en la vista.
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
-            return "pagos/editar-pago";
+            model.addAttribute("pago", pago);
+            model.addAttribute("ajuste", ajuste);
+            return "pagos/ajustar-pago";
         }
 
         try {
-            log.info("Pago a guardar: {}", pagoMembresia);
-            pagoMembresiaService.save(pagoMembresia);
+            ajuste.setFechaAjuste(LocalDateTime.now());
+            // TODO. Ajustar con el usuario de la sesión.
+            ajuste.setRegistradoPor(usuarioService.findById(1));
+            pagoAjusteService.save(ajuste);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();
             log.error("Error de integridad de datos: {}", errorMessage);
             if (errorMessage.contains("uq_miembro")) {
                 // Agregamos un error global que no se asocia a un campo en particular
-                bindingResult.reject("global.error", "El pago ya existe. Verifique los datos ingresados.");
+                bindingResult.reject("global.error", "Se ha presentado un error al guardar el ajuste.");
             }
-            return "pagos/editar-pago";
+            return "pagos/ajustar-pago";
         }
 
-        redirectAttributes.addFlashAttribute("exito", "El pago de membresía se ha guardado correctamente");
+        redirectAttributes.addFlashAttribute("exito", "El ajuste al pago de membresía se ha guardado correctamente");
         return "redirect:/pagos";
     }
 
@@ -153,5 +176,28 @@ public class PagoMembresiaController {
         model.addAttribute("miembro", miembro.orElse(new Miembro()));
         return "pagos/historial";
     }
+
+    @ExceptionHandler(PagoInactivoException.class)
+    public String handlePagoInactivoException(PagoInactivoException ex, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/pagos";
+    }
+
+
+//    @InitBinder
+//    public void initBinder(WebDataBinder binder) {
+//        binder.registerCustomEditor(PagoMembresia.class, new PropertyEditorSupport() {
+//            @Override
+//            public void setAsText(String text) throws IllegalArgumentException {
+//                try {
+//                    Integer id = Integer.parseInt(text);
+//                    log.info("Convirtiendo - String '{}' a PagoMembresia con ID {}", text, id);
+//                    setValue(pagoMembresiaService.findById(id));
+//                } catch (NumberFormatException e) {
+//                    setValue(null);
+//                }
+//            }
+//        });
+//    }
 
 }
