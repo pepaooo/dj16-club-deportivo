@@ -86,10 +86,6 @@
                 <th>Fecha inicio</th>
                 <th>Fecha fin</th>
                 <th>Estatus</th>
-<!--                <th>Monto</th>-->
-<!--                <th>Fecha Pago</th>-->
-<!--                <th>Fecha Inicio</th>-->
-<!--                <th>Fecha Fin</th>-->
                 <th>Acciones</th>
             </tr>
             </thead>
@@ -98,14 +94,10 @@
                 <td th:text="${pago.id}"></td>
                 <td th:text="${pago.nombreMiembro + ' ' + pago.apPaternoMiembro + ' ' + pago.apMaternoMiembro}"></td>
                 <td th:text="${pago.membresiaActual}"></td>
-                <td th:text="${pago.monto}"></td>
+                <td>$<span th:text="${pago.monto}"></span></td>
                 <td th:text="${pago.fechaInicio}"></td>
                 <td th:text="${pago.fechaFin}"></td>
                 <td th:text="${pago.estatusMembresia}"></td>
-<!--                <td th:text="${pago.monto}"></td>-->
-<!--                <td th:text="${#temporals.format(pago.fechaPago, 'yyyy-MM-dd HH:mm')}"></td>-->
-<!--                <td th:text="${pago.fechaInicio}"></td>-->
-<!--                <td th:text="${pago.fechaFin}"></td>-->
                 <td>
                     <a class="btn btn-outline-primary btn-sm"
                        th:href="@{'/pagos/get?id=' + ${pago.id}}">

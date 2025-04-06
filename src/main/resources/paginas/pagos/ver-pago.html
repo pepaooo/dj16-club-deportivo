@@ -21,23 +21,25 @@
                 <!-- Columna Izquierda -->
                 <div class="col-md-6">
                     <p>
-                        <strong>ID:</strong>
+                        <strong>ID Pago:</strong>
                         <span th:text="${pago.id}"></span>
                     </p>
                     <p>
                         <strong>Miembro:</strong>
-                        <span th:text="${pago.miembro.nombre} + ' ' + ${pago.miembro.apellidoPaterno} + ' ' + ${pago.miembro.apellidoMaterno}"></span>
+                        <a th:href="@{'/miembros/get?id=' + ${pago.miembro.id}}">
+                            <span th:text="${pago.miembro.nombre} + ' ' + ${pago.miembro.apellidoPaterno} + ' ' + ${pago.miembro.apellidoMaterno}"></span>
+                        </a>
                     </p>
                     <p>
                         <strong>Membresía:</strong>
                         <span th:text="${pago.membresia.nombre}"></span>
                     </p>
                     <p>
-                        <strong>Monto Original:</strong> $<span th:text="${pago.monto}"></span>
-                    </p>
-                    <p>
                         <strong>Estatus:</strong>
                         <span th:text="${pago.estatus}"></span>
+                    </p>
+                    <p>
+                        <strong>Monto:</strong> $<span th:text="${pago.monto}"></span>
                     </p>
                 </div>
                 <!-- Columna Derecha -->
@@ -54,19 +56,20 @@
                         <strong>Fecha Fin:</strong>
                         <span th:text="${#temporals.format(pago.fechaFin, 'yyyy-MM-dd')}"></span>
                     </p>
-<!--                    <p>-->
-<!--                        <strong>Registrado por:</strong>-->
-<!--                        <span th:text="${pago.registradoPor.nombre}"></span>-->
-<!--                    </p>-->
+                    <p>
+                        <strong>Registrado por:</strong>
+                        <span th:text="${pago.registradoPor.nombre}"></span>
+                    </p>
                 </div>
             </div>
             <!-- Monto Final -->
-            <div class="alert alert-info mt-3">
+            <div class="alert alert-info mt-3" th:if="${not #lists.isEmpty(ajustes)}">
                 <strong>Monto Final Cobrado:</strong> $<span th:text="${montoFinal}"></span>
             </div>
         </div>
         <div class="card-footer text-end">
-            <a class="btn btn-secondary" th:href="@{${origen}=='miembro' ? '/pagos/historial-pagos?id=' + ${pago.miembro.id} : '/pagos'}">
+            <a class="btn btn-secondary"
+               th:href="@{${origen}=='miembro' ? '/pagos/historial-pagos?id=' + ${pago.miembro.id} : '/pagos'}">
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
             <a class="btn btn-warning"
@@ -78,7 +81,7 @@
     </div>
 
     <!-- Historial de Ajustes -->
-    <div class="card">
+    <div class="card" th:if="${not #lists.isEmpty(ajustes)}">
         <div class="card-header">
             <h4>Historial de Ajustes</h4>
         </div>
