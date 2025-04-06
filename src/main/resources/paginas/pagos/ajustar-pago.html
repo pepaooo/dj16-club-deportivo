@@ -50,6 +50,18 @@
                                     readonly
                             />
                         </div>
+                        <!-- Campo para la membresía -->
+                        <div class="mb-3">
+                            <label for="membresia" class="form-label">Miembro</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="membresia"
+                                    name="membresia"
+                                    th:value="${pago.membresia.nombre}"
+                                    readonly
+                            />
+                        </div>
                         <div class="mb-3">
                             <label for="monto" class="form-label">Monto Original</label>
                             <input
