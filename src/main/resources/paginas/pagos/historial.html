@@ -12,10 +12,9 @@
         <div class="col-12 text-center">
             <i class="bi bi-receipt" style="font-size: 3rem; color: #1976d2"></i>
             <h2 class="mt-2">Historial de Pagos del Miembro</h2>
-            <p
-                    class="text-muted"
-                    th:text="'Historial de pagos para: ' + ${miembro.nombre} + ' ' + ${miembro.apellidoPaterno} + ' ' + ${miembro.apellidoMaterno}"
-            ></p>
+            <p class="text-muted"
+               th:text="'Historial de pagos para: ' + ${miembro.nombre} + ' ' + ${miembro.apellidoPaterno} + ' ' + ${miembro.apellidoMaterno}">
+            </p>
         </div>
     </div>
 
@@ -63,9 +62,8 @@
                 <td th:text="${#temporals.format(pago.fechaFin, 'yyyy-MM-dd')}"></td>
                 <td th:text="${pago.estatus}"></td>
                 <td>
-                    <a
-                            class="btn btn-outline-primary btn-sm"
-                            th:href="@{'/pagos/get?id=' + ${pago.id} + '&origen=miembro'}">
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{'/pagos/get?id=' + ${pago.id} + '&origen=miembro'}">
                         <i class="bi bi-eye"></i> Ver Detalle
                     </a>
                 </td>

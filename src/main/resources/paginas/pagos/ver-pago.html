@@ -35,6 +35,10 @@
                     <p>
                         <strong>Monto:</strong> $<span th:text="${pago.monto}"></span>
                     </p>
+                    <p>
+                        <strong>Estatus:</strong>
+                        <span th:text="${pago.estatus}"></span>
+                    </p>
                 </div>
                 <!-- Columna Derecha -->
                 <div class="col-md-6">
@@ -51,9 +55,8 @@
                         <span th:text="${#temporals.format(pago.fechaFin, 'yyyy-MM-dd')}"></span>
                     </p>
                     <p>
-                        <!-- TODO. Implementar la consulta del campo registrado por -->
                         <strong>Registrado por:</strong>
-                        <span >Admin</span>
+                        <span th:text="${pago.registradoPor.nombre}"></span>
                     </p>
                 </div>
             </div>
@@ -63,6 +66,7 @@
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
             <a class="btn btn-warning"
+               th:if="${pago.estatus == 'Activo'}"
                th:href="@{'/pagos/change?id=' + ${pago.id}}">
                 <i class="bi bi-pencil-square"></i> Ajustar
             </a>
