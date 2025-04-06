@@ -30,12 +30,12 @@ public class Miembro {
     @Column(name = "nombre", nullable = false, length = 50)
     private String nombre;
 
-    @NotBlank(message = "El apoellido paterno del miembro no puede estar vacío")
+    @NotBlank(message = "El apellido paterno del miembro no puede estar vacío")
     @Size(max = 50, message = "El apellido paterno del miembro no pueden tener más de 50 caracteres")
     @Column(name = "apellido_paterno", nullable = false, length = 50)
     private String apellidoPaterno;
 
-    @NotBlank(message = "El apoellido materno del miembro no puede estar vacío")
+    @NotBlank(message = "El apellido materno del miembro no puede estar vacío")
     @Size(max = 50, message = "El apellido materno del miembro no pueden tener más de 50 caracteres")
     @Column(name = "apellido_materno", nullable = false, length = 50)
     private String apellidoMaterno;
