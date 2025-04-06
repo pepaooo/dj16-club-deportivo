@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS pago_membresia
 (
     id_pago        INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
     id_miembro     INT            NOT NULL,
+    id_membresia   INT            NOT NULL,
     monto          DECIMAL(10, 2) NOT NULL CHECK (monto >= 0),
     fecha_pago     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_inicio   DATE           NOT NULL,
@@ -100,6 +101,8 @@ CREATE TABLE IF NOT EXISTS pago_membresia
     CONSTRAINT uq_pago UNIQUE (id_miembro, fecha_pago),
     CONSTRAINT fk_pago_miembro
         FOREIGN KEY (id_miembro) REFERENCES miembro (id_miembro),
+    CONSTRAINT fk_pago_membresia
+        FOREIGN KEY (id_membresia) REFERENCES membresia (id_membresia),
     CONSTRAINT fk_pago_membresia_registrado_por
         FOREIGN KEY (registrado_por) REFERENCES usuario (id_usuario)
 );

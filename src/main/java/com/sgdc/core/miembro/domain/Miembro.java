@@ -3,7 +3,10 @@ package com.sgdc.core.miembro.domain;
 import com.sgdc.core.membresia.domain.Membresia;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -12,6 +15,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "miembro")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Miembro {
 
     @Id

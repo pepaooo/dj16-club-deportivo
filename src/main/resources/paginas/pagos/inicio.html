@@ -17,11 +17,11 @@
     <!-- Encabezado y botón Nuevo Miembro -->
     <div class="row align-items-center mb-4">
         <div class="col-md-6">
-            <h2>Gestión de Miembros</h2>
+            <h2>Resumen de Pagos de Membresía</h2>
         </div>
         <div class="col-md-6 text-end">
-            <a class="btn btn-primary" th:href="@{/miembros/new}">
-                <i class="bi bi-plus-circle"></i> Nuevo Miembro
+            <a class="btn btn-primary" th:href="@{/pagos/new}">
+                <i class="bi bi-plus-circle"></i> Nuevo Pago
             </a>
         </div>
     </div>
@@ -31,33 +31,33 @@
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
-                    <h6 class="card-title">Total Miembros</h6>
-                    <p class="card-text" th:text="${totalMiembros}"></p>
+                    <h6 class="card-title">Total de Pagos</h6>
+                    <p class="card-text" th:text="${totalDePagos}"></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
-                    <h6 class="card-title">Activos</h6>
-                    <p class="card-text" th:text="${miembrosActivos}"></p>
+                    <h6 class="card-title">Pagos Activos</h6>
+                    <p class="card-text" th:text="${pagosActivos}"></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
-                    <h6 class="card-title">Inactivos</h6>
-                    <p class="card-text" th:text="${miembrosInactivos}"></p>
+                    <h6 class="card-title">Pagos Vencidos</h6>
+                    <p class="card-text" th:text="${pagosVencidos}"></p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Campo de Búsqueda -->
-    <form id="searchForm" th:action="@{/miembros}" method="get">
+    <form id="searchForm" th:action="@{/pagos}" method="get">
         <div class="input-group mb-3">
-            <input type="text" id="searchInput" name="q" class="form-control" placeholder="Buscar miembro por nombre, correo, etc." th:value="${q}" aria-label="Buscar" aria-describedby="search-addon" />
+            <input type="text" id="searchInput" name="q" class="form-control" placeholder="Buscar pago por miembro, fecha, etc." th:value="${q}" aria-label="Buscar" aria-describedby="search-addon" />
             <button class="btn btn-primary" type="submit">
                 <i class="bi bi-search"></i> Buscar
             </button>
@@ -68,31 +68,41 @@
         </div>
     </form>
 
-    <!-- Tabla de Miembros -->
+    <!-- Tabla de Pagos -->
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead style="background-color: #e9f5ff; color: #0d6efd">
             <tr>
-                <th>ID Miembro</th>
-                <th>Nombre</th>
-                <th>Paterno</th>
-                <th>Materno</th>
-                <th>Correo</th>
+                <th>ID Pago</th>
+                <th>Miembro</th>
                 <th>Membresía</th>
+                <th>Monto</th>
+                <th>Fecha inicio</th>
+                <th>Fecha fin</th>
+                <th>Estatus</th>
+<!--                <th>Monto</th>-->
+<!--                <th>Fecha Pago</th>-->
+<!--                <th>Fecha Inicio</th>-->
+<!--                <th>Fecha Fin</th>-->
                 <th>Acciones</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="miembro : ${miembros}">
-                <td th:text="${miembro.id}"></td>
-                <td th:text="${miembro.nombre}"></td>
-                <td th:text="${miembro.apellidoPaterno}"></td>
-                <td th:text="${miembro.apellidoMaterno}"></td>
-                <td th:text="${miembro.correoElectronico}"></td>
-                <td th:text="${miembro.membresia.nombre}"></td>
+            <tr th:each="pago : ${pagosMembresiaDTO}">
+                <td th:text="${pago.id}"></td>
+                <td th:text="${pago.nombreMiembro + ' ' + pago.apPaternoMiembro + ' ' + pago.apMaternoMiembro}"></td>
+                <td th:text="${pago.membresiaActual}"></td>
+                <td th:text="${pago.monto}"></td>
+                <td th:text="${pago.fechaInicio}"></td>
+                <td th:text="${pago.fechaFin}"></td>
+                <td th:text="${pago.estatusMembresia}"></td>
+<!--                <td th:text="${pago.monto}"></td>-->
+<!--                <td th:text="${#temporals.format(pago.fechaPago, 'yyyy-MM-dd HH:mm')}"></td>-->
+<!--                <td th:text="${pago.fechaInicio}"></td>-->
+<!--                <td th:text="${pago.fechaFin}"></td>-->
                 <td>
                     <a class="btn btn-outline-primary btn-sm"
-                       th:href="@{'/miembros/get?id=' + ${miembro.id}}">
+                       th:href="@{'/pagos/get?id=' + ${pago.id}}">
                         <i class="bi bi-eye"></i> Ver Detalle
                     </a>
                 </td>

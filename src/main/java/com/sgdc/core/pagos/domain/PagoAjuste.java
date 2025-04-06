@@ -1,0 +1,50 @@
+package com.sgdc.core.pagos.domain;
+
+import com.sgdc.core.usuarios.domain.Usuario;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "pago_ajuste")
+@Data
+public class PagoAjuste {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_pago_ajuste")
+    private Integer id;
+
+    //@NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_pago", nullable = false)
+    private PagoMembresia pagoMembresia;
+
+    @NotNull
+    @DecimalMin(value = "0.00", message = "El monto debe ser mayor o igual a 0.00")
+    @Column(name = "monto_ajuste", nullable = false, precision = 10, scale = 2)
+    private BigDecimal montoAjuste;
+
+    @NotNull
+    @Column(name = "fecha_ajuste", nullable = false)
+    private LocalDateTime fechaAjuste;
+
+    @NotNull
+    @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
+    private String descripcion;
+
+    //@NotNull
+    @ManyToOne
+    @JoinColumn(name = "registrado_por", nullable = false)
+    private Usuario registradoPor;
+
+//    @AssertTrue(message = "El monto de ajuste debe ser distinto de 0")
+//    public boolean isMontoAjusteValido() {
+//        return montoAjuste != null && montoAjuste.compareTo(BigDecimal.ZERO) != 0;
+//    }
+
+}

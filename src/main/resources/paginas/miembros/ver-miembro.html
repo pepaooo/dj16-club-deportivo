@@ -91,6 +91,10 @@
             <a class="btn btn-secondary" th:href="@{/miembros}" >
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
+            <a class="btn btn-info"
+               th:href="@{'/pagos/historial-pagos?id=' + ${miembro.id}}">
+                <i class="bi bi-clock-history"></i> Historial de Pagos
+            </a>
             <a class="btn btn-warning"
                th:href="@{'/miembros/change?id=' + ${miembro.id}}">
                 <i class="bi bi-pencil-square"></i> Editar
