@@ -80,7 +80,7 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "JOIN p.membresia tm " +
             "WHERE p.fechaInicio > CURRENT_TIMESTAMP OR " +
             "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP) " +
-            "ORDER BY m.id, p.fechaInicio DESC")
+            "ORDER BY p.fechaInicio DESC, p.id DESC")
     List<PagoMembresiaResumenDTO> findResumenPagos();
 
 
@@ -122,7 +122,7 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
 //            "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaPago, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
         "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaInicio, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
         "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaFin, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-        ") ORDER BY m.id, p.fechaInicio DESC")
+        ") ORDER BY p.fechaInicio DESC, p.id DESC")
 List<PagoMembresiaResumenDTO> searchResumen(@Param("keyword") String keyword);
 
 }
