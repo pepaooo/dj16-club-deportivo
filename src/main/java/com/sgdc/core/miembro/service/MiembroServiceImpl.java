@@ -3,6 +3,7 @@ package com.sgdc.core.miembro.service;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.repository.MiembroRepository;
 import jakarta.persistence.criteria.Expression;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class MiembroServiceImpl implements MiembroService {
 
     @Override
     public List<Miembro> findAll() {
-        return repository.findAll();
+        return repository.findAllByOrderByIdDesc();
     }
 
     @Override
@@ -31,7 +32,7 @@ public class MiembroServiceImpl implements MiembroService {
     @Override
     public List<Miembro> search(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return repository.findAll();
+            return repository.findAllByOrderByIdDesc();
         }
         String pattern = "%" + keyword.toLowerCase() + "%";
 
@@ -50,7 +51,7 @@ public class MiembroServiceImpl implements MiembroService {
             );
         };
 
-        return repository.findAll(spec);
+        return repository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
     }
 
     @Override

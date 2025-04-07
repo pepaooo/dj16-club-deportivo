@@ -9,7 +9,7 @@ public interface MembresiaService {
 
     List<Membresia> findAll();
 
-    Optional<Membresia> findById(Integer id);
+    Membresia findById(Integer id);
 
     List<Membresia> search(String keyword);
 

@@ -36,7 +36,7 @@ public class MembresiasController {
     @GetMapping("tarifa")
     @ResponseBody
     public Map<String, Object> getTarifa(@RequestParam(value = "id") Integer idTipoMembresia) {
-        BigDecimal tarifa = membresiaService.findById(idTipoMembresia).map(Membresia::getTarifa).orElse(BigDecimal.ZERO);
+        BigDecimal tarifa = membresiaService.findById(idTipoMembresia).getTarifa();
         Map<String, Object> response = new HashMap<>();
         response.put("tarifa", tarifa);
         return response;
@@ -63,8 +63,8 @@ public class MembresiasController {
 
     @GetMapping("get")
     public String getMembresia(@RequestParam(value = "id") Integer idMembresia, Model model) {
-        Optional<Membresia> membresia = membresiaService.findById(idMembresia);
-        model.addAttribute("membresia", membresia.orElse(new Membresia()));
+        Membresia membresia = membresiaService.findById(idMembresia);
+        model.addAttribute("membresia", membresia);
         return "membresias/ver-membresia";
     }
 
@@ -99,8 +99,8 @@ public class MembresiasController {
 
     @GetMapping("change")
     public String changeMembresia(@RequestParam(value = "id") Integer idMembresia, Model model) {
-        Optional<Membresia> membresia = membresiaService.findById(idMembresia);
-        model.addAttribute("membresia", membresia.orElse(new Membresia()));
+        Membresia membresia = membresiaService.findById(idMembresia);
+        model.addAttribute("membresia", membresia);
         return "membresias/editar-membresia";
     }
 

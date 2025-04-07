@@ -67,7 +67,8 @@ public class PagoMembresia {
     public String getEstatus() {
         if (this.fechaInicio != null && this.fechaFin != null) {
             LocalDate now = LocalDate.now();
-            return ((this.fechaInicio.isBefore(now) || this.fechaInicio.isEqual(now)) && this.fechaFin.isAfter(now)) ? "Activo" : "Vencido";
+//            return ((this.fechaInicio.isBefore(now) || this.fechaInicio.isEqual(now)) && this.fechaFin.isAfter(now)) ? "Activo" : "Vencido";
+            return this.fechaFin.isAfter(now) ? "Activo" : "Vencido";
         }
         return "Desconocido";
     }

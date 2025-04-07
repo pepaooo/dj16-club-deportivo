@@ -13,6 +13,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
 
     List<PagoMembresia> findByMiembro_IdOrderByIdDesc(Integer idMiembro);
 
+    boolean existsByMiembro_Id(Integer idMiembro);
+
     @Query("SELECT new com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO(" +
             "p.id, " +
             "m.nombre, " +

@@ -1,5 +1,9 @@
 package com.sgdc.core.pagos.service;
 
+import com.sgdc.core.membresia.domain.HistorialMembresia;
+import com.sgdc.core.membresia.domain.Membresia;
+import com.sgdc.core.membresia.service.HistorialMembresiaService;
+import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
 import com.sgdc.core.pagos.domain.PagoAjuste;
@@ -15,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,13 +29,17 @@ import java.util.List;
 public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
     private static final Logger log = LoggerFactory.getLogger(PagoMembresiaServiceImpl.class);
+
     private final PagoMembresiaRepository pagoMembresiaRepository;
-
     private final MiembroService miembroService;
+    private final MembresiaService membresiaService;
+    private final HistorialMembresiaService historialMembresiaService;
 
-    public PagoMembresiaServiceImpl(PagoMembresiaRepository pagoMembresiaRepository, MiembroService miembroService) {
+    public PagoMembresiaServiceImpl(PagoMembresiaRepository pagoMembresiaRepository, MiembroService miembroService, MembresiaService membresiaService, HistorialMembresiaService historialMembresiaService) {
         this.pagoMembresiaRepository = pagoMembresiaRepository;
         this.miembroService = miembroService;
+        this.membresiaService = membresiaService;
+        this.historialMembresiaService = historialMembresiaService;
     }
 
     @Override
@@ -82,15 +91,25 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
     }
 
 
+    @Transactional
     @Override
     public void save(PagoMembresiaDTO pagoMembresiaDTO) {
-
         Miembro miembro = miembroService.findById(pagoMembresiaDTO.getIdMiembro());
+        boolean existeHistorial = pagoMembresiaRepository.existsByMiembro_Id(pagoMembresiaDTO.getIdMiembro());
+        log.info("Existe historial: " + existeHistorial);
+
+        // Cambio de membresía en miembro
+        Membresia nuevaMembresia = null;
+        if (pagoMembresiaDTO.getNuevoTipoMembresiaId() != null) {
+            nuevaMembresia = membresiaService.findById(pagoMembresiaDTO.getNuevoTipoMembresiaId());
+            miembro.setMembresia(nuevaMembresia);
+            miembroService.save(miembro);
+        }
 
         PagoMembresia pagoMembresia = PagoMembresia.builder()
                 .id(pagoMembresiaDTO.getId())
                 .miembro(miembro)
-                .membresia(miembro.getMembresia())
+                .membresia(pagoMembresiaDTO.getNuevoTipoMembresiaId() != null ? nuevaMembresia : miembro.getMembresia())
                 .monto(pagoMembresiaDTO.getMonto())
                 .fechaPago(LocalDateTime.now())
                 .fechaInicio(pagoMembresiaDTO.getFechaInicio())
@@ -100,6 +119,33 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
         //log.info("Guardando pago de membresía: {}", pagoMembresia);
         pagoMembresiaRepository.save(pagoMembresia);
+
+
+
+        // Creación de historial de membresía
+        if (!existeHistorial) {
+            log.info("No existe historial de membresía, creando uno nuevo.");
+            HistorialMembresia historialMembresia = new HistorialMembresia();
+            historialMembresia.setMiembro(miembro);
+            historialMembresia.setMembresia(miembro.getMembresia());
+            historialMembresia.setFechaCambio(LocalDateTime.now());
+            historialMembresia.setDescripcion("Primera suscripción a " + miembro.getMembresia().getNombre());
+            historialMembresia.setRegistradoPor(buildUsuario(pagoMembresiaDTO));
+            log.info("Guardando historial de membresía: {}", historialMembresia);
+            historialMembresiaService.save(historialMembresia);
+        }
+
+        if (pagoMembresiaDTO.getNuevoTipoMembresiaId() != null && nuevaMembresia != null) {
+            log.info("Actualizando membresía del miembro a: {}", nuevaMembresia.getNombre());
+            HistorialMembresia historialMembresia = new HistorialMembresia();
+            historialMembresia.setMiembro(miembro);
+            historialMembresia.setMembresia(nuevaMembresia);
+            historialMembresia.setFechaCambio(LocalDateTime.now());
+            historialMembresia.setDescripcion("Actualización a " + nuevaMembresia.getNombre());
+            historialMembresia.setRegistradoPor(buildUsuario(pagoMembresiaDTO));
+            historialMembresiaService.save(historialMembresia);
+        }
+
     }
 
     private static Usuario buildUsuario(PagoMembresiaDTO pagoMembresiaDTO) {
