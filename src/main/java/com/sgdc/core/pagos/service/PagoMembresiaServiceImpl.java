@@ -1,10 +1,13 @@
 package com.sgdc.core.pagos.service;
 
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.miembro.service.MiembroService;
 import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.domain.PagoMembresia;
+import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 import com.sgdc.core.pagos.repository.PagoMembresiaRepository;
+import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -12,37 +15,41 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
-    private final PagoMembresiaRepository repository;
+    private final PagoMembresiaRepository pagoMembresiaRepository;
 
-    public PagoMembresiaServiceImpl(PagoMembresiaRepository repository) {
-        this.repository = repository;
+    private final MiembroService miembroService;
+
+    public PagoMembresiaServiceImpl(PagoMembresiaRepository pagoMembresiaRepository, MiembroService miembroService) {
+        this.pagoMembresiaRepository = pagoMembresiaRepository;
+        this.miembroService = miembroService;
     }
 
     @Override
     public List<PagoMembresia> findAll() {
-        return repository.findAll();
+        return pagoMembresiaRepository.findAll();
     }
 
     @Override
     public PagoMembresia findById(Integer id) {
-        return repository.findById(id)
+        return pagoMembresiaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el pago de membresía con ID: " + id));
     }
 
     @Override
     public List<PagoMembresia> findByMiembroId(Integer idMiembro) {
-        return repository.findByMiembro_IdOrderByIdDesc(idMiembro);
+        return pagoMembresiaRepository.findByMiembro_IdOrderByIdDesc(idMiembro);
     }
 
     @Override
     public List<PagoMembresia> search(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return repository.findAll();
+            return pagoMembresiaRepository.findAll();
         }
         String pattern = "%" + keyword.toLowerCase() + "%";
 
@@ -68,26 +75,43 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
             );
         };
 
-        return repository.findAll(spec);
+        return pagoMembresiaRepository.findAll(spec);
     }
 
 
     @Override
-    public void save(PagoMembresia pagoMembresia) {
-        repository.save(pagoMembresia);
+    public void save(PagoMembresiaDTO pagoMembresiaDTO) {
+
+        Miembro miembro = miembroService.findById(pagoMembresiaDTO.getIdMiembro());
+
+        PagoMembresia pagoMembresia = PagoMembresia.builder()
+                .id(pagoMembresiaDTO.getId())
+                .miembro(miembro)
+                .monto(pagoMembresiaDTO.getMonto())
+                .fechaPago(LocalDateTime.now())
+                .fechaInicio(pagoMembresiaDTO.getFechaInicio())
+                .fechaFin(pagoMembresiaDTO.getFechaInicio().plusDays(miembro.getMembresia().getDuracionDias()))
+                .registradoPor(buildUsuario(pagoMembresiaDTO))
+                .build();
+
+        pagoMembresiaRepository.save(pagoMembresia);
+    }
+
+    private static Usuario buildUsuario(PagoMembresiaDTO pagoMembresiaDTO) {
+        return Usuario.builder().id(pagoMembresiaDTO.getUsuarioDTO().getId()).build();
     }
 
     @Override
     public List<PagoMembresiaResumenDTO> resumenPagos() {
-        return repository.findResumenPagos();
+        return pagoMembresiaRepository.findResumenPagos();
     }
 
     @Override
     public List<PagoMembresiaResumenDTO> searchResumen(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return repository.findResumenPagos();
+            return pagoMembresiaRepository.findResumenPagos();
         }
-        return repository.searchResumen(keyword);
+        return pagoMembresiaRepository.searchResumen(keyword);
     }
 
     @Override

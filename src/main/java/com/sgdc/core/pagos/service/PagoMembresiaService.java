@@ -3,6 +3,7 @@ package com.sgdc.core.pagos.service;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.domain.PagoMembresia;
+import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 
 import java.math.BigDecimal;
@@ -19,7 +20,7 @@ public interface PagoMembresiaService {
 
     List<PagoMembresia> search(String keyword);
 
-    void save(PagoMembresia pagoMembresia);
+    void save(PagoMembresiaDTO pagoMembresiaDTO);
 
     List<PagoMembresiaResumenDTO> resumenPagos();
 

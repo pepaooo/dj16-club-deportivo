@@ -10,6 +10,7 @@ import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 import com.sgdc.core.pagos.exception.PagoInactivoException;
 import com.sgdc.core.pagos.service.PagoAjusteService;
 import com.sgdc.core.pagos.service.PagoMembresiaService;
+import com.sgdc.core.usuarios.domain.UsuarioDTO;
 import com.sgdc.core.usuarios.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -94,31 +95,26 @@ public class PagoMembresiaController {
     }
 
     @PostMapping("create-pago")
-    public String createPagoMembresia(@Valid PagoMembresia pagoMembresia, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        log.info("Pago a guardar: {}", pagoMembresia);
+    public String createPagoMembresia(@Valid PagoMembresiaDTO pagoMembresiaDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        log.info("Pago a guardar: {}", pagoMembresiaDTO);
         if (bindingResult.hasErrors()) {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
+            model.addAttribute("tiposMembresia", membresiaService.findAll());
             return "pagos/nuevo-pago";
         }
 
         try {
-            pagoMembresia.setFechaPago(LocalDateTime.now());
-            Miembro miembro = miembroService.findById(pagoMembresia.getMiembro().getId());
-            pagoMembresia.setFechaFin(LocalDate.now().plusDays(miembro.getMembresia().getDuracionDias()));
-            pagoMembresia.setMembresia(miembro.getMembresia());
             // TODO. Ajustar con el usuario de la sesión.
-            pagoMembresia.setRegistradoPor(usuarioService.findById(1));
-            log.info("Pago a guardar: {}", pagoMembresia);
-            pagoMembresiaService.save(pagoMembresia);
+            pagoMembresiaDTO.setUsuarioDTO(UsuarioDTO.builder().id(1).build());
+            pagoMembresiaService.save(pagoMembresiaDTO);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();
             log.error("Error de integridad de datos: {}", errorMessage);
-            if (errorMessage.contains("uq_pago")) {
-                // Agregamos un error global que no se asocia a un campo en particular
-                bindingResult.reject("global.error", "El pago ya existe. Verifique los datos ingresados.");
-            }
+            // Agregamos un error global que no se asocia a un campo en particular
+            bindingResult.reject("global.error", "Se ha presentado un error al momento de crear el registro del pago.");
+            model.addAttribute("tiposMembresia", membresiaService.findAll());
             return "pagos/nuevo-pago";
         }
 

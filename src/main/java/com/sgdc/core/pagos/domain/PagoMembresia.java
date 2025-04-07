@@ -5,7 +5,10 @@ import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -15,6 +18,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "pago_membresia", uniqueConstraints = {@UniqueConstraint(columnNames = {"id_miembro", "fecha_pago"})})
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PagoMembresia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
