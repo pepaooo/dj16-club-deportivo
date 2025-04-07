@@ -9,7 +9,7 @@ public interface MiembroService {
 
     List<Miembro> findAll();
 
-    Optional<Miembro> findById(Integer id);
+    Miembro findById(Integer id);
 
     List<Miembro> search(String keyword);
 

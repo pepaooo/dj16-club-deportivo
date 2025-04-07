@@ -10,13 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -29,6 +29,15 @@ public class MembresiasController {
 
     public MembresiasController(MembresiaService membresiaService) {
         this.membresiaService = membresiaService;
+    }
+
+    @GetMapping("tarifa")
+    @ResponseBody
+    public Map<String, Object> getTarifa(@RequestParam(value = "id") Integer idTipoMembresia) {
+        BigDecimal tarifa = membresiaService.findById(idTipoMembresia).map(Membresia::getTarifa).orElse(BigDecimal.ZERO);
+        Map<String, Object> response = new HashMap<>();
+        response.put("tarifa", tarifa);
+        return response;
     }
 
     @GetMapping

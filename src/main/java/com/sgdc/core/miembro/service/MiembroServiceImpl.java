@@ -24,8 +24,8 @@ public class MiembroServiceImpl implements MiembroService {
     }
 
     @Override
-    public Optional<Miembro> findById(Integer id) {
-        return repository.findById(id);
+    public Miembro findById(Integer id) {
+        return repository.findById(id).orElseThrow(() -> new IllegalArgumentException("No se encontró el miembro con ID: " + id));
     }
 
     @Override

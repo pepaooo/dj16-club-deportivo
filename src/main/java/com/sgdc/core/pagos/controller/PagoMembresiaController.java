@@ -1,9 +1,11 @@
 package com.sgdc.core.pagos.controller;
 
+import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
 import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.domain.PagoMembresia;
+import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 import com.sgdc.core.pagos.exception.PagoInactivoException;
 import com.sgdc.core.pagos.service.PagoAjusteService;
@@ -36,13 +38,16 @@ public class PagoMembresiaController {
 
     private final MiembroService miembroService;
 
+    private final MembresiaService membresiaService;
+
     private final PagoAjusteService pagoAjusteService;
 
     private final UsuarioService usuarioService;
 
-    public PagoMembresiaController(PagoMembresiaService pagoMembresiaService, MiembroService miembroService, PagoAjusteService pagoAjusteService, UsuarioService usuarioService) {
+    public PagoMembresiaController(PagoMembresiaService pagoMembresiaService, MiembroService miembroService, MembresiaService membresiaService, PagoAjusteService pagoAjusteService, UsuarioService usuarioService) {
         this.pagoMembresiaService = pagoMembresiaService;
         this.miembroService = miembroService;
+        this.membresiaService = membresiaService;
         this.pagoAjusteService = pagoAjusteService;
         this.usuarioService = usuarioService;
     }
@@ -82,13 +87,15 @@ public class PagoMembresiaController {
 
     @GetMapping("new")
     public String newPagoMembresia(Model model) {
-        model.addAttribute("pagoMembresia", new PagoMembresia());
+        model.addAttribute("pagoDto", new PagoMembresiaDTO());
+        model.addAttribute("tiposMembresia", membresiaService.findAll());
         // Agregamos los atributos adicionales al bean necesarios para la vista.
         return "pagos/nuevo-pago";
     }
 
     @PostMapping("create-pago")
     public String createPagoMembresia(@Valid PagoMembresia pagoMembresia, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        log.info("Pago a guardar: {}", pagoMembresia);
         if (bindingResult.hasErrors()) {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
@@ -98,7 +105,11 @@ public class PagoMembresiaController {
 
         try {
             pagoMembresia.setFechaPago(LocalDateTime.now());
-            pagoMembresia.setFechaFin(LocalDate.now().plusDays(pagoMembresia.getMiembro().getMembresia().getDuracionDias()));
+            Miembro miembro = miembroService.findById(pagoMembresia.getMiembro().getId());
+            pagoMembresia.setFechaFin(LocalDate.now().plusDays(miembro.getMembresia().getDuracionDias()));
+            pagoMembresia.setMembresia(miembro.getMembresia());
+            // TODO. Ajustar con el usuario de la sesión.
+            pagoMembresia.setRegistradoPor(usuarioService.findById(1));
             log.info("Pago a guardar: {}", pagoMembresia);
             pagoMembresiaService.save(pagoMembresia);
         } catch (DataIntegrityViolationException e) {
@@ -132,9 +143,7 @@ public class PagoMembresiaController {
 
     @PostMapping("ajustar-pago")
     public String ajustarPagoMembresia(@Valid PagoAjuste ajuste, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        // TODO. Verificar que exista la membresía y que esté activa, evitar que se pueda meter desde la url el id de la membresía
         log.info("Pago a ajustar: {}", ajuste);
-
         // Recuperamos el pagoMembresia usando el id recibido
         PagoMembresia pago = pagoMembresiaService.findById(ajuste.getPagoMembresia().getId());
         ajuste.setPagoMembresia(pago);
@@ -170,10 +179,10 @@ public class PagoMembresiaController {
 
     @GetMapping("historial-pagos")
     public String viewHistoialPagos(@RequestParam(value = "id") Integer idMiembro, Model model) {
-        Optional<Miembro> miembro = miembroService.findById(idMiembro);
+        Miembro miembro = miembroService.findById(idMiembro);
         List<PagoMembresia> historialPagos = pagoMembresiaService.findByMiembroId(idMiembro);
         model.addAttribute("historialPagos", historialPagos);
-        model.addAttribute("miembro", miembro.orElse(new Miembro()));
+        model.addAttribute("miembro", miembro);
         return "pagos/historial";
     }
 

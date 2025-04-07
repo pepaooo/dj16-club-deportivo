@@ -1,10 +1,15 @@
 package com.sgdc.core.miembro.controller;
 
 import com.sgdc.core.membresia.repository.MembresiaRepository;
+import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Genero;
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.miembro.domain.dto.MiembroDTO;
+import com.sgdc.core.miembro.domain.dto.MiembroDetalleDTO;
 import com.sgdc.core.miembro.service.MiembroService;
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,15 +17,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("miembros")
@@ -30,11 +31,41 @@ public class MiembroController {
 
     private final MiembroService miembroService;
 
-    private final MembresiaRepository membresiaRepository;
+    private final MembresiaService membresiaService;
 
-    public MiembroController(MiembroService miembroService, MembresiaRepository membresiaRepository) {
+    private final ModelMapper modelMapper;
+
+    public MiembroController(MiembroService miembroService, MembresiaService membresiaService, ModelMapper modelMapper) {
         this.miembroService = miembroService;
-        this.membresiaRepository = membresiaRepository;
+        this.membresiaService = membresiaService;
+        this.modelMapper = modelMapper;
+    }
+
+    @GetMapping("search")
+    @ResponseBody
+    public List<MiembroDTO> searchMiembros(@RequestParam("q") String term) {
+        return miembroService.search(term).stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    @GetMapping("detail")
+    @ResponseBody
+    public MiembroDetalleDTO getMiembroDetalle(@RequestParam("id") Integer id) {
+        ModelMapper customMapper = new ModelMapper();
+        customMapper.addMappings(new PropertyMap<Miembro, MiembroDetalleDTO>() {
+            @Override
+            protected void configure() {
+                map().setMembresiaActual(source.getMembresia().getNombre());
+                map().setTarifa(source.getMembresia().getTarifa());
+            }
+        });
+        Miembro miembro = miembroService.findById(id);
+        return customMapper.map(miembro, MiembroDetalleDTO.class);
+    }
+
+    private MiembroDTO convertToDto(Miembro miembro) {
+        return modelMapper.map(miembro, MiembroDTO.class);
     }
 
     @GetMapping
@@ -61,9 +92,9 @@ public class MiembroController {
     public String getMiembro(@RequestParam(value = "id") Integer idMiembro, Model model) {
         // TODO. Revisar si las fechas en la base de datos se pueden almacenar en UTC y luego convertirlas a la zona horaria local.
         // TODO. Revisar si las fechas desplegadas se homologan con base en el formulario de creación/edición
-        Optional<Miembro> miembro = miembroService.findById(idMiembro);
+        Miembro miembro = miembroService.findById(idMiembro);
         log.info("getMiembro: {}", miembro);
-        model.addAttribute("miembro", miembro.orElse(new Miembro()));
+        model.addAttribute("miembro", miembro);
         return "miembros/ver-miembro";
     }
 
@@ -72,7 +103,7 @@ public class MiembroController {
         model.addAttribute("miembro", new Miembro());
         // Agregamos los atributos adicionales al bean necesarios para la vista.
         model.addAttribute("generos", Genero.values());
-        model.addAttribute("membresias", membresiaRepository.findAll());
+        model.addAttribute("membresias", membresiaService.findAll());
         return "miembros/nuevo-miembro";
     }
 
@@ -84,7 +115,7 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaRepository.findAll());
+            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/nuevo-miembro";
         }
 
@@ -103,7 +134,7 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaRepository.findAll());
+            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/nuevo-miembro";
         }
 
@@ -113,11 +144,11 @@ public class MiembroController {
 
     @GetMapping("change")
     public String changeMiembro(@RequestParam(value = "id") Integer idMiembro, Model model) {
-        Optional<Miembro> miembro = miembroService.findById(idMiembro);
-        model.addAttribute("miembro", miembro.orElse(new Miembro()));
+        Miembro miembro = miembroService.findById(idMiembro);
+        model.addAttribute("miembro", miembro);
         // Agregamos los atributos adicionales al bean necesarios para la vista.
         model.addAttribute("generos", Genero.values());
-        model.addAttribute("membresias", membresiaRepository.findAll());
+        model.addAttribute("membresias", membresiaService.findAll());
         return "miembros/editar-miembro";
     }
 
@@ -129,7 +160,7 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaRepository.findAll());
+            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/editar-miembro";
         }
 
@@ -147,7 +178,7 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaRepository.findAll());
+            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/editar-miembro";
         }
 
