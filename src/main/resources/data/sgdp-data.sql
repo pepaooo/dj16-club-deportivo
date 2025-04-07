@@ -175,7 +175,7 @@ VALUES
     (2, -200.00, 'Descuento por promoción', '2023-01-10 09:30:00', 1),
     (3, 50.00, 'Ajuste por error', '2023-01-15 11:00:00', 1);
 
-INSERT INTO historial_tipo_membresia
+INSERT INTO historial_membresia
 (id_miembro, id_membresia, fecha_cambio, descripcion, registrado_por)
 VALUES
     (1, 1, '2023-01-05 10:00:00', 'Primera suscripción', 1),

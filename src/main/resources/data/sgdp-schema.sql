@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS pago_ajuste
 );
 
 
-CREATE TABLE IF NOT EXISTS historial_tipo_membresia
+CREATE TABLE IF NOT EXISTS historial_membresia
 (
     id_historial   INT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
     id_miembro     INT      NOT NULL,
