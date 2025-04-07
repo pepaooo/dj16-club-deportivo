@@ -65,9 +65,9 @@ public class PagoMembresiaController {
         model.addAttribute("totalDePagos", pagosMembresiaDTO.size());
         // Para calcular pagos activos/vencidos
         long activos = pagosMembresiaDTO.stream().filter(m -> "Activo".equalsIgnoreCase(m.getEstatusMembresia())).count();
-        long vencidos = pagosMembresiaDTO.size() - activos;
+        long programados = pagosMembresiaDTO.size() - activos;
         model.addAttribute("pagosActivos", activos);
-        model.addAttribute("pagosVencidos", vencidos);
+        model.addAttribute("pagosProgramados", programados);
 
         return "pagos/inicio";
     }

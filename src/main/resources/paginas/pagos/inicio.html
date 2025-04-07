@@ -37,7 +37,7 @@
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
-                    <h6 class="card-title">Total de Pagos</h6>
+                    <h6 class="card-title">Total de Pagos de Membresía</h6>
                     <p class="card-text" th:text="${totalDePagos}"></p>
                 </div>
             </div>
@@ -45,7 +45,7 @@
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
-                    <h6 class="card-title">Pagos Activos</h6>
+                    <h6 class="card-title">Pagos de Membresía Vigentes</h6>
                     <p class="card-text" th:text="${pagosActivos}"></p>
                 </div>
             </div>
@@ -53,8 +53,8 @@
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">
-                    <h6 class="card-title">Pagos Vencidos</h6>
-                    <p class="card-text" th:text="${pagosVencidos}"></p>
+                    <h6 class="card-title">Pagos de Membresía Programados</h6>
+                    <p class="card-text" th:text="${pagosProgramados}"></p>
                 </div>
             </div>
         </div>
@@ -103,6 +103,11 @@
                        th:href="@{'/pagos/get?id=' + ${pago.id}}">
                         <i class="bi bi-eye"></i> Ver Detalle
                     </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(pagosMembresiaDTO)}">
+                <td colspan="8" class="text-center">
+                    No se encontraron registros.
                 </td>
             </tr>
             </tbody>
