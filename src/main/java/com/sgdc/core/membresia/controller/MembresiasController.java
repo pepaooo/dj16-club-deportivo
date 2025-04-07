@@ -2,6 +2,8 @@ package com.sgdc.core.membresia.controller;
 
 import com.sgdc.core.membresia.domain.Membresia;
 import com.sgdc.core.membresia.service.MembresiaService;
+import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.pagos.domain.PagoMembresia;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,12 +1,15 @@
 package com.sgdc.core.miembro.controller;
 
+import com.sgdc.core.membresia.domain.HistorialMembresia;
 import com.sgdc.core.membresia.repository.MembresiaRepository;
+import com.sgdc.core.membresia.service.HistorialMembresiaService;
 import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Genero;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.domain.dto.MiembroDTO;
 import com.sgdc.core.miembro.domain.dto.MiembroDetalleDTO;
 import com.sgdc.core.miembro.service.MiembroService;
+import com.sgdc.core.pagos.domain.PagoMembresia;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -33,11 +36,14 @@ public class MiembroController {
 
     private final MembresiaService membresiaService;
 
+    private final HistorialMembresiaService historialMembresiaService;
+
     private final ModelMapper modelMapper;
 
-    public MiembroController(MiembroService miembroService, MembresiaService membresiaService, ModelMapper modelMapper) {
+    public MiembroController(MiembroService miembroService, MembresiaService membresiaService, HistorialMembresiaService historialMembresiaService, ModelMapper modelMapper) {
         this.miembroService = miembroService;
         this.membresiaService = membresiaService;
+        this.historialMembresiaService = historialMembresiaService;
         this.modelMapper = modelMapper;
     }
 
@@ -184,6 +190,21 @@ public class MiembroController {
 
         redirectAttributes.addFlashAttribute("exito", "La membresía se ha guardado correctamente");
         return "redirect:/miembros";
+    }
+
+
+    @GetMapping("historial-membresias")
+    public String viewHistoialMembresias(@RequestParam(value = "id") Integer idMiembro, Model model) {
+        Miembro miembro = miembroService.findById(idMiembro);
+        List<HistorialMembresia> historialMembresias = historialMembresiaService.findByMiembroId(idMiembro);
+        model.addAttribute("historialMembresias", historialMembresias);
+        model.addAttribute("miembro", miembro);
+
+//        List<HistorialMembresia> historialMembresias = historialMembresiaService.search(keyword);
+//        // Agregar al modelo los resultados y también el término de búsqueda para que el input lo retenga.
+//        model.addAttribute("historialMembresias", historialMembresias);
+//        model.addAttribute("q", keyword);
+        return "miembros/historial-membresias";
     }
 
 }

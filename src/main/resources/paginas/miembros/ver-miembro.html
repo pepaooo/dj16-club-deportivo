@@ -88,12 +88,16 @@
         </div>
         <!-- Botones de Acción -->
         <div class="card-footer text-end">
-            <a class="btn btn-secondary" th:href="@{/miembros}" >
+            <a class="btn btn-secondary me-2" th:href="@{/miembros}" >
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
-            <a class="btn btn-info"
+            <a class="btn btn-outline-success me-2"
                th:href="@{'/pagos/historial-pagos?id=' + ${miembro.id}}">
                 <i class="bi bi-clock-history"></i> Historial de Pagos
+            </a>
+            <a class="btn btn-outline-warning me-2"
+               th:href="@{'/miembros/historial-membresias?id=' + ${miembro.id}}">
+                <i class="bi bi-clock-history"></i> Historial de Membresías
             </a>
             <a class="btn btn-warning"
                th:href="@{'/miembros/change?id=' + ${miembro.id}}">

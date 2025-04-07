@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<!-- Contenido principal -->
+<div class="container mt-4 container-custom">
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i class="bi bi-clock-history" style="font-size: 3rem; color: #1976d2"></i>
+            <h2 class="mt-2">Historial de Membresías del Miembro</h2>
+            <p class="text-muted"
+               th:text="'Historial de membresías para: ' + ${miembro.nombre} + ' ' + ${miembro.apellidoPaterno} + ' ' + ${miembro.apellidoMaterno}">
+            </p>
+        </div>
+    </div>
+
+    <!-- Opcional: Filtro específico para el historial -->
+    <form th:action="@{/miembros/historial-membresias}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-6 offset-md-3">
+                <div class="input-group">
+                    <input type="hidden" name="id" th:value="${miembro.id}"/>
+                    <input type="text" name="q" class="form-control" placeholder="Filtrar por fecha, tipo, etc." th:value="${q}"/>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de Historial de Membresías -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead style="background-color: #e9f5ff; color: #0d6efd">
+            <tr>
+                <th>ID</th>
+                <th>Fecha de Cambio</th>
+                <th>Tipo de Membresía</th>
+                <th>Descripción</th>
+                <th>Registrado por</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="hist : ${historialMembresias}">
+                <td th:text="${hist.id}"></td>
+                <td th:text="${#temporals.format(hist.fechaCambio, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${hist.membresia.nombre}"></td>
+                <td th:text="${hist.descripcion}"></td>
+                <td th:text="${hist.registradoPor.nombre}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(historialMembresias)}">
+                <td colspan="5" class="text-center">
+                    No se encontraron registros para este miembro.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botón para volver al detalle del miembro -->
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary" th:href="@{'/miembros/get?id=' + ${miembro.id}}">
+            <i class="bi bi-arrow-left-circle"></i> Volver al Detalle del Miembro
+        </a>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>
