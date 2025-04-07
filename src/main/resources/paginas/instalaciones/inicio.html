@@ -102,6 +102,11 @@
                     </a>
                 </td>
             </tr>
+            <tr th:if="${#lists.isEmpty(instalaciones)}">
+                <td colspan="5" class="text-center">
+                    No se encontraron registros.
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>

@@ -66,6 +66,11 @@
                     </a>
                 </td>
             </tr>
+            <tr th:if="${#lists.isEmpty(beneficios)}">
+                <td colspan="4" class="text-center">
+                    No se encontraron registros.
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
