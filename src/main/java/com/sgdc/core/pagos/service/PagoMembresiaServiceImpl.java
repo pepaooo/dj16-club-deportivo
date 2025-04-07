@@ -11,6 +11,8 @@ import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,7 @@ import java.util.List;
 @Service
 public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
+    private static final Logger log = LoggerFactory.getLogger(PagoMembresiaServiceImpl.class);
     private final PagoMembresiaRepository pagoMembresiaRepository;
 
     private final MiembroService miembroService;
@@ -87,6 +90,7 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         PagoMembresia pagoMembresia = PagoMembresia.builder()
                 .id(pagoMembresiaDTO.getId())
                 .miembro(miembro)
+                .membresia(miembro.getMembresia())
                 .monto(pagoMembresiaDTO.getMonto())
                 .fechaPago(LocalDateTime.now())
                 .fechaInicio(pagoMembresiaDTO.getFechaInicio())
@@ -94,6 +98,7 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
                 .registradoPor(buildUsuario(pagoMembresiaDTO))
                 .build();
 
+        //log.info("Guardando pago de membresía: {}", pagoMembresia);
         pagoMembresiaRepository.save(pagoMembresia);
     }
 

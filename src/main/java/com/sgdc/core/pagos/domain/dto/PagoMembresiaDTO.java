@@ -14,12 +14,21 @@ import java.time.LocalDate;
 public class PagoMembresiaDTO {
 
     private Integer id;
-    @NotEmpty(message = "El id del miembro no puede estar vacío")
+
+    @NotNull(message = "El id del miembro no puede estar vacío")
     private Integer idMiembro;
+
+    @NotEmpty(message = "El tipo de operación no puede estar vacío")
     private String operacion;
+
     private Integer nuevoTipoMembresiaId;
+
+    @NotNull(message = "El monto no puede estar vacío")
     private BigDecimal monto;
+
+    @NotNull(message = "La fecha de pago no puede estar vacía")
     private LocalDate fechaInicio;
+
     private UsuarioDTO usuarioDTO;
 
 }

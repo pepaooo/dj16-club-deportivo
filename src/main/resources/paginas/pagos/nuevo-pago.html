@@ -27,7 +27,6 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <form th:action="@{/pagos/create-pago}" th:object="${pagoDto}" method="post">
-
                         <!-- Mostrar errores globales -->
                         <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
                             Verifique los siguientes inconvenientes:
@@ -43,6 +42,8 @@
                                     style="width: 100%;">
                                 <!-- Las opciones se cargarán vía AJAX -->
                             </select>
+                            <div class="text-danger" th:if="${#fields.hasErrors('idMiembro')}"
+                                 th:errors="*{idMiembro}"></div>
                         </div>
 
                         <!-- Selector de Operación -->
@@ -58,23 +59,25 @@
                                        id="cambiarRadio"/>
                                 <label class="form-check-label" for="cambiarRadio">Cambiar Membresía</label>
                             </div>
+                            <div class="text-danger" th:if="${#fields.hasErrors('operacion')}"
+                                 th:errors="*{operacion}"></div>
                         </div>
 
                         <!-- Campo para la membresía actual (solo lectura) -->
-<!--                        <div class="mb-3">-->
-<!--                            <label for="membresiaActual" class="form-label">Membresía Actual</label>-->
-<!--                            <input type="text" class="form-control" id="membresiaActual" readonly />-->
-<!--                        </div>-->
-<!--                        &lt;!&ndash; Campo para la tarifa (solo lectura) &ndash;&gt;-->
-<!--                        <div class="mb-3">-->
-<!--                            <label for="tarifa" class="form-label">Tarifa</label>-->
-<!--                            <input type="number" step="0.01" class="form-control" id="tarifa" readonly />-->
-<!--                        </div>-->
+                        <!--                        <div class="mb-3">-->
+                        <!--                            <label for="membresiaActual" class="form-label">Membresía Actual</label>-->
+                        <!--                            <input type="text" class="form-control" id="membresiaActual" readonly />-->
+                        <!--                        </div>-->
+                        <!--                        &lt;!&ndash; Campo para la tarifa (solo lectura) &ndash;&gt;-->
+                        <!--                        <div class="mb-3">-->
+                        <!--                            <label for="tarifa" class="form-label">Tarifa</label>-->
+                        <!--                            <input type="number" step="0.01" class="form-control" id="tarifa" readonly />-->
+                        <!--                        </div>-->
 
                         <!-- Contenedor para seleccionar el nuevo tipo de membresía -->
                         <div class="mb-3" id="nuevoTipoContainer" style="display: none;">
                             <label for="nuevoTipo" class="form-label">Nuevo Tipo de Membresía</label>
-                            <select id="nuevoTipo" th:field="*{nuevoTipoMembresiaId}" class="form-select" required>
+                            <select id="nuevoTipo" th:field="*{nuevoTipoMembresiaId}" class="form-select">
                                 <option value="">Seleccione un tipo</option>
                                 <option th:each="tm : ${tiposMembresia}" th:value="${tm.id}"
                                         th:text="${tm.nombre}"></option>
@@ -86,7 +89,9 @@
                             <label for="monto" class="form-label">Monto</label>
                             <!-- El campo se pondrá en modo lectura si se selecciona "RENOVAR" -->
                             <input type="number" step="0.01" th:field="*{monto}" id="monto" class="form-control"
-                                   required/>
+                                 required />
+                            <div class="text-danger" th:if="${#fields.hasErrors('monto')}"
+                                 th:errors="*{monto}"></div>
                         </div>
 
                         <!-- Fecha de Inicio de Membresía sin horas -->
@@ -102,6 +107,8 @@
                                     th:field="*{fechaInicio}"
                                     required
                             />
+                            <div class="text-danger" th:if="${#fields.hasErrors('fechaInicio')}"
+                                 th:errors="*{fechaInicio}"></div>
                         </div>
                         <div class="d-flex justify-content-end">
                             <a th:href="@{/pagos}" class="btn btn-secondary me-2">
@@ -125,19 +132,18 @@
     var defaultTarifa = null; // Variable para guardar la tarifa inicial
 
     $(document).ready(function () {
+        var defaultTarifa = null; // Variable para guardar la tarifa inicial
+
         $('#miembroSelect').select2({
             placeholder: 'Buscar miembro por nombre, correo, etc.',
             ajax: {
-                url: '/miembros/search', // Endpoint REST configurado
+                url: '/miembros/search',
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                    return {
-                        q: params.term // Término de búsqueda
-                    };
+                    return {q: params.term};
                 },
                 processResults: function (data) {
-                    // Mapear la respuesta a formato select2
                     return {
                         results: $.map(data, function (item) {
                             return {
@@ -152,23 +158,18 @@
             minimumInputLength: 1
         });
 
-        // Cuando se seleccione un miembro, hacer una llamada AJAX para obtener más datos.
+        // Al seleccionar un miembro
         $('#miembroSelect').on('select2:select', function (e) {
-            var data = e.params.data;
-            var miembroId = data.id;
+            var miembroId = e.params.data.id;
             $.ajax({
                 url: '/miembros/detail',
                 data: {id: miembroId},
                 dataType: 'json',
                 success: function (response) {
-                    // Guardamos la tarifa predeterminada
                     defaultTarifa = response.tarifa;
-                    // Selecciona automáticamente "RENOVAR"
                     $("input[name='operacion'][value='RENOVAR']").prop('checked', true);
-                    // Oculta el contenedor para nuevo tipo de membresía
                     $("#nuevoTipoContainer").hide();
                     $("#monto").prop("readonly", true);
-                    // Actualiza el campo monto con la tarifa del plan actual
                     $("#monto").val(response.tarifa);
                 },
                 error: function () {
@@ -177,37 +178,38 @@
             });
         });
 
-        // Al cambiar la operación entre "CAMBIAR" y "RENOVAR"
-        $("input[name='operacion']").change(function() {
+        // Al cambiar la operación
+        $("input[name='operacion']").change(function () {
             var operacion = $(this).val();
             if (operacion === "CAMBIAR") {
                 $("#nuevoTipoContainer").show();
+                $("#nuevoTipo").prop("required", true);
                 $("#monto").prop("readonly", false);
-                // Resetear el combo a la opción por defecto y limpiar el campo monto
                 $('#nuevoTipo').val('').trigger('change');
+                // Vaciar el campo monto para forzar selección del nuevo tipo
                 $("#monto").val('');
             } else if (operacion === "RENOVAR") {
                 $("#nuevoTipoContainer").hide();
+                $("#nuevoTipo").prop("required", false);
                 $("#monto").prop("readonly", true);
-                // Restaura el valor inicial si existe
                 if (defaultTarifa !== null) {
                     $("#monto").val(defaultTarifa);
                 }
             }
         });
 
-        // Cuando se selecciona un nuevo tipo de membresía (para la operación "CAMBIAR")
-        $('#nuevoTipo').change(function() {
+        // Al seleccionar un nuevo tipo de membresía
+        $('#nuevoTipo').change(function () {
             var nuevoTipoId = $(this).val();
             if (nuevoTipoId) {
                 $.ajax({
-                    url: '/membresias/tarifa', // Endpoint que retorna la tarifa para el nuevo tipo de membresía
-                    data: { id: nuevoTipoId },
+                    url: '/membresias/tarifa',
+                    data: {id: nuevoTipoId},
                     dataType: 'json',
-                    success: function(data) {
+                    success: function (data) {
                         $("#monto").val(data.tarifa);
                     },
-                    error: function() {
+                    error: function () {
                         console.error('Error al obtener la tarifa del nuevo plan');
                     }
                 });
@@ -215,8 +217,8 @@
                 $("#monto").val('');
             }
         });
-
     });
+
 </script>
 
 </body>
