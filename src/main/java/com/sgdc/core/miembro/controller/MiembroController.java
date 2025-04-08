@@ -82,12 +82,11 @@ public class MiembroController {
         model.addAttribute("q", keyword);
 
         // Otros atributos, por ejemplo para los resúmenes:
-        List<Miembro> allMiembros = miembroService.findAll();
-        model.addAttribute("totalMiembros", allMiembros.size());
+        //List<Miembro> allMiembros = miembroService.findAll();
+        model.addAttribute("totalMiembros", miembros.size());
         // Para calcular miembros activos/inactivos.
-        // TODO calcular miembros activos/inactivos.
-//        long activas = allMiembros.stream().filter(m -> "Activo".equalsIgnoreCase(m.getEstatus())).count();
-//        long inactivas = allMiembros.size() - activas;
+//        long activas = miembros.stream().filter(m -> "Activo".equalsIgnoreCase(m.getEstatus())).count();
+//        long inactivas = miembros.size() - activas;
         model.addAttribute("miembrosActivos", 0);
         model.addAttribute("miembrosInactivos", 0);
 

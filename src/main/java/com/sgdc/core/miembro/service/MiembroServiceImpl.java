@@ -2,13 +2,15 @@ package com.sgdc.core.miembro.service;
 
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.repository.MiembroRepository;
+import com.sgdc.core.reportes.utils.PdfGenerator;
 import jakarta.persistence.criteria.Expression;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MiembroServiceImpl implements MiembroService {
@@ -57,5 +59,28 @@ public class MiembroServiceImpl implements MiembroService {
     @Override
     public void save(Miembro miembro) {
         repository.save(miembro);
+    }
+
+    @Override
+    public List<Miembro> searchMiembros(Integer idMembresia, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        // Si todos los filtros son nulos, se devolverán todos los registros.
+        if (idMembresia == null && fechaInicio == null && fechaFin == null) {
+            return repository.findAllByOrderByIdDesc();
+        }
+        return repository.findByFilters(idMembresia, fechaInicio, fechaFin);
+    }
+
+    @Override
+    public byte[] generatePdfReport(Integer idMembresia, LocalDate fechaInicio, LocalDate fechaFin) {
+        // Convertir las fechas de LocalDate a LocalDateTime.
+        // Para fechaInicio se usa el comienzo del día y para fechaFin se usa el final del día.
+        LocalDateTime fechaInicioDT = (fechaInicio != null) ? fechaInicio.atStartOfDay() : null;
+        LocalDateTime fechaFinDT = (fechaFin != null) ? fechaFin.atTime(23, 59, 59) : null;
+
+        // Se obtienen los registros según los filtros ingresados.
+        List<Miembro> miembros = searchMiembros(idMembresia, fechaInicioDT, fechaFinDT);
+        // Aquí se utiliza una utilidad para generar el PDF.
+        // Debes implementar la clase PdfGenerator con la lógica para crear el documento PDF.
+        return PdfGenerator.generateMiembrosReport(miembros);
     }
 }

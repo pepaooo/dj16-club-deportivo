@@ -4,39 +4,50 @@
 <head th:replace="~{plantillas/plantilla :: head}"></head>
 <body>
 <header th:replace="~{plantillas/plantilla :: header}"></header>
+
 <!-- Contenido principal -->
 <div class="container mt-4">
     <h2 class="mb-4">Reportes</h2>
     <div class="row g-3">
+        <!-- Tarjeta de Membresías -->
         <div class="col-md-4">
-            <div class="card card-report">
-                <div class="card-body text-center">
-                    <i class="bi bi-people-fill" style="font-size: 2rem"></i>
-                    <h5 class="card-title mt-2">Membresías</h5>
-                    <p class="card-text">Reporte de estado de membresías.</p>
+            <a th:href="@{/reportes/miembros}" class="text-decoration-none text-reset">
+                <div class="card card-report">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people-fill" style="font-size: 2rem"></i>
+                        <h5 class="card-title mt-2">Miembros</h5>
+                        <p class="card-text">Reporte de miembros.</p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+        <!-- Tarjeta de Reservas -->
         <div class="col-md-4">
-            <div class="card card-report">
-                <div class="card-body text-center">
-                    <i class="bi bi-calendar-check" style="font-size: 2rem"></i>
-                    <h5 class="card-title mt-2">Reservas</h5>
-                    <p class="card-text">Reporte de ocupación de instalaciones.</p>
+<!--            <a th:href="@{/reportes/reservas}" class="text-decoration-none text-reset">-->
+                <div class="card card-report">
+                    <div class="card-body text-center">
+                        <i class="bi bi-calendar-check" style="font-size: 2rem"></i>
+                        <h5 class="card-title mt-2">Reservas</h5>
+                        <p class="card-text">Reporte de ocupación de instalaciones.</p>
+                    </div>
                 </div>
-            </div>
+<!--            </a>-->
         </div>
+        <!-- Tarjeta de Pagos -->
         <div class="col-md-4">
-            <div class="card card-report">
-                <div class="card-body text-center">
-                    <i class="bi bi-currency-dollar" style="font-size: 2rem"></i>
-                    <h5 class="card-title mt-2">Pagos</h5>
-                    <p class="card-text">Reporte de ingresos y pagos realizados.</p>
+<!--            <a th:href="@{/reportes/pagos}" class="text-decoration-none text-reset">-->
+                <div class="card card-report">
+                    <div class="card-body text-center">
+                        <i class="bi bi-currency-dollar" style="font-size: 2rem"></i>
+                        <h5 class="card-title mt-2">Pagos</h5>
+                        <p class="card-text">Reporte de ingresos y pagos realizados.</p>
+                    </div>
                 </div>
-            </div>
+<!--            </a>-->
         </div>
     </div>
 </div>
+
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
 </body>
 </html>

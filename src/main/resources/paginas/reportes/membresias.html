@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container mt-4">
+    <h2>Reporte de Miembros</h2>
+    <!-- Sección de Filtros -->
+    <form th:action="@{/reportes/miembros}" method="get">
+        <div class="row mb-3">
+            <!-- Filtro por tipo de membresía -->
+            <div class="col-md-4">
+                <label for="idMembresia" class="form-label">Tipo de Membresía:</label>
+                <select class="form-select" id="idMembresia" name="idMembresia">
+                    <option value="">-- Seleccione --</option>
+                    <option th:each="memb : ${listaMembresias}"
+                            th:value="${memb.id}"
+                            th:text="${memb.nombre}">
+                    </option>
+                </select>
+            </div>
+            <!-- Filtro por rango de fecha de inscripción -->
+            <div class="col-md-4">
+                <label for="fechaInicio" class="form-label">Fecha de Inscripción Desde:</label>
+                <input type="date" class="form-control" id="fechaInicio" name="fechaInicio"
+                       th:value="${param.fechaInicio}">
+            </div>
+            <div class="col-md-4">
+                <label for="fechaFin" class="form-label">Fecha de Inscripción Hasta:</label>
+                <input type="date" class="form-control" id="fechaFin" name="fechaFin"
+                       th:value="${param.fechaFin}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Filtrar Reporte</button>
+            <!-- Enlace para exportar los resultados filtrados en PDF -->
+            <a th:href="@{/reportes/miembros/exportPdf(idMembresia=${param.idMembresia},fechaInicio=${param.fechaInicio},fechaFin=${param.fechaFin})}"
+               class="btn btn-secondary">
+                Exportar a PDF
+            </a>
+        </div>
+    </form>
+
+    <!-- Sección para mostrar los resultados del filtro -->
+    <div class="mt-4">
+        <h3>Resultados</h3>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>ID Miembro</th>
+                <th>Nombre Completo</th>
+                <th>Tipo de Membresía</th>
+                <th>Fecha de Inscripción</th>
+<!--                <th>Estatus</th>-->
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Se recorre la lista de resultados (por ejemplo, la lista de miembros que cumplen con el filtro) -->
+            <tr th:each="miembro : ${resultados}">
+                <td th:text="${miembro.id}"></td>
+                <td th:text="${miembro.nombre + ' ' + miembro.apellidoPaterno + ' ' + miembro.apellidoMaterno}"></td>
+                <td th:text="${miembro.membresia.nombre}"></td>
+                <td th:text="${#temporals.format(miembro.fechaInscripcion, 'dd/MM/yyyy HH:mm')}"></td>
+<!--                <td th:text="${miembro.estatus}"></td>-->
+            </tr>
+            <!-- Si no existen resultados, se muestra un mensaje informativo -->
+            <tr th:if="${#lists.isEmpty(resultados)}">
+                <td colspan="5" class="text-center">No se encontraron resultados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>
