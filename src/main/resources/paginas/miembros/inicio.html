@@ -26,34 +26,6 @@
         </div>
     </div>
 
-    <!-- Tarjetas Resumen -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h6 class="card-title">Total Miembros</h6>
-                    <p class="card-text" th:text="${totalMiembros}"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h6 class="card-title">Activos</h6>
-                    <p class="card-text" th:text="${miembrosActivos}"></p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h6 class="card-title">Inactivos</h6>
-                    <p class="card-text" th:text="${miembrosInactivos}"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Campo de Búsqueda -->
     <form id="searchForm" th:action="@{/miembros}" method="get">
         <div class="input-group mb-3">
