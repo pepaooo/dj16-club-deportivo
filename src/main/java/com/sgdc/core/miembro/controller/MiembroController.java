@@ -97,11 +97,11 @@ public class MiembroController {
     }
 
     @GetMapping("get")
-    public String getMiembro(@RequestParam(value = "id") Integer idMiembro, Model model) {
+    public String getMiembro(@RequestParam(value = "id") Integer idMiembro,  Model model) {
         // TODO. Revisar si las fechas en la base de datos se pueden almacenar en UTC y luego convertirlas a la zona horaria local.
         Miembro miembro = miembroService.findById(idMiembro);
         log.info("getMiembro: {}", miembro);
-        List<PagoMembresiaResumenDTO> pagos = pagoMembresiaService.resumenPagosByMiembro(idMiembro);
+        List<PagoMembresiaResumenDTO> pagos = pagoMembresiaService.resumenPagosByMiembro(idMiembro, null);
         log.info("pagos del id miembro {} : {}", idMiembro, pagos);
         model.addAttribute("miembro", miembro);
         model.addAttribute("pagosMembresiaDTO", pagos);

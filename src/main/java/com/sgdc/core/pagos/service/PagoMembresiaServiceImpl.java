@@ -15,8 +15,10 @@ import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,16 +61,24 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
     }
 
     @Override
-    public List<PagoMembresia> search(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return pagoMembresiaRepository.findAll();
+    public List<PagoMembresia> search(Integer idMiembro, String keyword) {
+        if (idMiembro == null) {
+            throw new IllegalArgumentException("El id del miembro no puede ser nulo");
         }
-        String pattern = "%" + keyword.toLowerCase() + "%";
 
         Specification<PagoMembresia> spec = (root, query, cb) -> {
-            // Para buscar el nombre del miembro se realiza un join
-            Join<PagoMembresia, Miembro> miembroJoin = root.join("miembro", JoinType.LEFT);
-            Expression<String> miembroNombreExpr = cb.lower(miembroJoin.get("nombre"));
+            // Filtro obligatorio por id del miembro
+            Predicate predicateBase = cb.equal(root.get("miembro").get("id"), idMiembro);
+
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return predicateBase;
+            }
+
+            String pattern = "%" + keyword.toLowerCase() + "%";
+
+            // JOIN con la membresía
+            Join<PagoMembresia, Membresia> membresiaJoin = root.join("membresia", JoinType.LEFT);
+            Expression<String> nombreMembresiaExpr = cb.lower(membresiaJoin.get("nombre"));
 
             // Para monto: convertirlo a String usando, por ejemplo, concat (compatible con MariaDB)
             Expression<String> montoExpr = cb.function("concat", String.class, root.get("monto"), cb.literal(""));
@@ -78,16 +88,18 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
             Expression<String> fechaInicioExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaInicio"), cb.literal("%Y-%m-%d"));
             Expression<String> fechaFinExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaFin"), cb.literal("%Y-%m-%d"));
 
-            return cb.or(
-                    cb.like(miembroNombreExpr, pattern),
+            Predicate keywordPredicate = cb.or(
+                    cb.like(nombreMembresiaExpr, pattern),
                     cb.like(cb.lower(montoExpr), pattern),
                     cb.like(cb.lower(fechaPagoExpr), pattern),
                     cb.like(cb.lower(fechaInicioExpr), pattern),
                     cb.like(cb.lower(fechaFinExpr), pattern)
             );
+            return cb.and(predicateBase, keywordPredicate);
         };
 
-        return pagoMembresiaRepository.findAll(spec);
+        return pagoMembresiaRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "id")
+        );
     }
 
 
@@ -119,7 +131,6 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
         //log.info("Guardando pago de membresía: {}", pagoMembresia);
         pagoMembresiaRepository.save(pagoMembresia);
-
 
 
         // Creación de historial de membresía
@@ -162,7 +173,7 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return pagoMembresiaRepository.findResumenPagos();
         }
-        return pagoMembresiaRepository.searchResumen(keyword);
+        return pagoMembresiaRepository.searchResumenPagos(keyword);
     }
 
     @Override
@@ -177,8 +188,11 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
     }
 
     @Override
-    public List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro) {
-        return pagoMembresiaRepository.findResumenPagosByMiembro(idMiembro);
+    public List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return pagoMembresiaRepository.findResumenPagosByMiembro(idMiembro);
+        }
+        return pagoMembresiaRepository.searchResumenPagosByMiembro(idMiembro, keyword);
     }
 
 }

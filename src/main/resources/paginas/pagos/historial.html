@@ -19,20 +19,18 @@
     </div>
 
     <!-- Opcional: filtros o campo de búsqueda específico para el historial -->
-    <form th:action="@{/pagos/historial-pagos}" method="get">
+    <form id="searchForm" th:action="@{/pagos/historial-pagos}" method="get">
         <div class="row mb-3">
             <div class="col-md-6 offset-md-3">
                 <div class="input-group">
                     <input type="hidden" name="id" th:value="${miembro.id}"/>
-                    <input
-                            type="text"
-                            name="q"
-                            class="form-control"
-                            placeholder="Filtrar por fecha, monto, etc."
-                            th:value="${q}"
-                    />
+                    <input type="text" id="searchInput" name="q" class="form-control" placeholder="Filtrar por fecha, monto, etc." th:value="${q}" aria-label="Buscar" aria-describedby="search-addon" />
                     <button class="btn btn-primary" type="submit">
                         <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <!-- Botón de limpiar, inicialmente oculto -->
+                    <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                        <i class="bi bi-x"></i> Limpiar
                     </button>
                 </div>
             </div>
@@ -50,7 +48,7 @@
                 <th>Fecha de Pago</th>
                 <th>Fecha Inicio</th>
                 <th>Fecha Fin</th>
-                <th>Estatus</th>
+                <th>Vigencia</th>
                 <th>Acciones</th>
             </tr>
             </thead>
@@ -89,5 +87,29 @@
 </div>
 
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Muestra el botón de limpiar si hay texto en el campo de búsqueda
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("searchInput");
+        const clearButton = document.getElementById("clearSearch");
+        const searchForm = document.getElementById("searchForm");
+
+        // Mostrar botón de limpiar si el campo tiene contenido al cargar la página
+        if (searchInput.value.trim() !== "") {
+            clearButton.style.display = "inline-block";
+        }
+
+        // Actualizar visibilidad del botón a medida que se escribe
+        searchInput.addEventListener("input", function() {
+            clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
+        });
+
+        // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
+        clearButton.addEventListener("click", function() {
+            searchInput.value = "";
+            searchForm.submit();
+        });
+    });
+</script>
 </body>
 </html>

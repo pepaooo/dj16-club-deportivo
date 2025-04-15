@@ -18,11 +18,11 @@ public interface PagoMembresiaService {
 
     List<PagoMembresia> findByMiembroId(Integer idMiembro);
 
-    List<PagoMembresia> search(String keyword);
+    List<PagoMembresia> search(Integer idMiembro, String keyword);
 
     void save(PagoMembresiaDTO pagoMembresiaDTO);
 
-    List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro);
+    List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro, String keyword);
 
     List<PagoMembresiaResumenDTO> resumenPagos();
 

@@ -33,11 +33,32 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "FROM PagoMembresia p " +
             "JOIN p.miembro m " +
             "JOIN p.membresia tm " +
-            "WHERE (p.fechaInicio > CURRENT_TIMESTAMP OR " +
+            "WHERE m.id = :idMiembro " +
+            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
             "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
-            "AND m.id = :idMiembro " +
             "ORDER BY p.fechaInicio DESC, p.id DESC")
     List<PagoMembresiaResumenDTO> findResumenPagosByMiembro(@Param("idMiembro") Integer idMiembro);
+
+    @Query("SELECT new com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO(" +
+            "p.id, m.id, m.nombre, m.apellidoPaterno, m.apellidoMaterno, tm.nombre, p.monto , p.fechaInicio, p.fechaFin, " +
+            "CASE WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' ELSE 'Vencido' END" +
+            ") " +
+            "FROM PagoMembresia p " +
+            "LEFT JOIN p.miembro m " +
+            "LEFT JOIN p.membresia tm " +
+            "WHERE m.id = :idMiembro " +
+            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
+            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
+            "AND (LOWER(m.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(m.apellidoPaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(m.apellidoMaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(tm.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+//            "   OR LOWER(CAST(p.monto AS string)) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+//            "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaPago, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaInicio, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaFin, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
+            ") ORDER BY p.fechaInicio DESC, p.id DESC")
+    List<PagoMembresiaResumenDTO> searchResumenPagosByMiembro(@Param("idMiembro") Integer idMiembro, @Param("keyword") String keyword);
 
     @Query("SELECT new com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO(" +
             "p.id, " +
@@ -80,6 +101,6 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaInicio, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaFin, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
             ") ORDER BY p.fechaInicio DESC, p.id DESC")
-    List<PagoMembresiaResumenDTO> searchResumen(@Param("keyword") String keyword);
+    List<PagoMembresiaResumenDTO> searchResumenPagos(@Param("keyword") String keyword);
 
 }
