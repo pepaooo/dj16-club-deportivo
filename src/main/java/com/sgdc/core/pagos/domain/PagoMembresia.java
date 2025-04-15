@@ -68,7 +68,14 @@ public class PagoMembresia {
         if (this.fechaInicio != null && this.fechaFin != null) {
             LocalDate now = LocalDate.now();
 //            return ((this.fechaInicio.isBefore(now) || this.fechaInicio.isEqual(now)) && this.fechaFin.isAfter(now)) ? "Activo" : "Vencido";
-            return this.fechaFin.isAfter(now) ? "Activo" : "Vencido";
+//            return this.fechaFin.isAfter(now) ? "Activo" : "Vencido";
+            if (this.fechaInicio.isAfter(now)) {
+                return "Pendiente";
+            } else if (this.fechaFin.isAfter(now)) {
+                return "Activo";
+            } else {
+                return "Vencido";
+            }
         }
         return "Desconocido";
     }

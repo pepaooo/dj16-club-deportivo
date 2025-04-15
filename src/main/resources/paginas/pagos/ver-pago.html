@@ -21,8 +21,12 @@
                 <!-- Columna Izquierda -->
                 <div class="col-md-6">
                     <p>
-                        <strong>ID Pago:</strong>
+                        <strong>ID de pago:</strong>
                         <span th:text="${pago.id}"></span>
+                    </p>
+                    <p>
+                        <strong>ID de miembro:</strong>
+                        <span th:text="${pago.miembro.id}"></span>
                     </p>
                     <p>
                         <strong>Miembro:</strong>
@@ -35,15 +39,15 @@
                         <span th:text="${pago.membresia.nombre}"></span>
                     </p>
                     <p>
-                        <strong>Estatus:</strong>
-                        <span th:text="${pago.estatus}"></span>
-                    </p>
-                    <p>
                         <strong>Monto:</strong> $<span th:text="${pago.monto}"></span>
                     </p>
                 </div>
                 <!-- Columna Derecha -->
                 <div class="col-md-6">
+                    <p>
+                        <strong>Vigencia:</strong>
+                        <span th:text="${pago.estatus}"></span>
+                    </p>
                     <p>
                         <strong>Fecha de Pago:</strong>
                         <span th:text="${#temporals.format(pago.fechaPago, 'yyyy-MM-dd HH:mm')}"></span>

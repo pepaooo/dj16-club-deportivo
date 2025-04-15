@@ -102,7 +102,7 @@ public class MiembroController {
         Miembro miembro = miembroService.findById(idMiembro);
         log.info("getMiembro: {}", miembro);
         List<PagoMembresiaResumenDTO> pagos = pagoMembresiaService.resumenPagosByMiembro(idMiembro);
-        log.info("pagos: {}", pagos);
+        log.info("pagos del id miembro {} : {}", idMiembro, pagos);
         model.addAttribute("miembro", miembro);
         model.addAttribute("pagosMembresiaDTO", pagos);
         return "miembros/ver-miembro";

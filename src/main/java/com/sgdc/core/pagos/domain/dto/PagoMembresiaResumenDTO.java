@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public class PagoMembresiaResumenDTO {
 
     private Integer id;
+    private Integer idMiembro;
     private String nombreMiembro;
     private String apPaternoMiembro;
     private String apMaternoMiembro;
