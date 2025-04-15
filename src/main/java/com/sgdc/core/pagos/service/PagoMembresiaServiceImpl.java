@@ -176,4 +176,9 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         return montoFinal;
     }
 
+    @Override
+    public List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro) {
+        return pagoMembresiaRepository.findResumenPagosByMiembro(idMiembro);
+    }
+
 }

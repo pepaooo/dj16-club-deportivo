@@ -27,7 +27,7 @@
                 <!-- Primera Columna -->
                 <div class="col-md-6">
                     <p>
-                        <strong>ID:</strong>
+                        <strong>Identificador:</strong>
                         <span th:text="${miembro.id}"></span>
                     </p>
                     <p>
@@ -46,15 +46,11 @@
                         <strong>Género:</strong>
                         <span th:text="${miembro.genero.label}"></span>
                     </p>
-                    <p>
-                        <strong>Dirección:</strong>
-                        <span th:text="${miembro.direccion}"></span>
-                    </p>
                 </div>
                 <!-- Segunda Columna -->
                 <div class="col-md-6">
                     <p>
-                        <strong>Correo Electrónico:</strong>
+                        <strong>Correo electrónico:</strong>
                         <span th:text="${miembro.correoElectronico}"></span>
                     </p>
                     <p>
@@ -66,29 +62,24 @@
                         <span th:text="${miembro.fechaNacimiento}"></span>
                     </p>
                     <p>
-                        <strong>Tipo de Membresía:</strong>
-                        <span th:text="${miembro.membresia.nombre}">Mensual</span>
+                        <strong>Dirección:</strong>
+                        <span th:text="${miembro.direccion}"></span>
                     </p>
                     <p>
                         <strong>Fecha inscripción:</strong>
-                        <span th:text="${miembro.fechaInscripcion}"></span>
+                        <span th:text="${#temporals.format(miembro.fechaInscripcion, 'yyyy-MM-dd HH:mm')}"></span>
                     </p>
-<!--                    <p>-->
-<!--                        &lt;!&ndash; TODO. Implementar la consulta del campo estatus &ndash;&gt;-->
-<!--                        <strong>Estatus:</strong>-->
-<!--                        <span >Activo</span>-->
-<!--                    </p>-->
                     <p>
-<!--                        &lt;!&ndash; TODO. Implementar la consulta del campo registrado por &ndash;&gt;-->
-<!--                        <strong>Registrado por:</strong>-->
-<!--                        <span th:text=""></span>-->
-<!--                    </p>-->
+                        <!--                        &lt;!&ndash; TODO. Implementar la consulta del campo registrado por &ndash;&gt;-->
+                        <!--                        <strong>Registrado por:</strong>-->
+                        <!--                        <span th:text=""></span>-->
+                        <!--                    </p>-->
                 </div>
             </div>
         </div>
         <!-- Botones de Acción -->
         <div class="card-footer text-end">
-            <a class="btn btn-secondary me-2" th:href="@{/miembros}" >
+            <a class="btn btn-secondary me-2" th:href="@{/miembros}">
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
             <a class="btn btn-outline-success me-2"
@@ -105,6 +96,40 @@
             </a>
         </div>
     </div>
+
+    <!-- Membresías Vigentes -->
+    <!-- Tabla de Pagos -->
+    <div class="card">
+        <div class="card-header">
+            <h4>Membresía vigente</h4>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead style="background-color: #e9f5ff; color: #0d6efd">
+                <tr>
+                    <th>Membresía</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Estatus</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pago : ${pagosMembresiaDTO}">
+                    <td th:text="${pago.membresiaActual}"></td>
+                    <td th:text="${pago.fechaInicio}"></td>
+                    <td th:text="${pago.fechaFin}"></td>
+                    <td th:text="${pago.estatusMembresia}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(pagosMembresiaDTO)}">
+                    <td colspan="8" class="text-center">
+                        No se encontraron registros.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>

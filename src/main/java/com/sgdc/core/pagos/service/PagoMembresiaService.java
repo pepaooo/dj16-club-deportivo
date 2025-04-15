@@ -22,6 +22,8 @@ public interface PagoMembresiaService {
 
     void save(PagoMembresiaDTO pagoMembresiaDTO);
 
+    List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro);
+
     List<PagoMembresiaResumenDTO> resumenPagos();
 
     List<PagoMembresiaResumenDTO> searchResumen(String keyword);

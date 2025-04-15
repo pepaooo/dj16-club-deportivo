@@ -34,27 +34,50 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "JOIN p.membresia tm " +
             "WHERE p.fechaInicio > CURRENT_TIMESTAMP OR " +
             "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP) " +
+            "AND m.id = :idMiembro " +
+            "ORDER BY p.fechaInicio DESC, p.id DESC")
+    List<PagoMembresiaResumenDTO> findResumenPagosByMiembro(@Param("idMiembro") Integer idMiembro);
+
+    @Query("SELECT new com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO(" +
+            "p.id, " +
+            "m.nombre, " +
+            "m.apellidoPaterno, " +
+            "m.apellidoMaterno, " +
+            "tm.nombre, " +
+            "p.monto, " +
+            "p.fechaInicio, " +
+            "p.fechaFin, " +
+            "CASE " +
+            "   WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' " +
+            "   WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' " +
+            "   ELSE 'Vencido' END" +
+            ") " +
+            "FROM PagoMembresia p " +
+            "JOIN p.miembro m " +
+            "JOIN p.membresia tm " +
+            "WHERE p.fechaInicio > CURRENT_TIMESTAMP OR " +
+            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP) " +
             "ORDER BY p.fechaInicio DESC, p.id DESC")
     List<PagoMembresiaResumenDTO> findResumenPagos();
 
     @Query("SELECT new com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO(" +
-        "p.id, m.nombre, m.apellidoPaterno, m.apellidoMaterno, tm.nombre, p.monto , p.fechaInicio, p.fechaFin, " +
-        "CASE WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' ELSE 'Vencido' END" +
-        ") " +
-        "FROM PagoMembresia p " +
-        "LEFT JOIN p.miembro m " +
-        "LEFT JOIN p.membresia tm " +
-        "WHERE (p.fechaInicio > CURRENT_TIMESTAMP OR " +
-        "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
-        "AND (LOWER(m.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-        "   OR LOWER(m.apellidoPaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-        "   OR LOWER(m.apellidoMaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-        "   OR LOWER(tm.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "p.id, m.nombre, m.apellidoPaterno, m.apellidoMaterno, tm.nombre, p.monto , p.fechaInicio, p.fechaFin, " +
+            "CASE WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' ELSE 'Vencido' END" +
+            ") " +
+            "FROM PagoMembresia p " +
+            "LEFT JOIN p.miembro m " +
+            "LEFT JOIN p.membresia tm " +
+            "WHERE (p.fechaInicio > CURRENT_TIMESTAMP OR " +
+            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
+            "AND (LOWER(m.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(m.apellidoPaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(m.apellidoMaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(tm.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
 //            "   OR LOWER(CAST(p.monto AS string)) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
 //            "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaPago, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-        "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaInicio, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
-        "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaFin, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
-        ") ORDER BY p.fechaInicio DESC, p.id DESC")
-List<PagoMembresiaResumenDTO> searchResumen(@Param("keyword") String keyword);
+            "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaInicio, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaFin, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
+            ") ORDER BY p.fechaInicio DESC, p.id DESC")
+    List<PagoMembresiaResumenDTO> searchResumen(@Param("keyword") String keyword);
 
 }
