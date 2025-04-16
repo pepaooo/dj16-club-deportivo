@@ -1,4 +1,4 @@
-package com.sgdc.core.instalacion.domain;
+package com.sgdc.core.reservas.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

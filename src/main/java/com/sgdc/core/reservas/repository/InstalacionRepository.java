@@ -1,6 +1,6 @@
-package com.sgdc.core.instalacion.repository;
+package com.sgdc.core.reservas.repository;
 
-import com.sgdc.core.instalacion.domain.Instalacion;
+import com.sgdc.core.reservas.domain.Instalacion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

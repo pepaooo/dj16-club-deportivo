@@ -1,6 +1,6 @@
-package com.sgdc.core.instalacion.service;
+package com.sgdc.core.reservas.service;
 
-import com.sgdc.core.instalacion.domain.Instalacion;
+import com.sgdc.core.reservas.domain.Instalacion;
 
 import java.util.List;
 import java.util.Optional;

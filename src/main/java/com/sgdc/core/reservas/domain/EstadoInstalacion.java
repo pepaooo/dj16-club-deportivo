@@ -1,4 +1,4 @@
-package com.sgdc.core.instalacion.domain;
+package com.sgdc.core.reservas.domain;
 
 public enum EstadoInstalacion {
     DISPONIBLE("Disponible"),

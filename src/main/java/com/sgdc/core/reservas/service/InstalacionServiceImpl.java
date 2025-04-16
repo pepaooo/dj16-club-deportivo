@@ -1,7 +1,7 @@
-package com.sgdc.core.instalacion.service;
+package com.sgdc.core.reservas.service;
 
-import com.sgdc.core.instalacion.domain.Instalacion;
-import com.sgdc.core.instalacion.repository.InstalacionRepository;
+import com.sgdc.core.reservas.domain.Instalacion;
+import com.sgdc.core.reservas.repository.InstalacionRepository;
 import jakarta.persistence.criteria.Expression;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;

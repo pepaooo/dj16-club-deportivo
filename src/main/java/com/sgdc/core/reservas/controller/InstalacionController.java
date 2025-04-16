@@ -1,8 +1,8 @@
-package com.sgdc.core.instalacion.controller;
+package com.sgdc.core.reservas.controller;
 
-import com.sgdc.core.instalacion.domain.EstadoInstalacion;
-import com.sgdc.core.instalacion.domain.Instalacion;
-import com.sgdc.core.instalacion.service.InstalacionService;
+import com.sgdc.core.reservas.domain.EstadoInstalacion;
+import com.sgdc.core.reservas.domain.Instalacion;
+import com.sgdc.core.reservas.service.InstalacionService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
