@@ -1,8 +1,14 @@
 package com.sgdc.core.membresia.service;
 
 import com.sgdc.core.membresia.domain.HistorialMembresia;
+import com.sgdc.core.membresia.domain.Membresia;
 import com.sgdc.core.membresia.repository.HistorialMembresiaRepository;
+import com.sgdc.core.pagos.domain.PagoMembresia;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -33,29 +39,39 @@ public class HistorialMembresiaServiceImpl implements HistorialMembresiaService 
     }
 
     @Override
-    public List<HistorialMembresia> search(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return repository.findAll();
+    public List<HistorialMembresia> search(Integer idMiembro, String keyword) {
+        if (idMiembro == null) {
+            throw new IllegalArgumentException("El id del miembro no puede ser nulo");
         }
-        String pattern = "%" + keyword.toLowerCase() + "%";
 
         Specification<HistorialMembresia> spec = (root, query, cb) -> {
+            // Filtro obligatorio por id del miembro
+            Predicate predicateBase = cb.equal(root.get("miembro").get("id"), idMiembro);
+
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return predicateBase;
+            }
+
+            String pattern = "%" + keyword.toLowerCase() + "%";
+
+            // JOIN con la membresía
+            Join<HistorialMembresia, Membresia> membresiaJoin = root.join("membresia", JoinType.LEFT);
+            Expression<String> nombreMembresiaExpr = cb.lower(membresiaJoin.get("nombre"));
+
             // Para atributos de tipo String se hace directamente.
             Expression<String> descripcionExpr = cb.lower(root.get("descripcion"));
-//            Expression<String> estatusExpr = cb.lower(root.get("estatus"));
-//            // Para atributos numéricos, se puede usar una función para convertir a cadena, si lo soporta el dialecto
-//            Expression<String> tarifaExpr = cb.function("str", String.class, root.get("tarifa"));
-//            Expression<String> duracionExpr = cb.function("str", String.class, root.get("duracionDias"));
+            // Para las fechas, podemos usar una función de formateo. Por ejemplo, en MariaDB se puede usar DATE_FORMAT.
+            Expression<String> fechaCambioExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaCambio"), cb.literal("%Y-%m-%d"));
 
-            return cb.or(
-                    cb.like(descripcionExpr, pattern)
-//                    cb.like(estatusExpr, pattern),
-//                    cb.like(cb.lower(tarifaExpr), pattern),
-//                    cb.like(cb.lower(duracionExpr), pattern)
+            Predicate keywordPredicate = cb.or(
+                    cb.like(nombreMembresiaExpr, pattern),
+                    cb.like(descripcionExpr, pattern),
+                    cb.like(fechaCambioExpr, pattern)
             );
+            return cb.and(predicateBase, keywordPredicate);
         };
 
-        return repository.findAll(spec);
+        return repository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
     }
 
     @Override

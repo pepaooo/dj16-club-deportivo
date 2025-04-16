@@ -12,7 +12,7 @@ public interface HistorialMembresiaService {
 
     List<HistorialMembresia> findByMiembroId(Integer id);
 
-    List<HistorialMembresia> search(String keyword);
+    List<HistorialMembresia> search(Integer idMiembro, String keyword);
 
     void save(HistorialMembresia membresia);
 

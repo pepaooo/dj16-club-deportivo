@@ -178,7 +178,9 @@ public class PagoMembresiaController {
     }
 
     @GetMapping("historial-pagos")
-    public String viewHistoialPagos(@RequestParam(value = "id") Integer idMiembro, @RequestParam(value = "q", required = false) String keyword, Model model) {
+    public String viewHistoialPagos(@RequestParam(value = "id") Integer idMiembro,
+                                    @RequestParam(value = "q", required = false) String keyword,
+                                    Model model) {
         Miembro miembro = miembroService.findById(idMiembro);
         List<PagoMembresia> historialPagos = pagoMembresiaService.search(idMiembro, keyword);
         model.addAttribute("historialPagos", historialPagos);

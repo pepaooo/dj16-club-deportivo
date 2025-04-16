@@ -198,12 +198,14 @@ public class MiembroController {
 
 
     @GetMapping("historial-membresias")
-    public String viewHistoialMembresias(@RequestParam(value = "id") Integer idMiembro, Model model) {
+    public String viewHistoialMembresias(@RequestParam(value = "id") Integer idMiembro,
+                                         @RequestParam(value = "q", required = false) String keyword,
+                                         Model model) {
         Miembro miembro = miembroService.findById(idMiembro);
-        List<HistorialMembresia> historialMembresias = historialMembresiaService.findByMiembroId(idMiembro);
+        List<HistorialMembresia> historialMembresias = historialMembresiaService.search(idMiembro, keyword);
         model.addAttribute("historialMembresias", historialMembresias);
         model.addAttribute("miembro", miembro);
-
+        model.addAttribute("q", keyword);
 //        List<HistorialMembresia> historialMembresias = historialMembresiaService.search(keyword);
 //        // Agregar al modelo los resultados y también el término de búsqueda para que el input lo retenga.
 //        model.addAttribute("historialMembresias", historialMembresias);
