@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Encabezado del formulario -->
+            <div class="text-center mb-4">
+                <i class="bi bi-card-checklist" style="font-size: 3rem; color: #1976d2"></i>
+                <h2 class="mt-2">Nueva Reserva</h2>
+                <p class="text-muted">
+                    Complete la información para registrar una nueva reserva de instalación.
+                </p>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <!-- Formulario con binding de Thymeleaf -->
+                    <form th:action="@{/reservas/create-reserva}" th:object="${reserva}" method="post">
+                        <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
+                            Verifique los siguientes inconvenientes
+                            <ul>
+                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+                            </ul>
+                        </div>
+                        <!-- Selección de Miembro -->
+                        <div class="mb-3">
+                            <label for="miembro" class="form-label">Miembro</label>
+                            <select class="form-select" id="miembro" th:field="*{miembro}" required>
+                                <option value="">Seleccione un miembro</option>
+                                <option th:each="m : ${miembros}"
+                                        th:value="${m.id}"
+                                        th:text="${m.nombre + ' ' + m.apellidoPaterno + ' ' + m.apellidoMaterno}">
+                                </option>
+                            </select>
+                            <div class="text-danger" th:if="${#fields.hasErrors('miembro')}" th:errors="*{miembro}"></div>
+                        </div>
+                        <!-- Selección de Instalación -->
+                        <div class="mb-3">
+                            <label for="instalacion" class="form-label">Miembro</label>
+                            <select class="form-select" id="instalacion" th:field="*{instalacion}" required>
+                                <option value="">Seleccione una instalación</option>
+                                <option th:each="ins : ${instalaciones}"
+                                        th:value="${ins.id}"
+                                        th:text="${ins.nombre}">
+                                </option>
+                            </select>
+                            <div class="text-danger" th:if="${#fields.hasErrors('instalacion')}" th:errors="*{instalacion}"></div>
+                        </div>
+                        <!-- Campo: Fecha y Hora de Inicio -->
+                        <div class="mb-3">
+                            <label for="fechaHoraInicio" class="form-label">Fecha y Hora de Inicio</label>
+                            <input
+                                    type="datetime-local"
+                                    class="form-control"
+                                    id="fechaHoraInicio"
+                                    th:field="*{fechaHoraInicio}"
+                                    name="fechaHoraInicio"
+                                    required
+                            />
+                            <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraInicio')}"
+                                 th:errors="*{fechaHoraInicio}"></div>
+                        </div>
+                        <!-- Campo: Fecha y Hora de Fin -->
+                        <div class="mb-3">
+                            <label for="fechaHoraFin" class="form-label">Fecha y Hora de Fin</label>
+                            <input
+                                    type="datetime-local"
+                                    class="form-control"
+                                    id="fechaHoraFin"
+                                    th:field="*{fechaHoraFin}"
+                                    name="fechaHoraFin"
+                                    required
+                            />
+                            <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraFin')}"
+                                 th:errors="*{fechaHoraFin}"></div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-end">
+                            <a th:href="@{/reservas}" class="btn btn-secondary me-2">
+                                <i class="bi bi-arrow-left-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+
+<script>
+    // Cuando cambie el inicio, calculamos +1h y ponemos en fin:
+    document.getElementById('fechaHoraInicio').addEventListener('change', function() {
+        const inicio = this.value;  // cadena "YYYY-MM-DDThh:mm"
+        if (!inicio) return;
+        const dt = new Date(inicio);
+        if (isNaN(dt)) return;
+        dt.setHours(dt.getHours() + 1);
+        // Ajustamos formato de vuelta a "YYYY-MM-DDThh:mm"
+        const pad = n => n.toString().padStart(2,'0');
+        const yyyy = dt.getFullYear();
+        const mm   = pad(dt.getMonth()+1);
+        const dd   = pad(dt.getDate());
+        const hh   = pad(dt.getHours());
+        const mi   = pad(dt.getMinutes());
+        document.getElementById('fechaHoraFin').value = `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+    });
+</script>
+
+</body>
+</html>

@@ -18,12 +18,12 @@ public class Reserva {
     @Column(name = "id_reserva")
     private Integer id;
 
-    @NotNull
+    //@NotNull
     @ManyToOne
     @JoinColumn(name = "id_instalacion", nullable = false)
     private Instalacion instalacion;
 
-    @NotNull
+    //@NotNull
     @ManyToOne
     @JoinColumn(name = "id_miembro", nullable = false)
     private Miembro miembro;
@@ -36,12 +36,12 @@ public class Reserva {
     @Column(name = "fecha_hora_fin", nullable = false)
     private LocalDateTime fechaHoraFin;
 
-    @NotNull
+    //@NotNull
     @Pattern(regexp = "Pendiente|Confirmada|Cancelada")
     @Column(name = "estado_reserva", nullable = false, length = 20)
     private String estadoReserva;
 
-    @NotNull
+    //@NotNull
     @ManyToOne
     @JoinColumn(name = "registrado_por", nullable = false)
     private Usuario registradoPor;

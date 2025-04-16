@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido Principal -->
+<div class="container container-custom-details mt-4">
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i
+                    class="bi bi-card-checklist"
+                    style="font-size: 3rem; color: #1976d2"
+            ></i>
+            <h2 class="mt-2">Detalles de la Reserva</h2>
+            <p class="text-muted">
+                Visualiza la información de la instalación en modo solo lectura.
+            </p>
+        </div>
+    </div>
+
+    <!-- Datos de la Reserva -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <!-- Columna Izquierda -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>ID de reserva:</strong>
+                        <span th:text="${reserva.id}"></span>
+                    </p>
+                    <p>
+                        <strong>Miembro:</strong>
+                        <a th:href="@{'/miembros/get?id=' + ${reserva.miembro.id}}">
+                            <span th:text="${reserva.miembro.nombre} + ' ' + ${reserva.miembro.apellidoPaterno} + ' ' + ${reserva.miembro.apellidoMaterno}"></span>
+                        </a>
+                    </p>
+                    <p>
+                        <strong>Instalación:</strong>
+                        <span th:text="${reserva.instalacion.nombre}"></span>
+                    </p>
+                    <p>
+                        <strong>Registrado por:</strong>
+                        <span th:text="${reserva.registradoPor.nombre}"></span>
+                    </p>
+                </div>
+                <!-- Columna Derecha -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>Fecha y Hora Inicio:</strong>
+                        <span
+                                th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></span>
+                    </p>
+                    <p>
+                        <strong>Fecha y Hora Fin:</strong>
+                        <span
+                                th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}"></span>
+                    </p>
+                    <p>
+                        <strong>Estado:</strong>
+                        <span th:text="${reserva.estadoReserva}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <a class="btn btn-secondary" th:href="@{/reservas}">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+            <!-- Ejemplo: acciones condicionales según el estado de la reserva -->
+            <div th:if="${reserva.estadoReserva == 'Pendiente'}" style="display:inline-block">
+                <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmarReservaModal">
+                    <i class="bi bi-check-circle"></i> Confirmar Reserva
+                </a>
+            </div>
+            <div th:if="${reserva.estadoReserva != 'Cancelada'}" style="display:inline-block">
+                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelarReservaModal">
+                    <i class="bi bi-trash"></i> Eliminar Reserva
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Pendientes Solapadas -->
+    <div th:if="${not #lists.isEmpty(pendientesSolapadas)}" class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Otras reservas pendientes que solapan (se cancelarán si confirma)
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Miembro</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${pendientesSolapadas}">
+                    <td th:text="${r.id}">42</td>
+                    <td>
+                        <a th:href="@{'/miembros/get?id=' + ${r.miembro.id}}">
+                            <span th:text="${r.miembro.nombre} + ' ' + ${r.miembro.apellidoPaterno} + ' ' + ${r.miembro.apellidoMaterno} "></span>
+                        </a>
+                    </td>
+                    <td th:text="${#temporals.format(r.fechaHoraInicio,'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(r.fechaHoraFin,'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Modal para Confirmar Reserva -->
+<div class="modal fade" id="confirmarReservaModal" tabindex="-1" aria-labelledby="confirmarReservaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 1rem">
+            <div class="modal-header" style="background-color: #d1e7dd; border-bottom: none; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                <h5 class="modal-title" id="confirmarReservaModalLabel" style="color: #0f5132">
+                    <i class="bi bi-exclamation-circle-fill"></i> Confirmar Reserva
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="font-size: 1.1rem">
+                <p class="text-left mb-0">
+                    ¿Está seguro de que desea confirmar esta reserva?
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: none; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <form th:action="@{'/reservas/confirmar?id=' + ${reserva.id}}" method="post">
+                    <!-- Incluir token CSRF si es necesario -->
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="bi bi-check-circle"></i> Confirmar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Cancelar Reserva -->
+<div class="modal fade" id="cancelarReservaModal" tabindex="-1" aria-labelledby="cancelarReservaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 1rem">
+            <div class="modal-header" style="background-color: #f8d7da; border-bottom: none; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                <h5 class="modal-title" id="cancelarReservaModalLabel" style="color: #842029">
+                    <i class="bi bi-exclamation-circle-fill"></i> Eliminar Reserva
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="font-size: 1.1rem">
+                <p class="text-left mb-0">
+                    ¿Está seguro de que desea eliminar esta reserva?
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: none; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <form th:action="@{'/reservas/cancelar?id=' + ${reserva.id}}" method="post">
+                    <!-- Incluir token CSRF si es necesario -->
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

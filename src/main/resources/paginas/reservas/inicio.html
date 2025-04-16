@@ -7,6 +7,13 @@
 
 <!-- Contenido principal -->
 <div class="container container-custom mt-4">
+
+    <!-- Mensaje de éxito -->
+    <div id="alertSuccess" th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <!-- Encabezado y Botón Nueva Reserva -->
     <div class="row align-items-center mb-4">
         <div class="col-md-6">
@@ -56,26 +63,23 @@
     </div>
 
     <!-- Campo de búsqueda -->
-    <form th:action="@{/reservas}" method="get">
-        <div class="input-group mb-3">
-          <span class="input-group-text" id="search-addon"
-          ><i class="bi bi-search"></i
-          ></span>
-            <input
-                    type="text"
-                    name="q"
-                    class="form-control"
-                    placeholder="Buscar reserva por miembro, instalación o fecha"
-                    th:value="${q}"
-                    aria-label="Buscar"
-                    aria-describedby="search-addon"
-            />
-            <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i> Buscar
-            </button>
-            <button id="clearBtn" type="button" class="btn btn-outline-secondary">
-                <i class="bi bi-x-circle"></i> Limpiar
-            </button>
+    <form id="searchForm" th:action="@{/reservas}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-8 offset-md-2">
+                <div class="input-group">
+                    <input type="text" id="searchInput" name="q" class="form-control"
+                           placeholder="Buscar reserva por miembro, instalación o fecha" th:value="${q}"
+                           aria-label="Buscar"
+                           aria-describedby="search-addon"/>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <!-- Botón de limpiar, inicialmente oculto -->
+                    <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                        <i class="bi bi-x"></i> Limpiar
+                    </button>
+                </div>
+            </div>
         </div>
     </form>
 
@@ -99,8 +103,8 @@
                 <td th:text="${reserva.id}"></td>
                 <td th:text="${reserva.miembro.nombre}"></td>
                 <td th:text="${reserva.instalacion.nombre}"></td>
-                <td th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd')}"></td>
-                <td th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd')}"></td>
+                <td th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}"></td>
                 <td th:text="${reserva.estadoReserva}"></td>
                 <td>
                     <a class="btn btn-outline-primary btn-sm"
@@ -110,7 +114,7 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(reservas)}">
-                <td colspan="5" class="text-center">
+                <td colspan="7" class="text-center">
                     No se encontraron registros.
                 </td>
             </tr>
@@ -120,5 +124,40 @@
 </div>
 
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Espera 5 segundos y oculta el alert automáticamente
+    document.addEventListener("DOMContentLoaded", function () {
+        var alertEl = document.getElementById("alertSuccess");
+        if (alertEl) {
+            setTimeout(function () {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+    // Muestra el botón de limpiar si hay texto en el campo de búsqueda
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const clearButton = document.getElementById("clearSearch");
+        const searchForm = document.getElementById("searchForm");
+
+        // Mostrar botón de limpiar si el campo tiene contenido al cargar la página
+        if (searchInput.value.trim() !== "") {
+            clearButton.style.display = "inline-block";
+        }
+
+        // Actualizar visibilidad del botón a medida que se escribe
+        searchInput.addEventListener("input", function () {
+            clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
+        });
+
+        // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            searchForm.submit();
+        });
+    });
+</script>
 </body>
 </html>

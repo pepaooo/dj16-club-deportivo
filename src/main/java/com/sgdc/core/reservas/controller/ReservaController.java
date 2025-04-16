@@ -1,9 +1,14 @@
 package com.sgdc.core.reservas.controller;
 
+import com.sgdc.core.membresia.domain.Membresia;
+import com.sgdc.core.miembro.service.MiembroService;
 import com.sgdc.core.reservas.domain.EstadoReserva;
 import com.sgdc.core.reservas.domain.Reserva;
+import com.sgdc.core.reservas.exception.ReservaSolapadaException;
+import com.sgdc.core.reservas.service.InstalacionService;
 import com.sgdc.core.reservas.service.ReservaService;
 import com.sgdc.core.reservas.service.ReservaService;
+import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +34,14 @@ public class ReservaController {
 
     private final ReservaService reservaService;
 
-    public ReservaController(ReservaService reservaService) {
+    private final MiembroService miembroService;
+
+    private final InstalacionService instalacionService;
+
+    public ReservaController(ReservaService reservaService, MiembroService miembroService, InstalacionService instalacionService) {
         this.reservaService = reservaService;
+        this.miembroService = miembroService;
+        this.instalacionService = instalacionService;
     }
 
     @GetMapping
@@ -56,14 +67,28 @@ public class ReservaController {
 
     @GetMapping("get")
     public String getReserva(@RequestParam(value = "id") Integer idReserva, Model model) {
-        Optional<Reserva> reserva = reservaService.findById(idReserva);
-        model.addAttribute("reserva", reserva.orElse(new Reserva()));
+        Reserva reserva = reservaService.findById(idReserva);
+        model.addAttribute("reserva", reserva);
+
+        // obtenemos las pendientes para la misma instalación que se solapan
+        List<Reserva> solapadas = reservaService
+                .buscarPendientesSolapadas(
+                        reserva.getInstalacion().getId(),
+                        reserva.getFechaHoraInicio(),
+                        reserva.getFechaHoraFin(),
+                        reserva.getId()
+                );
+        model.addAttribute("pendientesSolapadas", solapadas);
+
         return "reservas/ver-reserva";
     }
 
     @GetMapping("new")
     public String newReserva(Model model) {
         model.addAttribute("reserva", new Reserva());
+        // Agregar los posibles estados al modelo
+        model.addAttribute("miembros", miembroService.findAll());
+        model.addAttribute("instalaciones", instalacionService.findAll());
         return "reservas/nueva-reserva";
     }
 
@@ -73,16 +98,23 @@ public class ReservaController {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
+            model.addAttribute("miembros", miembroService.findAll());
+            model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
         }
 
         try {
+            log.info("Guardando Reserva: {}", reserva);
             reserva.setEstadoReserva(EstadoReserva.PENDIENTE.getLabel());
+            // TODO. Ajustar con el usuario de la sesión.
+            reserva.setRegistradoPor(Usuario.builder().id(1).build());
             log.info("Reserva a guardar: {}", reserva);
             reservaService.save(reserva);
-        } catch (DataIntegrityViolationException e) {
+        } catch (ReservaSolapadaException | DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
-            bindingResult.rejectValue("global.error", "Esta reserva ya existe. Por favor, vuelva a intentarlo en otra fecha/hora.");
+            bindingResult.reject("global.error", "Ya existe una reserva en el espacio deseado. Por favor, vuelva a intentarlo en otra horario.");
+            model.addAttribute("miembros", miembroService.findAll());
+            model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
         }
 
@@ -92,8 +124,8 @@ public class ReservaController {
 
     @GetMapping("change")
     public String changeReserva(@RequestParam(value = "id") Integer idReserva, Model model) {
-        Optional<Reserva> reserva = reservaService.findById(idReserva);
-        model.addAttribute("reserva", reserva.orElse(new Reserva()));
+        Reserva reserva = reservaService.findById(idReserva);
+        model.addAttribute("reserva", reserva);
         // Agregar los posibles estados al modelo
         model.addAttribute("estados", EstadoReserva.values());
         return "reservas/editar-reserva";
@@ -118,6 +150,20 @@ public class ReservaController {
         }
 
         redirectAttributes.addFlashAttribute("exito", "La reserva se ha guardado correctamente");
+        return "redirect:/reservas";
+    }
+
+    @PostMapping("confirmar")
+    public String confirmarReserva(@RequestParam(value = "id") Integer idReserva, RedirectAttributes redirectAttributes) {
+        Optional<Reserva> reserva = reservaService.confirmarReserva(idReserva);
+        redirectAttributes.addFlashAttribute("exito", "La reserva " + idReserva + " se ha guardado correctamente");
+        return "redirect:/reservas";
+    }
+
+    @PostMapping("cancelar")
+    public String cancelarReserva(@RequestParam(value = "id") Integer idReserva, RedirectAttributes redirectAttributes) {
+        Optional<Reserva> reserva = reservaService.cancelarReserva(idReserva);
+        redirectAttributes.addFlashAttribute("exito", "La reserva " + idReserva + " se ha guardado correctamente");
         return "redirect:/reservas";
     }
 

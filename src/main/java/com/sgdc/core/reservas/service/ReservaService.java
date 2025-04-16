@@ -2,6 +2,7 @@ package com.sgdc.core.reservas.service;
 
 import com.sgdc.core.reservas.domain.Reserva;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,10 +10,20 @@ public interface ReservaService {
 
     List<Reserva> findAll();
 
-    Optional<Reserva> findById(Integer id);
+    Reserva findById(Integer id);
 
     List<Reserva> search(String keyword);
 
     void save(Reserva reserva);
+
+    Optional<Reserva> confirmarReserva(Integer id);
+
+    Optional<Reserva> cancelarReserva(Integer id);
+
+    public List<Reserva> buscarPendientesSolapadas(Integer instalacionId,
+                                                   LocalDateTime inicio,
+                                                   LocalDateTime fin,
+                                                   Integer excludeId);
+
 
 }
