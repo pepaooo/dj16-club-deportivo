@@ -28,15 +28,21 @@
 
     <!-- Campo de búsqueda -->
     <form id="searchForm" th:action="@{/beneficios}" method="get">
-        <div class="input-group mb-3">
-            <input type="text" id="searchInput" name="q" class="form-control" placeholder="Buscar beneficio por nombre o descripción" th:value="${q}" aria-label="Buscar" aria-describedby="search-addon" />
-            <button class="btn btn-primary" type="submit">
-                <i class="bi bi-search"></i> Buscar
-            </button>
-            <!-- Botón de limpiar, inicialmente oculto -->
-            <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
-                <i class="bi bi-x"></i> Limpiar
-            </button>
+        <div class="row mb-3">
+            <div class="col-md-12 ">
+                <div class="input-group">
+                    <input type="text" id="searchInput" name="q" class="form-control"
+                           placeholder="Buscar beneficio por nombre o descripción" th:value="${q}" aria-label="Buscar"
+                           aria-describedby="search-addon"/>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <!-- Botón de limpiar, inicialmente oculto -->
+                    <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                        <i class="bi bi-x"></i> Limpiar
+                    </button>
+                </div>
+            </div>
         </div>
     </form>
 
@@ -79,10 +85,10 @@
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
 <script>
     // Espera 5 segundos y oculta el alert automáticamente
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         var alertEl = document.getElementById("alertSuccess");
         if (alertEl) {
-            setTimeout(function() {
+            setTimeout(function () {
                 // Usa el metodo de Bootstrap para cerrar el alert
                 var bsAlert = new bootstrap.Alert(alertEl);
                 bsAlert.close();
@@ -90,7 +96,7 @@
         }
     });
     // Muestra el botón de limpiar si hay texto en el campo de búsqueda
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const searchInput = document.getElementById("searchInput");
         const clearButton = document.getElementById("clearSearch");
         const searchForm = document.getElementById("searchForm");
@@ -101,12 +107,12 @@
         }
 
         // Actualizar visibilidad del botón a medida que se escribe
-        searchInput.addEventListener("input", function() {
+        searchInput.addEventListener("input", function () {
             clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
         });
 
         // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
-        clearButton.addEventListener("click", function() {
+        clearButton.addEventListener("click", function () {
             searchInput.value = "";
             searchForm.submit();
         });
