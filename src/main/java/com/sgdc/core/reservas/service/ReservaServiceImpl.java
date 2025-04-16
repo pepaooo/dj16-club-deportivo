@@ -2,12 +2,14 @@ package com.sgdc.core.reservas.service;
 
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.reservas.domain.EstadoReserva;
+import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.Reserva;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.repository.ReservaRepository;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -40,33 +42,53 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public List<Reserva> search(String keyword) {
+        LocalDateTime ahora = LocalDateTime.now();
+
         if (keyword == null || keyword.trim().isEmpty()) {
-            return repository.findAllByOrderByIdDesc();
+            return repository.findByFechaHoraFinGreaterThanEqualOrderByFechaHoraInicioAsc(ahora);
         }
         String pattern = "%" + keyword.toLowerCase() + "%";
 
         Specification<Reserva> spec = (root, query, cb) -> {
+            // 1) Sólo reservas aún vigentes
+            Predicate vigentes = cb.greaterThanOrEqualTo(root.get("fechaHoraFin"), ahora);
+
 
             // JOIN con miembro
             Join<Reserva, Miembro> miembroJoin = root.join("miembro", JoinType.LEFT);
-            Expression<String> nombreMiembroExpr = cb.lower(miembroJoin.get("nombre"));
+            Predicate pNombreMiembro = cb.like(cb.lower(miembroJoin.get("nombre")), pattern);
+            Predicate pApellidoMiembro = cb.like(cb.lower(miembroJoin.get("apellidoPaterno")), pattern);
 
-            // Para atributos de tipo String se hace directamente.
-            Expression<String> estadoReservaExpr = cb.lower(root.get("estadoReserva"));
+            // 3) JOIN con Instalación
+            Join<Reserva, Instalacion> instalacionJoin = root.join("instalacion", JoinType.LEFT);
+            Predicate pNombreInstalacion = cb.like(cb.lower(instalacionJoin.get("nombre")), pattern);
 
-            // Para las fechas, podemos usar una función de formateo. Por ejemplo, en MariaDB se puede usar DATE_FORMAT.
-            Expression<String> fechaHoraInicioExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaHoraInicio"), cb.literal("%Y-%m-%d"));
-            Expression<String> fechaHoraFinExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaHoraFin"), cb.literal("%Y-%m-%d"));
-
-            return cb.or(
-                    cb.like(nombreMiembroExpr, pattern),
-                    cb.like(estadoReservaExpr, pattern),
-                    cb.like(fechaHoraInicioExpr, pattern),
-                    cb.like(fechaHoraFinExpr, pattern)
+            // 4) Estado y fechas
+            Predicate pEstado = cb.like(cb.lower(root.get("estadoReserva")), pattern);
+            Predicate pInicio = cb.like(
+                    cb.function("DATE_FORMAT", String.class, root.get("fechaHoraInicio"), cb.literal("%Y-%m-%d")),
+                    pattern
             );
+            Predicate pFin = cb.like(
+                    cb.function("DATE_FORMAT", String.class, root.get("fechaHoraFin"), cb.literal("%Y-%m-%d")),
+                    pattern
+            );
+
+            // 5) Unimos todos los OR de texto
+            Predicate texto = cb.or(
+                    pNombreMiembro,
+                    pApellidoMiembro,
+                    pNombreInstalacion,
+                    pEstado,
+                    pInicio,
+                    pFin
+            );
+
+            // 6) Combinamos con el filtro de vigentes
+            return cb.and(vigentes, texto);
         };
 
-        return repository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
+        return repository.findAll(spec, Sort.by(Sort.Direction.ASC, "fechaHoraInicio"));
     }
 
     @Override

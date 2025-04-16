@@ -13,6 +13,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer>, JpaS
     // Listas de todas las reservas ordenadas de forma descendente por ID
     List<Reserva> findAllByOrderByIdDesc();
 
+    List<Reserva> findByFechaHoraFinGreaterThanEqualOrderByFechaHoraInicioAsc(LocalDateTime ahora);
+
     @Query("SELECT COUNT(r) " +
             "FROM Reserva r " +
             "WHERE r.instalacion.id = :idInstalacion " +
