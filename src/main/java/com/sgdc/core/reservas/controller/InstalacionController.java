@@ -40,14 +40,14 @@ public class InstalacionController {
         model.addAttribute("q", keyword);
 
         // Otros atributos, por ejemplo para los resúmenes:
-        List<Instalacion> allInstalaciones = instalacionService.findAll();
-        model.addAttribute("totalInstalaciones", allInstalaciones.size());
+        //List<Instalacion> allInstalaciones = instalacionService.findAll();
+        model.addAttribute("totalInstalaciones", instalaciones.size());
         // Para calcular instalaciones activas/inactivas, podrías hacer filtrados o consultar en el servicio.
-        long disponibles = allInstalaciones.stream().filter(m -> EstadoInstalacion.DISPONIBLE.getLabel().equalsIgnoreCase(m.getEstado())).count();
+        long disponibles = instalaciones.stream().filter(m -> EstadoInstalacion.DISPONIBLE.getLabel().equalsIgnoreCase(m.getEstado())).count();
         model.addAttribute("instalacionesDisponibles", disponibles);
-        long mantenimiento = allInstalaciones.stream().filter(m -> EstadoInstalacion.EN_MANTENIMIENTO.getLabel().equalsIgnoreCase(m.getEstado())).count();
+        long mantenimiento = instalaciones.stream().filter(m -> EstadoInstalacion.EN_MANTENIMIENTO.getLabel().equalsIgnoreCase(m.getEstado())).count();
         model.addAttribute("instalacionesEnMantenimiento", mantenimiento);
-        long cerradas = allInstalaciones.stream().filter(m -> EstadoInstalacion.CERRADA.getLabel().equalsIgnoreCase(m.getEstado())).count();
+        long cerradas = instalaciones.stream().filter(m -> EstadoInstalacion.CERRADA.getLabel().equalsIgnoreCase(m.getEstado())).count();
         model.addAttribute("instalacionesCerradas", cerradas);
         
         return "instalaciones/inicio";
