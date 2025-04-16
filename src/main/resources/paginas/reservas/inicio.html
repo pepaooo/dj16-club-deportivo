@@ -101,7 +101,7 @@
             <!-- Ejemplo de fila (en producción se iteraría con th:each) -->
             <tr th:each="reserva : ${reservas}">
                 <td th:text="${reserva.id}"></td>
-                <td th:text="${reserva.miembro.nombre}"></td>
+                <td th:text="${reserva.miembro.nombre + ' ' + reserva.miembro.apellidoPaterno + ' ' + reserva.miembro.apellidoMaterno}"></td>
                 <td th:text="${reserva.instalacion.nombre}"></td>
                 <td th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></td>
                 <td th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}"></td>

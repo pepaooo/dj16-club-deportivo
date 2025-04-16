@@ -61,7 +61,7 @@ public class ReservaController {
         model.addAttribute("reservasConfirmadas", mantenimiento);
         long cerradas = reservas.stream().filter(m -> EstadoReserva.CANCELADA.getLabel().equalsIgnoreCase(m.getEstadoReserva())).count();
         model.addAttribute("reservasCanceladas", cerradas);
-        
+
         return "reservas/inicio";
     }
 
@@ -70,15 +70,17 @@ public class ReservaController {
         Reserva reserva = reservaService.findById(idReserva);
         model.addAttribute("reserva", reserva);
 
-        // obtenemos las pendientes para la misma instalación que se solapan
-        List<Reserva> solapadas = reservaService
-                .buscarPendientesSolapadas(
-                        reserva.getInstalacion().getId(),
-                        reserva.getFechaHoraInicio(),
-                        reserva.getFechaHoraFin(),
-                        reserva.getId()
-                );
-        model.addAttribute("pendientesSolapadas", solapadas);
+        if (!reserva.getEstadoReserva().equals(EstadoReserva.CANCELADA.getLabel())) {
+            // obtenemos las pendientes para la misma instalación que se solapan
+            List<Reserva> solapadas = reservaService
+                    .buscarPendientesSolapadas(
+                            reserva.getInstalacion().getId(),
+                            reserva.getFechaHoraInicio(),
+                            reserva.getFechaHoraFin(),
+                            reserva.getId()
+                    );
+            model.addAttribute("pendientesSolapadas", solapadas);
+        }
 
         return "reservas/ver-reserva";
     }
