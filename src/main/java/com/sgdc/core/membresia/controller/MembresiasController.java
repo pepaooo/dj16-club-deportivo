@@ -33,15 +33,6 @@ public class MembresiasController {
         this.membresiaService = membresiaService;
     }
 
-    @GetMapping("tarifa")
-    @ResponseBody
-    public Map<String, Object> getTarifa(@RequestParam(value = "id") Integer idTipoMembresia) {
-        BigDecimal tarifa = membresiaService.findById(idTipoMembresia).getTarifa();
-        Map<String, Object> response = new HashMap<>();
-        response.put("tarifa", tarifa);
-        return response;
-    }
-
     @GetMapping
     public String inicio(@RequestParam(value = "q", required = false) String keyword, Model model) {
         List<Membresia> membresias = membresiaService.search(keyword);

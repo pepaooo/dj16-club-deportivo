@@ -137,7 +137,7 @@
         $('#miembroSelect').select2({
             placeholder: 'Buscar miembro por nombre, correo, etc.',
             ajax: {
-                url: '/miembros/search',
+                url: '/api/miembros/search',
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
@@ -162,7 +162,7 @@
         $('#miembroSelect').on('select2:select', function (e) {
             var miembroId = e.params.data.id;
             $.ajax({
-                url: '/miembros/detail',
+                url: '/api/miembros/detail',
                 data: {id: miembroId},
                 dataType: 'json',
                 success: function (response) {
@@ -203,7 +203,7 @@
             var nuevoTipoId = $(this).val();
             if (nuevoTipoId) {
                 $.ajax({
-                    url: '/membresias/tarifa',
+                    url: '/api/membresias/tarifa',
                     data: {id: nuevoTipoId},
                     dataType: 'json',
                     success: function (data) {

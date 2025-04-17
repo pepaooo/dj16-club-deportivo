@@ -40,41 +40,11 @@ public class MiembroController {
 
     private final PagoMembresiaService pagoMembresiaService;
 
-    private final ModelMapper modelMapper;
-
-    public MiembroController(MiembroService miembroService, MembresiaService membresiaService, HistorialMembresiaService historialMembresiaService, PagoMembresiaService pagoMembresiaService, ModelMapper modelMapper) {
+    public MiembroController(MiembroService miembroService, MembresiaService membresiaService, HistorialMembresiaService historialMembresiaService, PagoMembresiaService pagoMembresiaService) {
         this.miembroService = miembroService;
         this.membresiaService = membresiaService;
         this.historialMembresiaService = historialMembresiaService;
         this.pagoMembresiaService = pagoMembresiaService;
-        this.modelMapper = modelMapper;
-    }
-
-    @GetMapping("search")
-    @ResponseBody
-    public List<MiembroDTO> searchMiembros(@RequestParam("q") String term) {
-        return miembroService.search(term).stream()
-                .map(this::convertToDto)
-                .toList();
-    }
-
-    @GetMapping("detail")
-    @ResponseBody
-    public MiembroDetalleDTO getMiembroDetalle(@RequestParam("id") Integer id) {
-        ModelMapper customMapper = new ModelMapper();
-        customMapper.addMappings(new PropertyMap<Miembro, MiembroDetalleDTO>() {
-            @Override
-            protected void configure() {
-                map().setMembresiaActual(source.getMembresia().getNombre());
-                map().setTarifa(source.getMembresia().getTarifa());
-            }
-        });
-        Miembro miembro = miembroService.findById(id);
-        return customMapper.map(miembro, MiembroDetalleDTO.class);
-    }
-
-    private MiembroDTO convertToDto(Miembro miembro) {
-        return modelMapper.map(miembro, MiembroDTO.class);
     }
 
     @GetMapping
