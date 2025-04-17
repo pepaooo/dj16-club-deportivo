@@ -20,15 +20,14 @@
             <h2>Gestión de Reservas</h2>
         </div>
         <div class="col-md-6 text-end">
-            <a class="btn btn-primary" th:href="@{/reservas/new}">
-                <i class="bi bi-plus-circle"></i> Nueva Reserva
-            </a>
-        </div>
-        <!-- Link para mostrar el calendario -->
-        <div class="col-md-6 text-end">
-            <a class="btn btn-secondary" th:href="@{/reservas/calendario}">
-                <i class="bi bi-calendar"></i> Ver Calendario
-            </a>
+            <div class="d-inline-flex gap-2">
+                <a class="btn btn-primary" th:href="@{/reservas/new}">
+                    <i class="bi bi-plus-circle"></i> Nueva Reserva
+                </a>
+                <a class="btn btn-secondary" th:href="@{/reservas/calendario}">
+                    <i class="bi bi-calendar"></i> Ver Calendario
+                </a>
+            </div>
         </div>
     </div>
 

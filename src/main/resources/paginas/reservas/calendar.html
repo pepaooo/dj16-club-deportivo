@@ -12,6 +12,23 @@
 
 <!-- Contenido principal -->
 <div class="container mt-4">
+    <!-- Encabezado y Botón Nueva Reserva -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2>Gestión de Reservas</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="d-inline-flex gap-2">
+                <a class="btn btn-secondary" th:href="@{/reservas}">
+                    <i class="bi bi-arrow-left-circle"></i> Volver
+                </a>
+                <a class="btn btn-primary" th:href="@{/reservas/new}">
+                    <i class="bi bi-plus-circle"></i> Nueva Reserva
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div id="calendar"></div>
 </div>
 

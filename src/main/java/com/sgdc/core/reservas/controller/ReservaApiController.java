@@ -29,7 +29,7 @@ public class ReservaApiController {
         for (Reserva r : reservas) {
             Map<String,Object> e = new HashMap<>();
             e.put("id",    r.getId());
-            e.put("title", r.getMiembro().getNombre() + " – " + r.getInstalacion().getNombre());
+            e.put("title", r.getMiembro().getNombre() + " " + r.getMiembro().getApellidoPaterno() + " " + r.getMiembro().getApellidoMaterno() + " – " + r.getInstalacion().getNombre());
             e.put("start", r.getFechaHoraInicio().toString());
             e.put("end",   r.getFechaHoraFin().toString());
             eventos.add(e);
