@@ -66,11 +66,11 @@ public class ReservaServiceImpl implements ReservaService {
             // 4) Estado y fechas
             Predicate pEstado = cb.like(cb.lower(root.get("estadoReserva")), pattern);
             Predicate pInicio = cb.like(
-                    cb.function("DATE_FORMAT", String.class, root.get("fechaHoraInicio"), cb.literal("%Y-%m-%d")),
+                    cb.function("DATE_FORMAT", String.class, root.get("fechaHoraInicio"), cb.literal("%Y-%m-%d %H:%i")),
                     pattern
             );
             Predicate pFin = cb.like(
-                    cb.function("DATE_FORMAT", String.class, root.get("fechaHoraFin"), cb.literal("%Y-%m-%d")),
+                    cb.function("DATE_FORMAT", String.class, root.get("fechaHoraFin"), cb.literal("%Y-%m-%d %H:%i")),
                     pattern
             );
 
