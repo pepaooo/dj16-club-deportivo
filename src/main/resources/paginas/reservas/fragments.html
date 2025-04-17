@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Fragmento reutilizable -->
+<div th:fragment="detalleReserva">
+    <!-- Datos de la Reserva -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>ID de reserva:</strong> <span th:text="${reserva.id}"></span></p>
+                    <p>
+                        <strong>Miembro:</strong>
+                        <a th:href="@{'/miembros/get?id=' + ${reserva.miembro.id}}">
+                            <span th:text="${reserva.miembro.nombre + ' ' + reserva.miembro.apellidoPaterno + ' ' + reserva.miembro.apellidoMaterno}"></span>
+                        </a>
+                    </p>
+                    <p><strong>Instalación:</strong> <span th:text="${reserva.instalacion.nombre}"></span></p>
+                    <p><strong>Registrado por:</strong> <span th:text="${reserva.registradoPor.nombre}"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p>
+                        <strong>Inicio:</strong>
+                        <span th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></span>
+                    </p>
+                    <p>
+                        <strong>Fin:</strong>
+                        <span th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}"></span>
+                    </p>
+                    <p><strong>Estado:</strong> <span th:text="${reserva.estadoReserva}"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <a class="btn btn-secondary" th:href="@{/reservas}">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+            <a class="btn btn-success" th:if="${reserva.estadoReserva=='Pendiente'}"
+               data-bs-toggle="modal" data-bs-target="#confirmarReservaModal">
+                <i class="bi bi-check-circle"></i> Confirmar
+            </a>
+            <a class="btn btn-danger" th:if="${reserva.estadoReserva!='Cancelada'}"
+               data-bs-toggle="modal" data-bs-target="#cancelarReservaModal">
+                <i class="bi bi-trash"></i> Eliminar
+            </a>
+        </div>
+    </div>
+
+    <!-- Lista de pendientes solapadas -->
+    <div th:if="${not #lists.isEmpty(pendientesSolapadas)}" class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Otras reservas pendientes que solapan
+        </div>
+        <div class="card-body p-0">
+            <table class="table mb-0">
+                <thead class="table-light">
+                <tr><th>ID</th><th>Miembro</th><th>Inicio</th><th>Fin</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${pendientesSolapadas}">
+                    <td th:text="${r.id}"></td>
+                    <td>
+                        <a th:href="@{'/miembros/get?id=' + ${r.miembro.id}}">
+                            <span th:text="${r.miembro.nombre + ' ' + r.miembro.apellidoPaterno}"></span>
+                        </a>
+                    </td>
+                    <td th:text="${#temporals.format(r.fechaHoraInicio,'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(r.fechaHoraFin,'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

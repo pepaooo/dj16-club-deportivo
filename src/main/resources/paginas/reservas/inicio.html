@@ -24,6 +24,12 @@
                 <i class="bi bi-plus-circle"></i> Nueva Reserva
             </a>
         </div>
+        <!-- Link para mostrar el calendario -->
+        <div class="col-md-6 text-end">
+            <a class="btn btn-secondary" th:href="@{/reservas/calendario}">
+                <i class="bi bi-calendar"></i> Ver Calendario
+            </a>
+        </div>
     </div>
 
     <!-- Tarjetas resumen (opcional) -->
@@ -115,7 +121,7 @@
             </tr>
             <tr th:if="${#lists.isEmpty(reservas)}">
                 <td colspan="7" class="text-center">
-                    No se encontraron registros.
+                    No se encontraron registros vigentes.
                 </td>
             </tr>
             </tbody>

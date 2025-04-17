@@ -30,6 +30,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer>, JpaS
                 FROM Reserva r 
                WHERE r.instalacion.id = :instalacionId
                  AND r.estadoReserva = 'Pendiente'
+                 AND r.fechaHoraFin > CURRENT_TIMESTAMP
                  AND r.fechaHoraFin   > :fechaInicio
                  AND r.fechaHoraInicio < :fechaFin
                  AND (:excludeId IS NULL OR r.id <> :excludeId)

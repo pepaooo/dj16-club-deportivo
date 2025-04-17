@@ -85,6 +85,40 @@ public class ReservaController {
         return "reservas/ver-reserva";
     }
 
+    @GetMapping("calendario")
+    public String calendario(Model model) {
+        return "reservas/calendar";
+    }
+
+    @GetMapping("modal-detail")
+    public String modalDetail(@RequestParam("id") Integer id, Model model) {
+        // Reserva principal
+        Reserva reserva = reservaService.findById(id);
+        model.addAttribute("reserva", reserva);
+
+        // Lista de pendientes solapadas (cancela a confirmar)
+        List<Reserva> solapadas = reservaService
+                .buscarPendientesSolapadas(
+                        reserva.getInstalacion().getId(),
+                        reserva.getFechaHoraInicio(),
+                        reserva.getFechaHoraFin(),
+                        reserva.getId()
+                );
+        model.addAttribute("pendientesSolapadas", solapadas);
+
+        // Apuntar al fragmento detalleReserva dentro de fragments.html
+        return "reservas/fragments :: detalleReserva";
+    }
+
+
+//    @GetMapping("modal-detail")
+//    public String modalDetail(@RequestParam("id") Integer id, Model model) {
+//        Reserva r = reservaService.findById(id);
+//        model.addAttribute("reserva", r);
+//        return "reservas/modal-detail :: detalle";
+//    }
+
+
     @GetMapping("new")
     public String newReserva(Model model) {
         model.addAttribute("reserva", new Reserva());

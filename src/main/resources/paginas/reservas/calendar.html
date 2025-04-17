@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <div th:insert="~{plantillas/plantilla :: headContent}"></div>
+    <script th:src="@{/jquery/3.7.1/jquery.min.js}" ></script>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
+</head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container mt-4">
+    <div id="calendar"></div>
+</div>
+
+<!-- Modal de detalle/edit reserva -->
+<div class="modal fade" id="reservaModal" tabindex="-1" aria-labelledby="reservaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reservaModalLabel">Detalle de Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" id="reservaModalBody">
+                <!-- Aquí cargaremos vía AJAX el contenido -->
+                <div class="text-center">
+                    <div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="#" id="btnEditarReserva" class="btn btn-primary">Editar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let calendarEl = document.getElementById('calendar');
+        let reservaModal = new bootstrap.Modal(document.getElementById('reservaModal'));
+
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            locale: 'es',
+            slotMinTime: '06:00:00',
+            slotMaxTime: '22:00:00',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridDay,timeGridWeek,dayGridMonth'
+            },
+            events: '/api/reservas',         // tu endpoint que devuelve JSON
+            selectable: true,
+            select: info => {
+                // abrir modal para crear reserva en info.start - info.end
+            },
+            eventClick: function (info) {
+                var reservaId = info.event.id;
+                // 1) Cargar el body del modal vía AJAX
+                $('#reservaModalBody').html(
+                    '<div class="text-center">' +
+                    '<div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div>' +
+                    '</div>'
+                );
+                // 2) Setear enlace de "Editar"
+                $('#btnEditarReserva').attr('href', '/reservas/edit?id=' + reservaId);
+
+                // 3) Petición AJAX para traer la vista parcial
+                $.ajax({
+                    url: '/reservas/modal-detail',
+                    data: {id: reservaId},
+                    success: function (html) {
+                        // Reemplaza el body con el HTML devuelto
+                        $('#reservaModalBody').html(html);
+                        reservaModal.show();
+                    },
+                    error: function () {
+                        $('#reservaModalBody').html('<div class="alert alert-danger">Error al cargar datos.</div>');
+                        reservaModal.show();
+                    }
+                });
+            }
+        });
+        calendar.render();
+    });
+</script>
+</body>
+</html>
