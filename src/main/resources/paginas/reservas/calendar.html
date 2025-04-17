@@ -23,22 +23,18 @@
                 <h5 class="modal-title" id="reservaModalLabel">Detalle de Reserva</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body" id="reservaModalBody">
+            <div class="modal-body" id="reservaModalBody" >
                 <!-- Aquí cargaremos vía AJAX el contenido -->
                 <div class="text-center">
                     <div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <a href="#" id="btnEditarReserva" class="btn btn-primary">Editar</a>
             </div>
         </div>
     </div>
 </div>
 
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.5/index.global.min.js"></script>-->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         let calendarEl = document.getElementById('calendar');
@@ -67,10 +63,8 @@
                     '<div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div>' +
                     '</div>'
                 );
-                // 2) Setear enlace de "Editar"
-                $('#btnEditarReserva').attr('href', '/reservas/edit?id=' + reservaId);
 
-                // 3) Petición AJAX para traer la vista parcial
+                // 2) Petición AJAX para traer la vista parcial
                 $.ajax({
                     url: '/reservas/modal-detail',
                     data: {id: reservaId},

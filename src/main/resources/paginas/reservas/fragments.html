@@ -31,26 +31,32 @@
                 </div>
             </div>
         </div>
+
         <div class="card-footer text-end">
-            <a class="btn btn-secondary" th:href="@{/reservas}">
-                <i class="bi bi-arrow-left-circle"></i> Volver
-            </a>
-            <a class="btn btn-success" th:if="${reserva.estadoReserva=='Pendiente'}"
-               data-bs-toggle="modal" data-bs-target="#confirmarReservaModal">
-                <i class="bi bi-check-circle"></i> Confirmar
-            </a>
-            <a class="btn btn-danger" th:if="${reserva.estadoReserva!='Cancelada'}"
-               data-bs-toggle="modal" data-bs-target="#cancelarReservaModal">
-                <i class="bi bi-trash"></i> Eliminar
-            </a>
+<!--            <a class="btn btn-secondary" th:href="@{/reservas}"><i class="bi bi-arrow-left-circle"></i> Volver</a>-->
+
+            <form th:action="@{'/reservas/confirmar?id=' + ${reserva.id}}" method="post"
+                  th:if="${reserva.estadoReserva=='Pendiente' and reserva.fechaHoraFin.isAfter(T(java.time.LocalDateTime).now())}" style="display:inline">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Confirmar Reserva
+                </button>
+            </form>
+
+            <form th:action="@{'/reservas/cancelar?id=' + ${reserva.id}}" method="post"
+                  th:if="${reserva.estadoReserva!='Cancelada' and reserva.fechaHoraFin.isAfter(T(java.time.LocalDateTime).now())}" style="display:inline">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Eliminar Reserva
+                </button>
+            </form>
         </div>
+
     </div>
 
     <!-- Lista de pendientes solapadas -->
     <div th:if="${not #lists.isEmpty(pendientesSolapadas)}" class="card mb-4">
         <div class="card-header bg-warning text-dark">
             <i class="bi bi-exclamation-triangle-fill"></i>
-            Otras reservas pendientes que solapan
+            Otras reservas pendientes que solapan (se cancelarán si confirma)
         </div>
         <div class="card-body p-0">
             <table class="table mb-0">
