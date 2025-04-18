@@ -46,4 +46,10 @@ public class Reserva {
     @JoinColumn(name = "registrado_por", nullable = false)
     private Usuario registradoPor;
 
+//    @AssertTrue(message = "La fecha fin debe ser posterior a la de inicio")
+//    public boolean isFechasCronologicas() {
+//        if (fechaHoraInicio == null || fechaHoraFin == null) return true;
+//        return fechaHoraInicio.isBefore(fechaHoraFin) && !fechaHoraInicio.isEqual(fechaHoraFin);
+//    }
+
 }

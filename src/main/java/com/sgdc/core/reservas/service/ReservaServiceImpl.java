@@ -4,23 +4,29 @@ import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.reservas.domain.EstadoReserva;
 import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.Reserva;
+import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.repository.ReservaRepository;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ReservaServiceImpl implements ReservaService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReservaServiceImpl.class);
 
     private final ReservaRepository repository;
 
@@ -93,6 +99,19 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public void save(Reserva reserva) {
+        // 1. Validar que las fechas de inicio y fin sean correctas
+        // Traza el now hasta minutos para ignorar segundos/nanos
+        LocalDateTime ahora = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        log.info("Reserva Ahora: {}, Inicio: {}, Fin:  {}", ahora, reserva.getFechaHoraInicio(), reserva.getFechaHoraFin());
+        if (reserva.getFechaHoraInicio().isBefore(ahora)) {
+            throw new ReservaInvalidaException("La fecha de inicio no puede ser en el pasado");
+        }
+        if (reserva.getFechaHoraFin().isBefore(reserva.getFechaHoraInicio()) ||
+                reserva.getFechaHoraFin().isEqual(reserva.getFechaHoraInicio())) {
+            throw new ReservaInvalidaException("La fecha fin debe ser posterior a la de inicio");
+        }
+
+        // 2. Verificar que no haya reservas solapadas
         Long solapadas = repository.countReservasSolapadas(
                 reserva.getInstalacion().getId(),
                 reserva.getFechaHoraInicio(),

@@ -1,12 +1,11 @@
 package com.sgdc.core.reservas.controller;
 
-import com.sgdc.core.membresia.domain.Membresia;
 import com.sgdc.core.miembro.service.MiembroService;
 import com.sgdc.core.reservas.domain.EstadoReserva;
 import com.sgdc.core.reservas.domain.Reserva;
+import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.service.InstalacionService;
-import com.sgdc.core.reservas.service.ReservaService;
 import com.sgdc.core.reservas.service.ReservaService;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.validation.Valid;
@@ -110,15 +109,6 @@ public class ReservaController {
         return "reservas/fragments :: detalleReserva";
     }
 
-
-//    @GetMapping("modal-detail")
-//    public String modalDetail(@RequestParam("id") Integer id, Model model) {
-//        Reserva r = reservaService.findById(id);
-//        model.addAttribute("reserva", r);
-//        return "reservas/modal-detail :: detalle";
-//    }
-
-
     @GetMapping("new")
     public String newReserva(Model model) {
         model.addAttribute("reserva", new Reserva());
@@ -146,9 +136,28 @@ public class ReservaController {
             reserva.setRegistradoPor(Usuario.builder().id(1).build());
             log.info("Reserva a guardar: {}", reserva);
             reservaService.save(reserva);
-        } catch (ReservaSolapadaException | DataIntegrityViolationException e) {
+        } catch (ReservaInvalidaException e) {
+            String message = e.getMessage();
+            log.error("Error de reserva inválida: {}", message);
+            switch (message) {
+                case "La fecha de inicio no puede ser en el pasado" ->
+                        bindingResult.rejectValue("fechaHoraInicio", "fechaHoraInicio", "La fecha/hora de inicio no puede ser en el pasado.");
+                case "La fecha fin debe ser posterior a la de inicio" ->
+                        bindingResult.rejectValue("fechaHoraFin", "fechaHoraFin", "La fecha/hora fin debe ser posterior a la de inicio.");
+                default -> bindingResult.reject("global.error", message);
+            }
+            model.addAttribute("miembros", miembroService.findAll());
+            model.addAttribute("instalaciones", instalacionService.findAll());
+            return "reservas/nueva-reserva";
+        } catch (ReservaSolapadaException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.reject("global.error", "Ya existe una reserva en el espacio deseado. Por favor, vuelva a intentarlo en otra horario.");
+            model.addAttribute("miembros", miembroService.findAll());
+            model.addAttribute("instalaciones", instalacionService.findAll());
+            return "reservas/nueva-reserva";
+        } catch (DataIntegrityViolationException e) {
+            log.error("Error de integridad de datos: {}", e.getMessage());
+            bindingResult.reject("global.error", "Se ha presentado un error al crear la reserva. Por favor, vuelva a intentarlo en otra horario.");
             model.addAttribute("miembros", miembroService.findAll());
             model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
