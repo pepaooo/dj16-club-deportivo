@@ -46,6 +46,10 @@ public class Reserva {
     @JoinColumn(name = "registrado_por", nullable = false)
     private Usuario registradoPor;
 
+    public boolean isCancelada() {
+        return estadoReserva != null && estadoReserva.equals("Cancelada");
+    }
+
 //    @AssertTrue(message = "La fecha fin debe ser posterior a la de inicio")
 //    public boolean isFechasCronologicas() {
 //        if (fechaHoraInicio == null || fechaHoraFin == null) return true;

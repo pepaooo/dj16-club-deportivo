@@ -15,7 +15,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,19 +67,7 @@ public class ReservaController {
     public String getReserva(@RequestParam(value = "id") Integer idReserva, Model model) {
         Reserva reserva = reservaService.findById(idReserva);
         model.addAttribute("reserva", reserva);
-
-        if (!reserva.getEstadoReserva().equals(EstadoReserva.CANCELADA.getLabel())) {
-            // obtenemos las pendientes para la misma instalación que se solapan
-            List<Reserva> solapadas = reservaService
-                    .buscarPendientesSolapadas(
-                            reserva.getInstalacion().getId(),
-                            reserva.getFechaHoraInicio(),
-                            reserva.getFechaHoraFin(),
-                            reserva.getId()
-                    );
-            model.addAttribute("pendientesSolapadas", solapadas);
-        }
-
+        addSolapadas(reserva, model);
         return "reservas/ver-reserva";
     }
 
@@ -94,17 +81,8 @@ public class ReservaController {
         // Reserva principal
         Reserva reserva = reservaService.findById(id);
         model.addAttribute("reserva", reserva);
-
         // Lista de pendientes solapadas (cancela a confirmar)
-        List<Reserva> solapadas = reservaService
-                .buscarPendientesSolapadas(
-                        reserva.getInstalacion().getId(),
-                        reserva.getFechaHoraInicio(),
-                        reserva.getFechaHoraFin(),
-                        reserva.getId()
-                );
-        model.addAttribute("pendientesSolapadas", solapadas);
-
+        addSolapadas(reserva, model);
         // Apuntar al fragmento detalleReserva dentro de fragments.html
         return "reservas/fragments :: detalleReserva";
     }
@@ -121,9 +99,7 @@ public class ReservaController {
     @PostMapping("create-reserva")
     public String guardarReserva(@Valid Reserva reserva, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         if (bindingResult.hasErrors()) {
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                log.error("Ocurrió un error: {}", error.getDefaultMessage());
-            }
+            logErrors(bindingResult);
             model.addAttribute("miembros", miembroService.findAll());
             model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
@@ -151,13 +127,13 @@ public class ReservaController {
             return "reservas/nueva-reserva";
         } catch (ReservaSolapadaException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
-            bindingResult.reject("global.error", "Ya existe una reserva en el espacio deseado. Por favor, vuelva a intentarlo en otra horario.");
+            bindingResult.reject("global.error", "Ya existe una reserva confirmada en el espacio deseado. Por favor, vuelva a intentarlo en otro horario.");
             model.addAttribute("miembros", miembroService.findAll());
             model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
-            bindingResult.reject("global.error", "Se ha presentado un error al crear la reserva. Por favor, vuelva a intentarlo en otra horario.");
+            bindingResult.reject("global.error", "Se ha presentado un error al crear la reserva. Por favor, vuelva a intentarlo en otro horario.");
             model.addAttribute("miembros", miembroService.findAll());
             model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
@@ -179,9 +155,7 @@ public class ReservaController {
     @PostMapping("change-reserva")
     public String changeReserva(@Valid Reserva reserva, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                log.error("Ocurrió un error: {}", error.getDefaultMessage());
-            }
+            logErrors(bindingResult);
             return "reservas/editar-reserva";
         }
 
@@ -200,16 +174,34 @@ public class ReservaController {
 
     @PostMapping("confirmar")
     public String confirmarReserva(@RequestParam(value = "id") Integer idReserva, RedirectAttributes redirectAttributes) {
-        Optional<Reserva> reserva = reservaService.confirmarReserva(idReserva);
+        reservaService.confirmarReserva(idReserva);
         redirectAttributes.addFlashAttribute("exito", "La reserva " + idReserva + " se ha guardado correctamente");
         return "redirect:/reservas";
     }
 
     @PostMapping("cancelar")
     public String cancelarReserva(@RequestParam(value = "id") Integer idReserva, RedirectAttributes redirectAttributes) {
-        Optional<Reserva> reserva = reservaService.cancelarReserva(idReserva);
+        reservaService.cancelarReserva(idReserva);
         redirectAttributes.addFlashAttribute("exito", "La reserva " + idReserva + " se ha guardado correctamente");
         return "redirect:/reservas";
+    }
+
+    private void addSolapadas(Reserva r, Model model) {
+        if (!r.isCancelada()) {
+            List<Reserva> solapadas = reservaService.buscarPendientesSolapadas(
+                    r.getInstalacion().getId(),
+                    r.getFechaHoraInicio(),
+                    r.getFechaHoraFin(),
+                    r.getId()
+            );
+            model.addAttribute("pendientesSolapadas", solapadas);
+        }
+    }
+
+    private void logErrors(BindingResult br) {
+        br.getAllErrors().forEach(err ->
+                log.error("Validación: {}", err.getDefaultMessage())
+        );
     }
 
 }
