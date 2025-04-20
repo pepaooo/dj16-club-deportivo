@@ -76,11 +76,17 @@
                th:href="@{${origen}=='miembro' ? '/pagos/historial-pagos?id=' + ${pago.miembro.id} : '/pagos'}">
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
+            <!-- Botón Ajustar -->
             <a class="btn btn-warning"
-               th:if="${pago.estatus == 'Activo'}"
+               th:if="${pago.estatus == 'Activo' or pago.estatus == 'Pendiente'}"
                th:href="@{'/pagos/ajustar?id=' + ${pago.id}}">
-                <i class="bi bi-pencil-square"></i> Ajustar
+                <i class="bi bi-pencil-square"></i> Ajustar Pago
             </a>
+            <!-- Botón Cancelar -->
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelarModal"
+                    th:if="${pago.estatus == 'Activo' or pago.estatus == 'Pendiente'}">
+                <i class="bi bi-x-circle"></i> Cancelar Pago
+            </button>
         </div>
     </div>
 
@@ -121,6 +127,30 @@
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Modal de cancelación -->
+<div class="modal fade" id="cancelarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form th:action="@{/pagos/cancelar}" method="post" class="modal-content">
+            <input type="hidden" name="idPago" th:value="${pago.id}"/>
+            <div class="modal-header">
+                <h5 class="modal-title">Cancelar Pago</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="motivo" class="form-label">Motivo de cancelación</label>
+                    <textarea id="motivo" name="motivoCancelacion" class="form-control"
+                              rows="3" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+                <button type="submit" class="btn btn-danger">Confirmar Cancelación</button>
+            </div>
+        </form>
     </div>
 </div>
 

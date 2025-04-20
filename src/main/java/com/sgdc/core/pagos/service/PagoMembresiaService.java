@@ -20,8 +20,6 @@ public interface PagoMembresiaService {
 
     List<PagoMembresia> search(Integer idMiembro, String keyword);
 
-    void save(PagoMembresiaDTO pagoMembresiaDTO);
-
     List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro, String keyword);
 
     List<PagoMembresiaResumenDTO> resumenAllPagosByMiembro(Integer idMiembro, int limite);
@@ -31,4 +29,8 @@ public interface PagoMembresiaService {
     List<PagoMembresiaResumenDTO> searchResumen(String keyword);
 
     BigDecimal calcularMontoFinal(PagoMembresia pago, List<PagoAjuste> ajustes);
+
+    void save(PagoMembresiaDTO pagoMembresiaDTO);
+
+    void cancelarPago(Integer idPago, String motivo);
 }

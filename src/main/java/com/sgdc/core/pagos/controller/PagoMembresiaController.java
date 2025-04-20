@@ -24,10 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("pagos")
@@ -176,6 +174,16 @@ public class PagoMembresiaController {
         redirectAttributes.addFlashAttribute("exito", "El ajuste al pago de membresía se ha guardado correctamente");
         return "redirect:/pagos";
     }
+
+    @PostMapping("cancelar")
+    public String cancelarPago(@RequestParam Integer idPago,
+                               @RequestParam String motivoCancelacion,
+                               RedirectAttributes rs) {
+        pagoMembresiaService.cancelarPago(idPago, motivoCancelacion);
+        rs.addFlashAttribute("exito", "Pago cancelado correctamente");
+        return "redirect:/pagos";
+    }
+
 
     @GetMapping("historial-pagos")
     public String viewHistoialPagos(@RequestParam(value = "id") Integer idMiembro,

@@ -102,6 +102,7 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "JOIN p.miembro m " +
             "JOIN p.membresia tm " +
             "WHERE m.id = :idMiembro " +
+            "AND p.cancelado = false " +
             "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
             "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
             "ORDER BY p.id DESC")
@@ -119,6 +120,7 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "LEFT JOIN p.miembro m " +
             "LEFT JOIN p.membresia tm " +
             "WHERE m.id = :idMiembro " +
+            "AND p.cancelado = false " +
             "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
             "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
             "AND (LOWER(m.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
@@ -150,8 +152,10 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "FROM PagoMembresia p " +
             "JOIN p.miembro m " +
             "JOIN p.membresia tm " +
-            "WHERE p.fechaInicio > CURRENT_TIMESTAMP OR " +
-            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP) " +
+            "WHERE " +
+            "p.cancelado = false " +
+            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
+            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
             "ORDER BY p.id DESC")
     List<PagoMembresiaResumenDTO> findResumenPagos();
 
@@ -166,7 +170,9 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "FROM PagoMembresia p " +
             "LEFT JOIN p.miembro m " +
             "LEFT JOIN p.membresia tm " +
-            "WHERE (p.fechaInicio > CURRENT_TIMESTAMP OR " +
+            "WHERE " +
+            "p.cancelado = false " +
+            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
             "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
             "AND (LOWER(m.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "   OR LOWER(m.apellidoPaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +

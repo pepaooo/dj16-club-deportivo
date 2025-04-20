@@ -12,6 +12,7 @@ import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 import com.sgdc.core.pagos.repository.PagoMembresiaRepository;
 import com.sgdc.core.usuarios.domain.Usuario;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
@@ -106,6 +107,42 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         );
     }
 
+    @Override
+    public List<PagoMembresiaResumenDTO> resumenPagos() {
+        return pagoMembresiaRepository.findResumenPagos();
+    }
+
+    @Override
+    public List<PagoMembresiaResumenDTO> searchResumen(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return pagoMembresiaRepository.findResumenPagos();
+        }
+        return pagoMembresiaRepository.searchResumenPagos(keyword);
+    }
+
+    @Override
+    public BigDecimal calcularMontoFinal(PagoMembresia pago, List<PagoAjuste> ajustes) {
+        BigDecimal montoFinal = pago.getMonto() != null ? pago.getMonto() : BigDecimal.ZERO;
+        if (ajustes != null) {
+            for (PagoAjuste ajuste : ajustes) {
+                montoFinal = montoFinal.add(ajuste.getMontoAjuste());
+            }
+        }
+        return montoFinal;
+    }
+
+    @Override
+    public List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return pagoMembresiaRepository.findResumenPagosByMiembro(idMiembro);
+        }
+        return pagoMembresiaRepository.searchResumenPagosByMiembro(idMiembro, keyword);
+    }
+
+    @Override
+    public List<PagoMembresiaResumenDTO> resumenAllPagosByMiembro(Integer idMiembro, int limite) {
+        return pagoMembresiaRepository.findAllResumenPagosByMiembro(idMiembro, limite != -1 ? PageRequest.of(0, limite) : Pageable.unpaged());
+    }
 
     @Transactional
     @Override
@@ -189,6 +226,17 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         }
     }
 
+    @Override
+    @Transactional
+    public void cancelarPago(Integer idPago, String motivo) {
+        PagoMembresia p = pagoMembresiaRepository.findById(idPago)
+                .orElseThrow(() -> new EntityNotFoundException("Pago no encontrado"));
+        p.setCancelado(true);
+        p.setFechaCancelacion(LocalDateTime.now());
+        p.setMotivoCancelacion(motivo);
+        pagoMembresiaRepository.save(p);
+    }
+
     private PagoMembresia cloneSinId(PagoMembresia ex) {
         return PagoMembresia.builder()
                 .miembro(ex.getMiembro())
@@ -238,42 +286,5 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
     private static Usuario buildUsuario(PagoMembresiaDTO dto) {
         return Usuario.builder().id(dto.getUsuarioDTO().getId()).build();
-    }
-
-    @Override
-    public List<PagoMembresiaResumenDTO> resumenPagos() {
-        return pagoMembresiaRepository.findResumenPagos();
-    }
-
-    @Override
-    public List<PagoMembresiaResumenDTO> searchResumen(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return pagoMembresiaRepository.findResumenPagos();
-        }
-        return pagoMembresiaRepository.searchResumenPagos(keyword);
-    }
-
-    @Override
-    public BigDecimal calcularMontoFinal(PagoMembresia pago, List<PagoAjuste> ajustes) {
-        BigDecimal montoFinal = pago.getMonto() != null ? pago.getMonto() : BigDecimal.ZERO;
-        if (ajustes != null) {
-            for (PagoAjuste ajuste : ajustes) {
-                montoFinal = montoFinal.add(ajuste.getMontoAjuste());
-            }
-        }
-        return montoFinal;
-    }
-
-    @Override
-    public List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro, String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return pagoMembresiaRepository.findResumenPagosByMiembro(idMiembro);
-        }
-        return pagoMembresiaRepository.searchResumenPagosByMiembro(idMiembro, keyword);
-    }
-
-    @Override
-    public List<PagoMembresiaResumenDTO> resumenAllPagosByMiembro(Integer idMiembro, int limite) {
-        return pagoMembresiaRepository.findAllResumenPagosByMiembro(idMiembro, limite != -1 ? PageRequest.of(0, limite) : Pageable.unpaged());
     }
 }
