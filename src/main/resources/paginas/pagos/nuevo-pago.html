@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <div th:insert="~{plantillas/plantilla :: headContent}"></div>
-    <link th:href="@{/select2/css/select2.min.css}"  rel="stylesheet"/>
-    <script th:src="@{/jquery/3.7.1/jquery.min.js}" ></script>
-    <script th:src="@{/select2/js/select2.full.min.js}" ></script>
+    <link th:href="@{/select2/css/select2.min.css}" rel="stylesheet"/>
+    <script th:src="@{/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/select2/js/select2.full.min.js}"></script>
 </head>
 <body>
 <header th:replace="~{plantillas/plantilla :: header}"></header>
@@ -27,6 +27,7 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <form th:action="@{/pagos/create-pago}" th:object="${pagoDto}" method="post">
+
                         <!-- Mostrar errores globales -->
                         <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
                             Verifique los siguientes inconvenientes:
@@ -35,7 +36,7 @@
                             </ul>
                         </div>
 
-                        <!-- Campo para seleccionar Miembro -->
+                        <!-- Selección de Miembro -->
                         <div class="mb-3">
                             <label for="miembroSelect" class="form-label">Miembro</label>
                             <select id="miembroSelect" name="idMiembro" th:field="*{idMiembro}" class="form-control"
@@ -46,59 +47,66 @@
                                  th:errors="*{idMiembro}"></div>
                         </div>
 
-                        <!-- Selector de Operación -->
+                        <!-- Historial contextual, oculto hasta elegir miembro -->
+                        <div id="miembro-contexto" class="mb-4" style="display:none">
+                            <h6>Historial de Membresías</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Inicio</th>
+                                        <th>Fin</th>
+                                        <th>Estatus</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tabla-pagos-miembro">
+                                    <!-- se llena vía JS -->
+                                    <tr id="sin-pagos">
+                                        <td colspan="4" class="text-center text-muted">No hay membresías registradas
+                                            aún
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Selección de Plan (nueva/renovación/cambio) -->
                         <div class="mb-3">
-                            <label class="form-label">Operación</label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" th:field="*{operacion}" value="RENOVAR"
-                                       id="renovarRadio"/>
-                                <label class="form-check-label" for="renovarRadio">Primera suscripción o Renovación</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" th:field="*{operacion}" value="CAMBIAR"
-                                       id="cambiarRadio"/>
-                                <label class="form-check-label" for="cambiarRadio">Cambiar Membresía</label>
-                            </div>
-                            <div class="text-danger" th:if="${#fields.hasErrors('operacion')}"
-                                 th:errors="*{operacion}"></div>
-                        </div>
-
-                        <!-- Campo para la membresía actual (solo lectura) -->
-                        <!--                        <div class="mb-3">-->
-                        <!--                            <label for="membresiaActual" class="form-label">Membresía Actual</label>-->
-                        <!--                            <input type="text" class="form-control" id="membresiaActual" readonly />-->
-                        <!--                        </div>-->
-                        <!--                        &lt;!&ndash; Campo para la tarifa (solo lectura) &ndash;&gt;-->
-                        <!--                        <div class="mb-3">-->
-                        <!--                            <label for="tarifa" class="form-label">Tarifa</label>-->
-                        <!--                            <input type="number" step="0.01" class="form-control" id="tarifa" readonly />-->
-                        <!--                        </div>-->
-
-                        <!-- Contenedor para seleccionar el nuevo tipo de membresía -->
-                        <div class="mb-3" id="nuevoTipoContainer" style="display: none;">
-                            <label for="nuevoTipo" class="form-label">Nuevo Tipo de Membresía</label>
-                            <select id="nuevoTipo" th:field="*{nuevoTipoMembresiaId}" class="form-select">
+                            <label for="tipoMembresia" class="form-label">Tipo de Membresía</label>
+                            <select id="tipoMembresia" th:field="*{membresiaId}" class="form-select">
                                 <option value="">Seleccione un tipo</option>
-                                <option th:each="tm : ${tiposMembresia}" th:value="${tm.id}"
-                                        th:text="${tm.nombre}"></option>
+                                <option th:each="tm : ${tiposMembresia}"
+                                        th:value="${tm.id}"
+                                        th:text="${tm.nombre}"
+                                        th:selected="${tm.id} == ${pagoDto.membresiaId}"></option>
                             </select>
+                            <div class="text-danger" th:if="${#fields.hasErrors('membresiaId')}"
+                                 th:errors="*{membresiaId}"></div>
                         </div>
 
-                        <!-- Campo para el monto del pago -->
+                        <!-- Monto calculado / editable -->
                         <div class="mb-3">
                             <label for="monto" class="form-label">Monto</label>
-                            <!-- El campo se pondrá en modo lectura si se selecciona "RENOVAR" -->
-                            <input type="number" step="0.01" th:field="*{monto}" id="monto" class="form-control"
-                                 required />
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">$</span>
+                                <input
+                                        type="number" step="0.01"
+                                        th:field="*{monto}"
+                                        id="monto"
+                                        class="form-control"
+                                        placeholder="0.00"
+                                        required
+                                />
+                            </div>
                             <div class="text-danger" th:if="${#fields.hasErrors('monto')}"
                                  th:errors="*{monto}"></div>
                         </div>
 
-                        <!-- Fecha de Inicio de Membresía sin horas -->
+                        <!-- Fecha de Inicio -->
                         <div class="mb-3">
-                            <label for="fechaInicio" class="form-label"
-                            >Fecha de Inicio de Membresía</label
-                            >
+                            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
                             <input
                                     type="date"
                                     class="form-control"
@@ -110,6 +118,8 @@
                             <div class="text-danger" th:if="${#fields.hasErrors('fechaInicio')}"
                                  th:errors="*{fechaInicio}"></div>
                         </div>
+
+                        <!-- Botones -->
                         <div class="d-flex justify-content-end">
                             <a th:href="@{/pagos}" class="btn btn-secondary me-2">
                                 <i class="bi bi-arrow-left-circle"></i> Cancelar
@@ -129,11 +139,10 @@
 
 <script>
 
-    var defaultTarifa = null; // Variable para guardar la tarifa inicial
-
     $(document).ready(function () {
-        var defaultTarifa = null; // Variable para guardar la tarifa inicial
+        let defaultFin = null;
 
+        // 1) Configuramos Select2 para buscar sólo miembros activos
         $('#miembroSelect').select2({
             placeholder: 'Buscar miembro por nombre, correo, etc.',
             ajax: {
@@ -156,67 +165,75 @@
                 cache: true
             },
             minimumInputLength: 1
-        });
+        })
+            .on('select2:select', e => {
+                const miembroId = e.params.data.id;
+                // Ocultamos/mostramos el panel de contexto
+                $('#miembro-contexto').show();
+                // Limpiamos la tabla ANTES de cargar datos
+                $('#tabla-pagos-miembro').empty();
+                $('#fechaInicio').prop('readonly', false).val('');
+                // Trae pagos ordenados por fechaInicio DESC
+                $.getJSON(`/api/pagos/miembro/${miembroId}`, pagos => {
+                    const $tb = $('#tabla-pagos-miembro');
+                    // a) quita el mensaje “sin registros”
+                    $tb.find('#sin-pagos').remove();
+                    // b) si no hay pagos, vuelve a poner fila
+                    if (pagos.length === 0) {
+                        $tb.append(`
+                          <tr id="sin-pagos">
+                            <td colspan="4" class="text-center text-muted">
+                              No hay membresías registradas aún
+                            </td>
+                          </tr>
+                        `);
+                    }
+                    // c) si hay pagos, dibújalos
+                    pagos.forEach(p => $tb.append(`
+                    <tr>
+                      <td>${p.membresiaActual}</td>
+                      <td>${p.fechaInicio}</td>
+                      <td>${p.fechaFin}</td>
+                      <td>${p.estatusMembresia}</td>
+                    </tr>
+                  `));
+                    // Inferimos «operación» y pre‑configuramos campos:
+                    const ultimo = pagos[0];
+                    if (ultimo) {
+                        $('#tipoMembresia').val(ultimo.idMembresiaActual);
+                        if (ultimo.estatusMembresia === 'Activo') {
+                            defaultFin = new Date(ultimo.fechaFin);
+                            defaultFin.setDate(defaultFin.getDate() + 1);
+                            $('#fechaInicio').val(defaultFin.toISOString().slice(0, 10))
+                                .prop('readonly', false);
+                        }
+                    }
+                    // Disparamos el change para poblar el monto correcto de la membresía
+                    $('#tipoMembresia').trigger('change');
 
-        // Al seleccionar un miembro
-        $('#miembroSelect').on('select2:select', function (e) {
-            var miembroId = e.params.data.id;
+                });
+            });
+
+        // cada vez que cambie el plan en el select:
+        $('#tipoMembresia').on('change', function () {
+            const planId = $(this).val();
+            if (!planId) {
+                $('#monto').val('');
+                return;
+            }
             $.ajax({
-                url: '/api/miembros/detail',
-                data: {id: miembroId},
+                url: '/api/membresias/tarifa',
+                data: {id: planId},
                 dataType: 'json',
-                success: function (response) {
-                    defaultTarifa = response.tarifa;
-                    $("input[name='operacion'][value='RENOVAR']").prop('checked', true);
-                    $("#nuevoTipoContainer").hide();
-                    $("#monto").prop("readonly", true);
-                    $("#monto").val(response.tarifa);
+                success: function (data) {
+                    $('#monto').val(data.tarifa);
                 },
                 error: function () {
-                    console.error('Error al obtener los datos del miembro');
+                    console.error('Error al obtener la tarifa del plan');
                 }
             });
         });
 
-        // Al cambiar la operación
-        $("input[name='operacion']").change(function () {
-            var operacion = $(this).val();
-            if (operacion === "CAMBIAR") {
-                $("#nuevoTipoContainer").show();
-                $("#nuevoTipo").prop("required", true);
-                $("#monto").prop("readonly", false);
-                $('#nuevoTipo').val('').trigger('change');
-                // Vaciar el campo monto para forzar selección del nuevo tipo
-                $("#monto").val('');
-            } else if (operacion === "RENOVAR") {
-                $("#nuevoTipoContainer").hide();
-                $("#nuevoTipo").prop("required", false);
-                $("#monto").prop("readonly", true);
-                if (defaultTarifa !== null) {
-                    $("#monto").val(defaultTarifa);
-                }
-            }
-        });
-
-        // Al seleccionar un nuevo tipo de membresía
-        $('#nuevoTipo').change(function () {
-            var nuevoTipoId = $(this).val();
-            if (nuevoTipoId) {
-                $.ajax({
-                    url: '/api/membresias/tarifa',
-                    data: {id: nuevoTipoId},
-                    dataType: 'json',
-                    success: function (data) {
-                        $("#monto").val(data.tarifa);
-                    },
-                    error: function () {
-                        console.error('Error al obtener la tarifa del nuevo plan');
-                    }
-                });
-            } else {
-                $("#monto").val('');
-            }
-        });
     });
 
 </script>

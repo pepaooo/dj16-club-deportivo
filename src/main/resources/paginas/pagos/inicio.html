@@ -85,6 +85,7 @@
         <table class="table table-striped table-hover">
             <thead style="background-color: #e9f5ff; color: #0d6efd">
             <tr>
+                <th>Pago</th>
                 <th>ID Miembro</th>
                 <th>Miembro</th>
                 <th>Membresía</th>
@@ -97,6 +98,7 @@
             </thead>
             <tbody>
             <tr th:each="pago : ${pagosMembresiaDTO}">
+                <td th:text="${pago.id}"></td>
                 <td th:text="${pago.idMiembro}"></td>
                 <td th:text="${pago.nombreMiembro + ' ' + pago.apPaternoMiembro + ' ' + pago.apMaternoMiembro}"></td>
                 <td th:text="${pago.membresiaActual}"></td>

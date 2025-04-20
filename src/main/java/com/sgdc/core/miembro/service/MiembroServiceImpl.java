@@ -57,6 +57,11 @@ public class MiembroServiceImpl implements MiembroService {
     }
 
     @Override
+    public List<Miembro> searchActive(String keyword) {
+        return repository.searchActiveMembers(keyword);
+    }
+
+    @Override
     public void save(Miembro miembro) {
         repository.save(miembro);
     }

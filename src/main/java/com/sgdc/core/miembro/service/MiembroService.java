@@ -14,6 +14,8 @@ public interface MiembroService {
 
     List<Miembro> search(String keyword);
 
+    List<Miembro> searchActive(String keyword);
+
     void save(Miembro miembro);
 
     List<Miembro> searchMiembros(Integer idMembresia, LocalDateTime fechaInicio, LocalDateTime fechaFin);

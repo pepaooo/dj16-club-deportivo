@@ -22,4 +22,22 @@ public interface MiembroRepository extends JpaRepository<Miembro, Integer>, JpaS
                                 @Param("fechaInicio") LocalDateTime fechaInicio,
                                 @Param("fechaFin") LocalDateTime fechaFin);
 
+    @Query("""
+              SELECT m FROM Miembro m
+                JOIN PagoMembresia p ON p.miembro.id = m.id
+              WHERE p.fechaInicio = (
+                SELECT MAX(p2.fechaInicio) FROM PagoMembresia p2
+                 WHERE p2.miembro.id = m.id
+                   AND p2.fechaInicio <= CURRENT_TIMESTAMP
+              )
+                AND p.cancelado = false
+                AND p.fechaInicio <= CURRENT_TIMESTAMP
+                AND p.fechaFin    >= CURRENT_TIMESTAMP
+                AND ( :q IS NULL 
+                      OR LOWER(m.nombre)  LIKE LOWER(CONCAT('%',:q,'%'))
+                      OR LOWER(m.apellidoPaterno) LIKE LOWER(CONCAT('%',:q,'%'))
+                      OR LOWER(m.apellidoMaterno) LIKE LOWER(CONCAT('%',:q,'%'))
+                      OR LOWER(m.correoElectronico) LIKE LOWER(CONCAT('%',:q,'%')) )
+            """)
+    List<Miembro> searchActiveMembers(@Param("q") String keyword);
 }

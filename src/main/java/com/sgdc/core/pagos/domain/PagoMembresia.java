@@ -60,11 +60,21 @@ public class PagoMembresia {
     @JoinColumn(name = "id_membresia", nullable = false)
     private Membresia membresia;
 
+    @Column(name = "cancelado")
+    private boolean cancelado = false;
+
+    @Column(name = "fecha_cancelacion")
+    private LocalDateTime fechaCancelacion;
+
+    @Column(name = "motivo_cancelacion", length = 255)
+    private String motivoCancelacion;
+
     /**
      * Metodo para obtener el estatus de la membresía.
      * @return
      */
     public String getEstatus() {
+        if (cancelado) return "Cancelado";
         if (this.fechaInicio != null && this.fechaFin != null) {
             LocalDate now = LocalDate.now();
 //            return ((this.fechaInicio.isBefore(now) || this.fechaInicio.isEqual(now)) && this.fechaFin.isAfter(now)) ? "Activo" : "Vencido";

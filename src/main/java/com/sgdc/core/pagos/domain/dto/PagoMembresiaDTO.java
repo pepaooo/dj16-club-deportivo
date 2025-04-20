@@ -15,13 +15,11 @@ public class PagoMembresiaDTO {
 
     private Integer id;
 
-    @NotNull(message = "El id del miembro no puede estar vacío")
+    @NotNull(message = "El id del miembro no puede estar vacío" )
     private Integer idMiembro;
 
-    @NotEmpty(message = "El tipo de operación no puede estar vacío")
-    private String operacion;
-
-    private Integer nuevoTipoMembresiaId;
+    @NotNull(message = "Debe seleccionar un tipo de membresía")
+    private Integer membresiaId;
 
     @NotNull(message = "El monto no puede estar vacío")
     private BigDecimal monto;

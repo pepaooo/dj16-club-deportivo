@@ -18,13 +18,17 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -105,62 +109,198 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
     @Transactional
     @Override
-    public void save(PagoMembresiaDTO pagoMembresiaDTO) {
-        Miembro miembro = miembroService.findById(pagoMembresiaDTO.getIdMiembro());
-        boolean existeHistorial = pagoMembresiaRepository.existsByMiembro_Id(pagoMembresiaDTO.getIdMiembro());
-        log.info("Existe historial: " + existeHistorial);
+    public void save(PagoMembresiaDTO dto) {
+        // 0) guardamos el pago nuevo y calculamos iniN, finN
+        PagoMembresia nuevo = buildAndSaveNuevo(dto);
+        LocalDate iniN = nuevo.getFechaInicio();
+        LocalDate finN = nuevo.getFechaFin();
 
-        // Cambio de membresía en miembro
-        Membresia nuevaMembresia = null;
-        if (pagoMembresiaDTO.getNuevoTipoMembresiaId() != null) {
-            nuevaMembresia = membresiaService.findById(pagoMembresiaDTO.getNuevoTipoMembresiaId());
-            miembro.setMembresia(nuevaMembresia);
-            miembroService.save(miembro);
+        // 1) ajustamos sólo los que realmente solapan contra [iniN, finN]
+        List<PagoMembresia> solapados = pagoMembresiaRepository.findOverlapping(dto.getIdMiembro(), iniN, finN);
+        List<PagoMembresia> cola = new ArrayList<>();
+
+        for (PagoMembresia ex : solapados) {
+            LocalDate ini = ex.getFechaInicio(), fin = ex.getFechaFin();
+            // 1.0) si el pago es el nuevo, lo ignoramos
+            if (ex.getId().equals(nuevo.getId())) {
+                log.info("Pago {} es el nuevo. Ignorando solapamiento.", ex.getId());
+                continue;
+            }
+
+            // 1.1) totalmente dentro → cancelar
+            if (!ini.isBefore(iniN) && !fin.isAfter(finN)) {
+                ex.setCancelado(true);
+                ex.setFechaCancelacion(LocalDateTime.now());
+                ex.setMotivoCancelacion("Pago solapado por otro nuevo. Id de pago: " + nuevo.getId());
+                pagoMembresiaRepository.save(ex);
+                log.info("Cancelación de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
+                continue;
+            }
+            // 1.2) envuelto por completo → fragmentar en dos
+            if (ini.isBefore(iniN) && fin.isAfter(finN)) {
+                log.info("Fragmentación de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
+                ex.setFechaFin(iniN.minusDays(1));
+                pagoMembresiaRepository.save(ex);
+                PagoMembresia frag = cloneSinId(ex);
+                frag.setFechaInicio(finN.plusDays(1));
+                frag.setFechaFin(frag.getFechaInicio()
+                        .plusDays(ex.getMembresia().getDuracionDias()));
+//                frag.setEstatus("Pendiente");
+                cola.add(frag);
+                continue;
+            }
+            // 1.3) solapa al principio → recortar fin
+            if (ini.isBefore(iniN) && fin.isAfter(iniN)) {
+                log.info("Recorte de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
+                ex.setFechaFin(iniN.minusDays(1));
+                pagoMembresiaRepository.save(ex);
+                continue;
+            }
+            // 1.4) solapa al final → encolar entero
+            if (ini.isBefore(finN) && fin.isAfter(finN)) {
+//                log.info("Encolado de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
+//                cola.add(ex);
+//                pagoMembresiaRepository.delete(ex); // lo quitamos para reubicarlo
+                log.info("Reubicación 1 de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
+                LocalDate nuevoInicio = finN.plusDays(1);
+                ex.setFechaInicio(nuevoInicio);
+                ex.setFechaFin(nuevoInicio.plusDays(ex.getMembresia().getDuracionDias()));
+                pagoMembresiaRepository.save(ex);
+                continue;
+            }
         }
 
-        PagoMembresia pagoMembresia = PagoMembresia.builder()
-                .id(pagoMembresiaDTO.getId())
-                .miembro(miembro)
-                .membresia(pagoMembresiaDTO.getNuevoTipoMembresiaId() != null ? nuevaMembresia : miembro.getMembresia())
-                .monto(pagoMembresiaDTO.getMonto())
-                .fechaPago(LocalDateTime.now())
-                .fechaInicio(pagoMembresiaDTO.getFechaInicio())
-                .fechaFin(pagoMembresiaDTO.getFechaInicio().plusDays(miembro.getMembresia().getDuracionDias()))
-                .registradoPor(buildUsuario(pagoMembresiaDTO))
-                .build();
-
-        //log.info("Guardando pago de membresía: {}", pagoMembresia);
-        pagoMembresiaRepository.save(pagoMembresia);
-
-
-        // Creación de historial de membresía
-        if (!existeHistorial) {
-            log.info("No existe historial de membresía, creando uno nuevo.");
-            HistorialMembresia historialMembresia = new HistorialMembresia();
-            historialMembresia.setMiembro(miembro);
-            historialMembresia.setMembresia(miembro.getMembresia());
-            historialMembresia.setFechaCambio(LocalDateTime.now());
-            historialMembresia.setDescripcion("Primera suscripción a " + miembro.getMembresia().getNombre());
-            historialMembresia.setRegistradoPor(buildUsuario(pagoMembresiaDTO));
-            log.info("Guardando historial de membresía: {}", historialMembresia);
-            historialMembresiaService.save(historialMembresia);
+        // 2) ahora añadimos **todos** los pagos futuros que queden:
+        //    los que no solaparon y los fragmentos nuevos
+        List<PagoMembresia> futuros = pagoMembresiaRepository
+                .findFutureByMiembroOrderByFechaInicio(dto.getIdMiembro(), iniN);
+        for (PagoMembresia f : futuros) {
+            if (!cola.contains(f)) cola.add(f);
         }
 
-        if (pagoMembresiaDTO.getNuevoTipoMembresiaId() != null && nuevaMembresia != null) {
-            log.info("Actualizando membresía del miembro a: {}", nuevaMembresia.getNombre());
-            HistorialMembresia historialMembresia = new HistorialMembresia();
-            historialMembresia.setMiembro(miembro);
-            historialMembresia.setMembresia(nuevaMembresia);
-            historialMembresia.setFechaCambio(LocalDateTime.now());
-            historialMembresia.setDescripcion("Actualización a " + nuevaMembresia.getNombre());
-            historialMembresia.setRegistradoPor(buildUsuario(pagoMembresiaDTO));
-            historialMembresiaService.save(historialMembresia);
+        // 3) reubicamos en cadena, empezando justo al final de finN
+        LocalDate prevEnd = finN;
+        for (PagoMembresia ex : cola) {
+            long dur = ex.getMembresia().getDuracionDias();
+            LocalDate start = prevEnd.plusDays(1);
+            ex.setFechaInicio(start);
+            ex.setFechaFin(start.plusDays(dur));
+//            ex.setEstatus("Pendiente");
+            log.info("Reubicación 2 de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
+            pagoMembresiaRepository.save(ex);
+            prevEnd = ex.getFechaFin();
         }
-
     }
 
-    private static Usuario buildUsuario(PagoMembresiaDTO pagoMembresiaDTO) {
-        return Usuario.builder().id(pagoMembresiaDTO.getUsuarioDTO().getId()).build();
+    private PagoMembresia cloneSinId(PagoMembresia ex) {
+        return PagoMembresia.builder()
+                .miembro(ex.getMiembro())
+                .membresia(ex.getMembresia())
+                .monto(ex.getMonto())
+                .fechaPago(ex.getFechaPago())
+                .fechaInicio(ex.getFechaInicio())
+                .fechaFin(ex.getFechaFin())
+                .registradoPor(ex.getRegistradoPor())
+                .cancelado(ex.isCancelado())
+                .build();
+    }
+
+    private PagoMembresia buildAndSaveNuevo(PagoMembresiaDTO dto) {
+        Miembro miembro = miembroService.findById(dto.getIdMiembro());
+        // -------------------------------------------------------
+        // 1) Calculamos el rango del nuevo pago
+        LocalDate inicioNuevo = dto.getFechaInicio();
+        Membresia planNuevo = membresiaService.findById(dto.getMembresiaId());
+        LocalDate finNuevo = inicioNuevo.plusDays(planNuevo.getDuracionDias());
+        // -------------------------------------------------------
+        // 2) Insertamos el nuevo pago
+        PagoMembresia nuevo = PagoMembresia.builder()
+                .miembro(miembro)
+                .membresia(planNuevo)
+                .monto(dto.getMonto())
+                .fechaPago(LocalDateTime.now())
+                .fechaInicio(inicioNuevo)
+                .fechaFin(finNuevo)
+                .registradoPor(buildUsuario(dto))
+                .build();
+        pagoMembresiaRepository.save(nuevo);
+        // -------------------------------------------------------
+        // 3) Histórico de cambio de plan
+        boolean primerPago = !pagoMembresiaRepository.existsByMiembro_Id(miembro.getId());
+        HistorialMembresia hist = new HistorialMembresia();
+        hist.setMiembro(miembro);
+        hist.setMembresia(planNuevo);
+        hist.setFechaCambio(LocalDateTime.now());
+        hist.setDescripcion((primerPago ? "Primera suscripción a " : "Renovación a ")
+                + planNuevo.getNombre());
+        hist.setRegistradoPor(buildUsuario(dto));
+        historialMembresiaService.save(hist);
+
+        return nuevo;
+    }
+
+
+//    @Transactional
+//    @Override
+//    public void save(PagoMembresiaDTO dto) {
+//        Miembro miembro = miembroService.findById(dto.getIdMiembro());
+//        // -------------------------------------------------------
+//        // 1) Calculamos el rango del nuevo pago
+//        LocalDate inicioNuevo = dto.getFechaInicio();
+//        Membresia planNuevo   = membresiaService.findById(dto.getMembresiaId());
+//        LocalDate finNuevo    = inicioNuevo.plusDays(planNuevo.getDuracionDias());
+//        // -------------------------------------------------------
+//        // 2) Buscamos todos los pagos (activos y futuros) que se solapen
+//        List<PagoMembresia> solapados = pagoMembresiaRepository
+//                .findOverlapping(miembro.getId(), inicioNuevo, finNuevo);
+//
+//        for (PagoMembresia existente : solapados) {
+//            // si el pago existente arranca antes del nuevo inicio...
+//            if (existente.getFechaInicio().isBefore(inicioNuevo)) {
+//                // → acortamos su fechaFin justo antes del nuevo
+//                existente.setFechaFin(inicioNuevo.minusDays(1));
+//            } else {
+//                // si el pago existente arranca dentro o después del nuevo,
+//                // lo desplazamos para que empiece justo al término de este:
+//                existente.setFechaInicio(finNuevo.plusDays(1));
+//                // y recalculamos su fin según su duración original:
+//                existente.setFechaFin(
+//                        existente.getFechaInicio()
+//                                .plusDays(existente.getMembresia().getDuracionDias())
+//                );
+//            }
+//            pagoMembresiaRepository.save(existente);
+//        }
+//
+//        // -------------------------------------------------------
+//        // 3) Insertamos el nuevo pago
+//        PagoMembresia nuevo = PagoMembresia.builder()
+//                .miembro(miembro)
+//                .membresia(planNuevo)
+//                .monto(dto.getMonto())
+//                .fechaPago(LocalDateTime.now())
+//                .fechaInicio(inicioNuevo)
+//                .fechaFin(finNuevo)
+//                .registradoPor(buildUsuario(dto))
+//                .build();
+//        pagoMembresiaRepository.save(nuevo);
+//
+//        // -------------------------------------------------------
+//        // 4) Histórico de cambio de plan
+//        boolean primerPago = !pagoMembresiaRepository.existsByMiembro_Id(miembro.getId());
+//        HistorialMembresia hist = new HistorialMembresia();
+//        hist.setMiembro(miembro);
+//        hist.setMembresia(planNuevo);
+//        hist.setFechaCambio(LocalDateTime.now());
+//        hist.setDescripcion((primerPago ? "Primera suscripción a " : "Renovación a ")
+//                + planNuevo.getNombre());
+//        hist.setRegistradoPor(buildUsuario(dto));
+//        historialMembresiaService.save(hist);
+//    }
+
+
+    private static Usuario buildUsuario(PagoMembresiaDTO dto) {
+        return Usuario.builder().id(dto.getUsuarioDTO().getId()).build();
     }
 
     @Override
@@ -195,4 +335,8 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         return pagoMembresiaRepository.searchResumenPagosByMiembro(idMiembro, keyword);
     }
 
+    @Override
+    public List<PagoMembresiaResumenDTO> resumenAllPagosByMiembro(Integer idMiembro, int limite) {
+        return pagoMembresiaRepository.findAllResumenPagosByMiembro(idMiembro, limite != -1 ? PageRequest.of(0, limite) : Pageable.unpaged());
+    }
 }

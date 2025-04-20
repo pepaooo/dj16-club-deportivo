@@ -25,8 +25,16 @@ public class MiembroApiController {
 
     @GetMapping("search")
     @ResponseBody
-    public List<MiembroDTO> searchMiembros(@RequestParam("q") String term) {
+    public List<MiembroDTO> search(@RequestParam("q") String term) {
         return miembroService.search(term).stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    @GetMapping("search-active")
+    @ResponseBody
+    public List<MiembroDTO> searchActive(@RequestParam("q") String term) {
+        return miembroService.searchActive(term).stream()
                 .map(this::convertToDto)
                 .toList();
     }

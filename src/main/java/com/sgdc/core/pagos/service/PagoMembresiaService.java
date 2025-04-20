@@ -24,6 +24,8 @@ public interface PagoMembresiaService {
 
     List<PagoMembresiaResumenDTO> resumenPagosByMiembro(Integer idMiembro, String keyword);
 
+    List<PagoMembresiaResumenDTO> resumenAllPagosByMiembro(Integer idMiembro, int limite);
+
     List<PagoMembresiaResumenDTO> resumenPagos();
 
     List<PagoMembresiaResumenDTO> searchResumen(String keyword);
