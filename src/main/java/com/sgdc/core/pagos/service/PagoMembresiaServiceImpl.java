@@ -158,9 +158,6 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
             }
             // 1.4) solapa al final → encolar entero
             if (ini.isBefore(finN) && fin.isAfter(finN)) {
-//                log.info("Encolado de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
-//                cola.add(ex);
-//                pagoMembresiaRepository.delete(ex); // lo quitamos para reubicarlo
                 log.info("Reubicación 1 de Pago {}. Pago solapado por otro nuevo. Id del nuevo pago: {}", ex.getId(), nuevo.getId());
                 LocalDate nuevoInicio = finN.plusDays(1);
                 ex.setFechaInicio(nuevoInicio);
@@ -238,66 +235,6 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
         return nuevo;
     }
-
-
-//    @Transactional
-//    @Override
-//    public void save(PagoMembresiaDTO dto) {
-//        Miembro miembro = miembroService.findById(dto.getIdMiembro());
-//        // -------------------------------------------------------
-//        // 1) Calculamos el rango del nuevo pago
-//        LocalDate inicioNuevo = dto.getFechaInicio();
-//        Membresia planNuevo   = membresiaService.findById(dto.getMembresiaId());
-//        LocalDate finNuevo    = inicioNuevo.plusDays(planNuevo.getDuracionDias());
-//        // -------------------------------------------------------
-//        // 2) Buscamos todos los pagos (activos y futuros) que se solapen
-//        List<PagoMembresia> solapados = pagoMembresiaRepository
-//                .findOverlapping(miembro.getId(), inicioNuevo, finNuevo);
-//
-//        for (PagoMembresia existente : solapados) {
-//            // si el pago existente arranca antes del nuevo inicio...
-//            if (existente.getFechaInicio().isBefore(inicioNuevo)) {
-//                // → acortamos su fechaFin justo antes del nuevo
-//                existente.setFechaFin(inicioNuevo.minusDays(1));
-//            } else {
-//                // si el pago existente arranca dentro o después del nuevo,
-//                // lo desplazamos para que empiece justo al término de este:
-//                existente.setFechaInicio(finNuevo.plusDays(1));
-//                // y recalculamos su fin según su duración original:
-//                existente.setFechaFin(
-//                        existente.getFechaInicio()
-//                                .plusDays(existente.getMembresia().getDuracionDias())
-//                );
-//            }
-//            pagoMembresiaRepository.save(existente);
-//        }
-//
-//        // -------------------------------------------------------
-//        // 3) Insertamos el nuevo pago
-//        PagoMembresia nuevo = PagoMembresia.builder()
-//                .miembro(miembro)
-//                .membresia(planNuevo)
-//                .monto(dto.getMonto())
-//                .fechaPago(LocalDateTime.now())
-//                .fechaInicio(inicioNuevo)
-//                .fechaFin(finNuevo)
-//                .registradoPor(buildUsuario(dto))
-//                .build();
-//        pagoMembresiaRepository.save(nuevo);
-//
-//        // -------------------------------------------------------
-//        // 4) Histórico de cambio de plan
-//        boolean primerPago = !pagoMembresiaRepository.existsByMiembro_Id(miembro.getId());
-//        HistorialMembresia hist = new HistorialMembresia();
-//        hist.setMiembro(miembro);
-//        hist.setMembresia(planNuevo);
-//        hist.setFechaCambio(LocalDateTime.now());
-//        hist.setDescripcion((primerPago ? "Primera suscripción a " : "Renovación a ")
-//                + planNuevo.getNombre());
-//        hist.setRegistradoPor(buildUsuario(dto));
-//        historialMembresiaService.save(hist);
-//    }
-
 
     private static Usuario buildUsuario(PagoMembresiaDTO dto) {
         return Usuario.builder().id(dto.getUsuarioDTO().getId()).build();
