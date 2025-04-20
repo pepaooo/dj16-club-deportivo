@@ -119,6 +119,24 @@
                                  th:errors="*{fechaInicio}"></div>
                         </div>
 
+                        <!-- Duración -->
+                        <div class="mb-3">
+                            <label for="duracion" class="form-label">Duración</label>
+                            <input type="text"
+                                   id="duracion"
+                                   class="form-control"
+                                   readonly/>
+                        </div>
+
+                        <!-- Fecha de Fin -->
+                        <div class="mb-3">
+                            <label for="fechaFin" class="form-label">Fecha Fin</label>
+                            <input type="date"
+                                   id="fechaFin"
+                                   class="form-control"
+                                   readonly/>
+                        </div>
+
                         <!-- Botones -->
                         <div class="d-flex justify-content-end">
                             <a th:href="@{/pagos}" class="btn btn-secondary me-2">
@@ -172,7 +190,10 @@
                 $('#miembro-contexto').show();
                 // Limpiamos la tabla ANTES de cargar datos
                 $('#tabla-pagos-miembro').empty();
-                $('#fechaInicio').prop('readonly', false).val('');
+                // 2) resetear selects e inputs
+                $('#tipoMembresia').val('').trigger('change');
+                $('#monto, #duracion, #fechaInicio, #fechaFin').val('');
+                $('#fechaInicio').prop('readonly', false);
                 // Trae pagos ordenados por fechaInicio DESC
                 $.getJSON(`/api/pagos/miembro/${miembroId}`, pagos => {
                     const $tb = $('#tabla-pagos-miembro');
@@ -222,16 +243,38 @@
                 return;
             }
             $.ajax({
-                url: '/api/membresias/tarifa',
-                data: {id: planId},
+                url: `/api/membresias/${planId}`,
                 dataType: 'json',
                 success: function (data) {
+                    // 1) tarifa
                     $('#monto').val(data.tarifa);
+                    // 2) duración
+                    $('#duracion').val(data.duracionDias + ' días');
+                    // 3) si ya hay fechaInicio, recalcula fechaFin
+                    const inicio = $('#fechaInicio').val();
+                    if (inicio) {
+                        const dt = new Date(inicio);
+                        dt.setDate(dt.getDate() + data.duracionDias);
+                        // yyyy‑mm‑dd
+                        $('#fechaFin').val(dt.toISOString().slice(0, 10));
+                    }
                 },
                 error: function () {
                     console.error('Error al obtener la tarifa del plan');
                 }
             });
+        });
+
+        // Y también al cambiar manualmente la fechaInicio…
+        $('#fechaInicio').on('change', function () {
+            const inicio = this.value;
+            const durText = $('#duracion').val();
+            if (inicio && durText) {
+                const dias = parseInt(durText, 10);
+                const dt = new Date(inicio);
+                dt.setDate(dt.getDate() + dias);
+                $('#fechaFin').val(dt.toISOString().slice(0, 10));
+            }
         });
 
     });

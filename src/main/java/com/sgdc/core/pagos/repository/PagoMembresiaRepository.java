@@ -75,6 +75,7 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
               )
               FROM PagoMembresia p
               WHERE p.miembro.id = :idMiembro
+                AND p.cancelado = false
               ORDER BY p.fechaInicio DESC
             """)
     List<PagoMembresiaResumenDTO> findAllResumenPagosByMiembro(@Param("idMiembro") Integer idMiembro,
