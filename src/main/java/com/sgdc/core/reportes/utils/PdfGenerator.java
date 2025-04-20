@@ -54,7 +54,7 @@ public class PdfGenerator {
             // Agregamos la fila de encabezado
             addTableHeaderCell(table, "ID Miembro");
             addTableHeaderCell(table, "Nombre Completo");
-            addTableHeaderCell(table, "Tipo de Membresía");
+            addTableHeaderCell(table, "Correo Electrónico");
             addTableHeaderCell(table, "Fecha Inscripción");
             //addTableHeaderCell(table, "Estatus");
 
@@ -70,9 +70,10 @@ public class PdfGenerator {
                 String nombreCompleto = miembro.getNombre() + " " + miembro.getApellidoPaterno() + " " + miembro.getApellidoMaterno();
                 table.addCell(new Cell().add(new Paragraph(nombreCompleto)));
 
-                // Tipo de Membresía (se asume que miembro.getMembresia() no es nulo)
-                String tipoMembresia = (miembro.getMembresia() != null) ? miembro.getMembresia().getNombre() : "";
-                table.addCell(new Cell().add(new Paragraph(tipoMembresia)));
+                // Correo Electrónico
+                String correoElectronico = (miembro.getCorreoElectronico() != null) ?
+                        miembro.getCorreoElectronico() : "";
+                table.addCell(new Cell().add(new Paragraph(correoElectronico)));
 
                 // Fecha de Inscripción
                 String fechaInscripcion = (miembro.getFechaInscripcion() != null) ?

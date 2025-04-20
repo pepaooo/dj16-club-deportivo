@@ -12,6 +12,6 @@ public class MiembroDetalleDTO {
     private String apellidoPaterno;
     private String apellidoMaterno;
     private String correoElectronico;
-    private String membresiaActual;
-    private BigDecimal tarifa;
+//    private String membresiaActual; // TODO Revisar si podemos tener alguin query para tener la membresía activa
+//    private BigDecimal tarifa;
 }

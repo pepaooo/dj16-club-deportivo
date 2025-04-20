@@ -2,7 +2,6 @@ package com.sgdc.core.miembro.controller;
 
 import com.sgdc.core.membresia.domain.HistorialMembresia;
 import com.sgdc.core.membresia.service.HistorialMembresiaService;
-import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Genero;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
@@ -33,15 +32,12 @@ public class MiembroController {
 
     private final MiembroService miembroService;
 
-    private final MembresiaService membresiaService;
-
     private final HistorialMembresiaService historialMembresiaService;
 
     private final PagoMembresiaService pagoMembresiaService;
 
-    public MiembroController(MiembroService miembroService, MembresiaService membresiaService, HistorialMembresiaService historialMembresiaService, PagoMembresiaService pagoMembresiaService) {
+    public MiembroController(MiembroService miembroService, HistorialMembresiaService historialMembresiaService, PagoMembresiaService pagoMembresiaService) {
         this.miembroService = miembroService;
-        this.membresiaService = membresiaService;
         this.historialMembresiaService = historialMembresiaService;
         this.pagoMembresiaService = pagoMembresiaService;
     }
@@ -52,21 +48,11 @@ public class MiembroController {
         // Agregar al modelo los resultados y también el término de búsqueda para que el input lo retenga.
         model.addAttribute("miembros", miembros);
         model.addAttribute("q", keyword);
-
-        // Otros atributos, por ejemplo para los resúmenes:
-        //List<Miembro> allMiembros = miembroService.findAll();
-        model.addAttribute("totalMiembros", miembros.size());
-        // Para calcular miembros activos/inactivos.
-//        long activas = miembros.stream().filter(m -> "Activo".equalsIgnoreCase(m.getEstatus())).count();
-//        long inactivas = miembros.size() - activas;
-        model.addAttribute("miembrosActivos", 0);
-        model.addAttribute("miembrosInactivos", 0);
-
         return "miembros/inicio";
     }
 
     @GetMapping("get")
-    public String getMiembro(@RequestParam(value = "id") Integer idMiembro,  Model model) {
+    public String getMiembro(@RequestParam(value = "id") Integer idMiembro, Model model) {
         // TODO. Revisar si las fechas en la base de datos se pueden almacenar en UTC y luego convertirlas a la zona horaria local.
         Miembro miembro = miembroService.findById(idMiembro);
         log.info("getMiembro: {}", miembro);
@@ -82,7 +68,6 @@ public class MiembroController {
         model.addAttribute("miembro", new Miembro());
         // Agregamos los atributos adicionales al bean necesarios para la vista.
         model.addAttribute("generos", Genero.values());
-        model.addAttribute("membresias", membresiaService.findAll());
         return "miembros/nuevo-miembro";
     }
 
@@ -94,7 +79,6 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/nuevo-miembro";
         }
 
@@ -113,7 +97,6 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/nuevo-miembro";
         }
 
@@ -127,7 +110,6 @@ public class MiembroController {
         model.addAttribute("miembro", miembro);
         // Agregamos los atributos adicionales al bean necesarios para la vista.
         model.addAttribute("generos", Genero.values());
-        model.addAttribute("membresias", membresiaService.findAll());
         return "miembros/editar-miembro";
     }
 
@@ -139,7 +121,6 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/editar-miembro";
         }
 
@@ -157,7 +138,6 @@ public class MiembroController {
             }
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("generos", Genero.values());
-            model.addAttribute("membresias", membresiaService.findAll());
             return "miembros/editar-miembro";
         }
 
@@ -175,10 +155,6 @@ public class MiembroController {
         model.addAttribute("historialMembresias", historialMembresias);
         model.addAttribute("miembro", miembro);
         model.addAttribute("q", keyword);
-//        List<HistorialMembresia> historialMembresias = historialMembresiaService.search(keyword);
-//        // Agregar al modelo los resultados y también el término de búsqueda para que el input lo retenga.
-//        model.addAttribute("historialMembresias", historialMembresias);
-//        model.addAttribute("q", keyword);
         return "miembros/historial-membresias";
     }
 

@@ -51,8 +51,9 @@
             <thead>
             <tr>
                 <th>ID Miembro</th>
-                <th>Nombre Completo</th>
-                <th>Tipo de Membresía</th>
+                <th>Nombre</th>
+<!--                <th>Tipo de Membresía</th>-->
+                <th>Correo</th>
                 <th>Fecha de Inscripción</th>
 <!--                <th>Estatus</th>-->
             </tr>
@@ -62,7 +63,8 @@
             <tr th:each="miembro : ${resultados}">
                 <td th:text="${miembro.id}"></td>
                 <td th:text="${miembro.nombre + ' ' + miembro.apellidoPaterno + ' ' + miembro.apellidoMaterno}"></td>
-                <td th:text="${miembro.membresia.nombre}"></td>
+                <td th:text="${miembro.correoElectronico}"></td>
+<!--                <td th:text="${miembro.membresia.nombre}"></td>-->
                 <td th:text="${#temporals.format(miembro.fechaInscripcion, 'dd/MM/yyyy HH:mm')}"></td>
 <!--                <td th:text="${miembro.estatus}"></td>-->
             </tr>

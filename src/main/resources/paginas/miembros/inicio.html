@@ -56,7 +56,6 @@
                 <th>Paterno</th>
                 <th>Materno</th>
                 <th>Correo</th>
-                <th>Membresía</th>
                 <th>Acciones</th>
             </tr>
             </thead>
@@ -67,7 +66,6 @@
                 <td th:text="${miembro.apellidoPaterno}"></td>
                 <td th:text="${miembro.apellidoMaterno}"></td>
                 <td th:text="${miembro.correoElectronico}"></td>
-                <td th:text="${miembro.membresia.nombre}"></td>
                 <td>
                     <a class="btn btn-outline-primary btn-sm"
                        th:href="@{'/miembros/get?id=' + ${miembro.id}}">

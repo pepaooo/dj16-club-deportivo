@@ -73,8 +73,4 @@ public class Miembro {
     @Column(name = "fecha_inscripcion", nullable = false)
     private LocalDateTime fechaInscripcion;
 
-    //@NotNull
-    @ManyToOne
-    @JoinColumn(name = "id_membresia", nullable = false)
-    private Membresia membresia;
 }

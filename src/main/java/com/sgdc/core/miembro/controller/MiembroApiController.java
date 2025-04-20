@@ -43,13 +43,6 @@ public class MiembroApiController {
     @ResponseBody
     public MiembroDetalleDTO getMiembroDetalle(@RequestParam("id") Integer id) {
         ModelMapper customMapper = new ModelMapper();
-        customMapper.addMappings(new PropertyMap<Miembro, MiembroDetalleDTO>() {
-            @Override
-            protected void configure() {
-                map().setMembresiaActual(source.getMembresia().getNombre());
-                map().setTarifa(source.getMembresia().getTarifa());
-            }
-        });
         Miembro miembro = miembroService.findById(id);
         return customMapper.map(miembro, MiembroDetalleDTO.class);
     }

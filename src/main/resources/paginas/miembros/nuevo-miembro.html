@@ -160,18 +160,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Secciones adicionales (género, tipo de membresía, etc.) pueden ir en una fila completa -->
-                        <div class="mb-3">
-                            <label for="membresia" class="form-label">Tipo de Membresía</label>
-                            <select class="form-select" id="membresia" th:field="*{membresia.id}" required>
-                                <option value="">Seleccione un tipo</option>
-                                <option th:each="tm : ${membresias}"
-                                        th:value="${tm.id}"
-                                        th:text="${tm.nombre}">
-                                </option>
-                            </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('membresia.id')}" th:errors="*{membresia.id}"></div>
-                        </div>
 
                         <div class="d-flex justify-content-end">
                             <a th:href="@{/miembros}" class="btn btn-secondary me-2">

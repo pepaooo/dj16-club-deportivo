@@ -57,16 +57,13 @@ public class PagoMembresiaController {
         // Agregar al modelo los resultados y también el término de búsqueda para que el input lo retenga.
         model.addAttribute("pagosMembresiaDTO", pagosMembresiaDTO);
         model.addAttribute("q", keyword);
-
         // Otros atributos, por ejemplo para los resúmenes:
-        //List<PagoMembresia> allPagosMembresia = pagoMembresiaService.findAll();
         model.addAttribute("totalDePagos", pagosMembresiaDTO.size());
         // Para calcular pagos activos/vencidos
         long activos = pagosMembresiaDTO.stream().filter(m -> "Activo".equalsIgnoreCase(m.getEstatusMembresia())).count();
         long programados = pagosMembresiaDTO.size() - activos;
         model.addAttribute("pagosActivos", activos);
         model.addAttribute("pagosProgramados", programados);
-
         return "pagos/inicio";
     }
 
