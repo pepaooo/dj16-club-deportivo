@@ -1,6 +1,7 @@
 package com.sgdc.core.reservas.service;
 
 import com.sgdc.core.reservas.domain.Instalacion;
+import com.sgdc.core.reservas.domain.dto.InstalacionDTO;
 import com.sgdc.core.reservas.repository.InstalacionRepository;
 import jakarta.persistence.criteria.Expression;
 import org.springframework.data.jpa.domain.Specification;
@@ -51,6 +52,14 @@ public class InstalacionServiceImpl implements InstalacionService {
         };
 
         return repository.findAll(spec);
+    }
+
+    @Override
+    public List<InstalacionDTO> findByMembresiaId(Integer mid) {
+        return repository.findByMembresiaId(mid)
+                .stream()
+                .map(i -> new InstalacionDTO(i.getId(), i.getNombre()))
+                .toList();
     }
 
     @Override

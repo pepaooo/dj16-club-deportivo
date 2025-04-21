@@ -1,6 +1,7 @@
 package com.sgdc.core.reservas.service;
 
 import com.sgdc.core.reservas.domain.Reserva;
+import com.sgdc.core.reservas.domain.dto.ReservaDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +15,7 @@ public interface ReservaService {
 
     List<Reserva> search(String keyword);
 
-    void save(Reserva reserva);
+    void save(ReservaDTO reserva);
 
     Optional<Reserva> confirmarReserva(Integer id);
 

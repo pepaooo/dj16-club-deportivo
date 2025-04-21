@@ -1,6 +1,7 @@
 package com.sgdc.core.miembro.service;
 
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.miembro.domain.dto.MiembroSearchDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public interface MiembroService {
 
     List<Miembro> search(String keyword);
 
-    List<Miembro> searchActive(String keyword);
+    List<MiembroSearchDTO> searchActive(String keyword);
 
     void save(Miembro miembro);
 

@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head th:replace="~{plantillas/plantilla :: head}"></head>
+<head>
+    <div th:insert="~{plantillas/plantilla :: headContent}"></div>
+    <link th:href="@{/select2/css/select2.min.css}" rel="stylesheet"/>
+    <script th:src="@{/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/select2/js/select2.full.min.js}"></script>
+</head>
 <body>
 <header th:replace="~{plantillas/plantilla :: header}"></header>
 
@@ -19,38 +24,46 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <!-- Formulario con binding de Thymeleaf -->
-                    <form th:action="@{/reservas/create-reserva}" th:object="${reserva}" method="post">
+                    <form th:action="@{/reservas/create-reserva}" th:object="${reservaDTO}" method="post">
                         <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
                             Verifique los siguientes inconvenientes
                             <ul>
                                 <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
                             </ul>
                         </div>
-                        <!-- Selección de Miembro -->
+                        <!-- 1) Miembro -->
                         <div class="mb-3">
-                            <label for="miembro" class="form-label">Miembro</label>
-                            <select class="form-select" id="miembro" th:field="*{miembro}" required>
-                                <option value="">Seleccione un miembro</option>
-                                <option th:each="m : ${miembros}"
-                                        th:value="${m.id}"
-                                        th:text="${m.nombre + ' ' + m.apellidoPaterno + ' ' + m.apellidoMaterno}">
-                                </option>
+                            <label for="miembroSelect" class="form-label">Miembro</label>
+                            <select id="miembroSelect" name="idMiembro" th:field="*{idMiembro}" class="form-control"
+                                    style="width: 100%;">
+                                <!-- Las opciones se cargarán vía AJAX -->
                             </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('miembro')}" th:errors="*{miembro}"></div>
+                            <div class="text-danger" th:if="${#fields.hasErrors('idMiembro')}"
+                                 th:errors="*{idMiembro}"></div>
                         </div>
-                        <!-- Selección de Instalación -->
+
+                        <!-- 2) Membresía activa (sólo lectura) -->
                         <div class="mb-3">
-                            <label for="instalacion" class="form-label">Miembro</label>
-                            <select class="form-select" id="instalacion" th:field="*{instalacion}" required>
-                                <option value="">Seleccione una instalación</option>
-                                <option th:each="ins : ${instalaciones}"
-                                        th:value="${ins.id}"
-                                        th:text="${ins.nombre}">
-                                </option>
-                            </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('instalacion')}" th:errors="*{instalacion}"></div>
+                            <label for="membresiaActiva" class="form-label">Membresía Activa</label>
+                            <input type="text"
+                                   id="membresiaActiva"
+                                   class="form-control"
+                                   readonly>
                         </div>
-                        <!-- Campo: Fecha y Hora de Inicio -->
+
+                        <!-- 3) Instalación -->
+                        <div class="mb-3">
+                            <label for="instalacionSelect" class="form-label">Instalación</label>
+                            <select id="instalacionSelect" name="idInstalacion" th:field="*{idInstalacion}"
+                                    class="form-control"
+                                    style="width: 100%;">
+                                <!-- Las opciones se cargarán vía AJAX -->
+                            </select>
+                            <div class="text-danger" th:if="${#fields.hasErrors('idInstalacion')}"
+                                 th:errors="*{idInstalacion}"></div>
+                        </div>
+
+                        <!-- 4) Fecha / Hora Inicio -->
                         <div class="mb-3">
                             <label for="fechaHoraInicio" class="form-label">Fecha y Hora de Inicio</label>
                             <input
@@ -64,7 +77,8 @@
                             <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraInicio')}"
                                  th:errors="*{fechaHoraInicio}"></div>
                         </div>
-                        <!-- Campo: Fecha y Hora de Fin -->
+
+                        <!-- 5) Fecha / Hora Fin -->
                         <div class="mb-3">
                             <label for="fechaHoraFin" class="form-label">Fecha y Hora de Fin</label>
                             <input
@@ -98,21 +112,66 @@
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
 
 <script>
-    // Cuando cambie el inicio, calculamos +1h y ponemos en fin:
-    document.getElementById('fechaHoraInicio').addEventListener('change', function() {
-        const inicio = this.value;  // cadena "YYYY-MM-DDThh:mm"
-        if (!inicio) return;
-        const dt = new Date(inicio);
-        if (isNaN(dt)) return;
-        dt.setHours(dt.getHours() + 1);
-        // Ajustamos formato de vuelta a "YYYY-MM-DDThh:mm"
-        const pad = n => n.toString().padStart(2,'0');
-        const yyyy = dt.getFullYear();
-        const mm   = pad(dt.getMonth()+1);
-        const dd   = pad(dt.getDate());
-        const hh   = pad(dt.getHours());
-        const mi   = pad(dt.getMinutes());
-        document.getElementById('fechaHoraFin').value = `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+
+    $(document).ready(function () {
+
+        $('#miembroSelect').select2({
+            placeholder: 'Buscar miembro por nombre, correo, etc.',
+            ajax: {
+                url: '/api/miembros/search-active',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {q: params.term};
+                },
+                processResults: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                id: item.id,
+                                text: item.nombre + ' ' + item.apellidoPaterno + ' ' + item.apellidoMaterno,
+                                membershipId: item.membershipId,
+                                membershipName: item.membershipName
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        })
+            .on('select2:select', e => {
+                const sel = e.params.data;
+                // 2) Muestro el nombre de la membresía
+                $('#membresiaActiva').val(sel.membershipName);
+                // 3) Cargo instalaciones válidas
+                if (!sel.membershipId) return;
+                $('#instalacionSelect').prop('disabled', true).empty()
+                    .append('<option>Cargando…</option>');
+                $.getJSON(`/api/membresias/${sel.membershipId}/instalaciones`, insts => {
+                    const $s = $('#instalacionSelect').empty()
+                        .append('<option value="">Seleccione una</option>');
+                    insts.forEach(i => {
+                        $s.append(`<option value="${i.id}">${i.nombre}</option>`);
+                    });
+                    $s.prop('disabled', false);
+                });
+
+            });
+
+        // 4) Auto‑calcula +1h para fin
+        $('#fechaHoraInicio').on('change', function () {
+            const inicio = this.value;
+            if (!inicio) return;
+            const dt = new Date(inicio);
+            dt.setHours(dt.getHours() + 1);
+            const pad = n => n.toString().padStart(2, '0');
+            const yyyy = dt.getFullYear(), mm = pad(dt.getMonth() + 1),
+                dd = pad(dt.getDate()), hh = pad(dt.getHours()),
+                mi = pad(dt.getMinutes());
+            $('#fechaHoraFin').val(`${yyyy}-${mm}-${dd}T${hh}:${mi}`);
+        });
+
     });
 </script>
 

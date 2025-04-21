@@ -1,10 +1,15 @@
 package com.sgdc.core.reservas.domain;
 
+import com.sgdc.core.membresia.domain.Membresia;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -20,6 +25,7 @@ import org.hibernate.annotations.ColumnDefault;
         )
 })
 @Data
+@ToString(exclude = "membresias")
 public class Instalacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,5 +45,8 @@ public class Instalacion {
     @ColumnDefault("'Disponible'")
     @Column(name = "estado", nullable = false, length = 20)
     private String estado;
+
+    @ManyToMany(mappedBy = "instalaciones")
+    private Set<Membresia> membresias = new HashSet<>();
 
 }

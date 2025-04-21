@@ -2,10 +2,9 @@ package com.sgdc.core.miembro.controller;
 
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.domain.dto.MiembroDTO;
-import com.sgdc.core.miembro.domain.dto.MiembroDetalleDTO;
+import com.sgdc.core.miembro.domain.dto.MiembroSearchDTO;
 import com.sgdc.core.miembro.service.MiembroService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,19 +32,17 @@ public class MiembroApiController {
 
     @GetMapping("search-active")
     @ResponseBody
-    public List<MiembroDTO> searchActive(@RequestParam("q") String term) {
-        return miembroService.searchActive(term).stream()
-                .map(this::convertToDto)
-                .toList();
+    public List<MiembroSearchDTO> searchActive(@RequestParam("q") String term) {
+        return miembroService.searchActive(term);
     }
 
-    @GetMapping("detail")
-    @ResponseBody
-    public MiembroDetalleDTO getMiembroDetalle(@RequestParam("id") Integer id) {
-        ModelMapper customMapper = new ModelMapper();
-        Miembro miembro = miembroService.findById(id);
-        return customMapper.map(miembro, MiembroDetalleDTO.class);
-    }
+//    @GetMapping("detail")
+//    @ResponseBody
+//    public MiembroDetalleDTO getMiembroDetalle(@RequestParam("id") Integer id) {
+//        ModelMapper customMapper = new ModelMapper();
+//        Miembro miembro = miembroService.findById(id);
+//        return customMapper.map(miembro, MiembroDetalleDTO.class);
+//    }
 
     private MiembroDTO convertToDto(Miembro miembro) {
         return modelMapper.map(miembro, MiembroDTO.class);

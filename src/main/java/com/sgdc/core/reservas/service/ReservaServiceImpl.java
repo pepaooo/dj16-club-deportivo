@@ -4,6 +4,7 @@ import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.reservas.domain.EstadoReserva;
 import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.Reserva;
+import com.sgdc.core.reservas.domain.dto.ReservaDTO;
 import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.repository.ReservaRepository;
@@ -11,6 +12,7 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -30,8 +32,11 @@ public class ReservaServiceImpl implements ReservaService {
 
     private final ReservaRepository repository;
 
-    public ReservaServiceImpl(ReservaRepository repository) {
+    private final ModelMapper modelMapper;
+
+    public ReservaServiceImpl(ReservaRepository repository, ModelMapper modelMapper) {
         this.repository = repository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -98,7 +103,10 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    public void save(Reserva reserva) {
+    public void save(ReservaDTO dto) {
+        // 1. Convertir DTO a entidad
+        Reserva reserva = modelMapper.map(dto, Reserva.class);
+
         // 1. Validar que las fechas de inicio y fin sean correctas
         // Traza el now hasta minutos para ignorar segundos/nanos
         LocalDateTime ahora = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);

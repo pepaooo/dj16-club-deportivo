@@ -1,13 +1,17 @@
 package com.sgdc.core.membresia.domain;
 
+import com.sgdc.core.reservas.domain.Instalacion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "membresia")
@@ -22,6 +26,7 @@ import java.math.BigDecimal;
         )
 })
 @Data
+@ToString(exclude = "instalaciones")
 public class Membresia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,5 +53,13 @@ public class Membresia {
     @NotBlank(message = "La descripción de la membresía no puede estar vacía")
     @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
     private String descripcion;
+
+    @ManyToMany
+    @JoinTable(
+            name = "membresia_instalacion",
+            joinColumns = @JoinColumn(name = "id_membresia"),
+            inverseJoinColumns = @JoinColumn(name = "id_instalacion")
+    )
+    private Set<Instalacion> instalaciones = new HashSet<>();
 
 }

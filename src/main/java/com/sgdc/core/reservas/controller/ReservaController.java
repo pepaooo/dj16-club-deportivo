@@ -3,11 +3,12 @@ package com.sgdc.core.reservas.controller;
 import com.sgdc.core.miembro.service.MiembroService;
 import com.sgdc.core.reservas.domain.EstadoReserva;
 import com.sgdc.core.reservas.domain.Reserva;
+import com.sgdc.core.reservas.domain.dto.ReservaDTO;
 import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.service.InstalacionService;
 import com.sgdc.core.reservas.service.ReservaService;
-import com.sgdc.core.usuarios.domain.Usuario;
+import com.sgdc.core.usuarios.domain.UsuarioDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("reservas")
@@ -89,7 +89,7 @@ public class ReservaController {
 
     @GetMapping("new")
     public String newReserva(Model model) {
-        model.addAttribute("reserva", new Reserva());
+        model.addAttribute("reservaDTO", new ReservaDTO());
         // Agregar los posibles estados al modelo
         model.addAttribute("miembros", miembroService.findAll());
         model.addAttribute("instalaciones", instalacionService.findAll());
@@ -97,7 +97,7 @@ public class ReservaController {
     }
 
     @PostMapping("create-reserva")
-    public String guardarReserva(@Valid Reserva reserva, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String guardarReserva(@Valid ReservaDTO reservaDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         if (bindingResult.hasErrors()) {
             logErrors(bindingResult);
             model.addAttribute("miembros", miembroService.findAll());
@@ -106,12 +106,12 @@ public class ReservaController {
         }
 
         try {
-            log.info("Guardando Reserva: {}", reserva);
-            reserva.setEstadoReserva(EstadoReserva.PENDIENTE.getLabel());
+            log.info("Guardando Reserva: {}", reservaDTO);
+            reservaDTO.setEstadoReserva(EstadoReserva.PENDIENTE.getLabel());
             // TODO. Ajustar con el usuario de la sesión.
-            reserva.setRegistradoPor(Usuario.builder().id(1).build());
-            log.info("Reserva a guardar: {}", reserva);
-            reservaService.save(reserva);
+            reservaDTO.setRegistradoPor(UsuarioDTO.builder().id(1).build());
+            log.info("Reserva a guardar: {}", reservaDTO);
+            reservaService.save(reservaDTO);
         } catch (ReservaInvalidaException e) {
             String message = e.getMessage();
             log.error("Error de reserva inválida: {}", message);
@@ -146,22 +146,22 @@ public class ReservaController {
     @GetMapping("change")
     public String changeReserva(@RequestParam(value = "id") Integer idReserva, Model model) {
         Reserva reserva = reservaService.findById(idReserva);
-        model.addAttribute("reserva", reserva);
+        model.addAttribute("reservaDTO", reserva);
         // Agregar los posibles estados al modelo
         model.addAttribute("estados", EstadoReserva.values());
         return "reservas/editar-reserva";
     }
 
     @PostMapping("change-reserva")
-    public String changeReserva(@Valid Reserva reserva, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String changeReserva(@Valid ReservaDTO reservaDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             logErrors(bindingResult);
             return "reservas/editar-reserva";
         }
 
         try {
-            log.info("Membresía a guardar: {}", reserva);
-            reservaService.save(reserva);
+            log.info("Membresía a guardar: {}", reservaDTO);
+            reservaService.save(reservaDTO);
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.rejectValue("global.error", "Esta reserva ya existe. Por favor, vuelva a intentarlo en otra fecha/hora.");

@@ -1,6 +1,7 @@
 package com.sgdc.core.miembro.service;
 
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.miembro.domain.dto.MiembroSearchDTO;
 import com.sgdc.core.miembro.repository.MiembroRepository;
 import com.sgdc.core.reportes.utils.PdfGenerator;
 import jakarta.persistence.criteria.Expression;
@@ -57,7 +58,7 @@ public class MiembroServiceImpl implements MiembroService {
     }
 
     @Override
-    public List<Miembro> searchActive(String keyword) {
+    public List<MiembroSearchDTO> searchActive(String keyword) {
         return repository.searchActiveMembers(keyword);
     }
 
