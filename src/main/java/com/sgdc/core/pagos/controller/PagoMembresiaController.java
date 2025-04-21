@@ -86,7 +86,7 @@ public class PagoMembresiaController {
     @GetMapping("new")
     public String newPagoMembresia(Model model) {
         model.addAttribute("pagoDTO", new PagoMembresiaDTO());
-        model.addAttribute("tiposMembresia", membresiaService.findAll());
+        model.addAttribute("tiposMembresia", membresiaService.findActive());
         // Agregamos los atributos adicionales al bean necesarios para la vista.
         return "pagos/nuevo-pago";
     }
@@ -99,7 +99,7 @@ public class PagoMembresiaController {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
             model.addAttribute("pagoDTO", pagoDTO);
-            model.addAttribute("tiposMembresia", membresiaService.findAll());
+            model.addAttribute("tiposMembresia", membresiaService.findActive());
             return "pagos/nuevo-pago";
         }
 
@@ -109,18 +109,18 @@ public class PagoMembresiaController {
             pagoMembresiaService.save(pagoDTO);
         } catch (MembresiaInactivaException e) {
             bindingResult.reject("global.error", "Al momento de registrar el pago, la membresía está inactiva.");
-            model.addAttribute("tiposMembresia", membresiaService.findAll());
+            model.addAttribute("tiposMembresia", membresiaService.findActive());
             return "pagos/nuevo-pago";
         } catch (PagoInvalidoException e) {
             bindingResult.reject("global.error", e.getMessage());
-            model.addAttribute("tiposMembresia", membresiaService.findAll());
+            model.addAttribute("tiposMembresia", membresiaService.findActive());
             return "pagos/nuevo-pago";
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();
             log.error("Error de integridad de datos: {}", errorMessage);
 //            // Agregamos un error global que no se asocia a un campo en particular
             bindingResult.reject("global.error", "Se ha presentado un error al momento de crear el registro del pago.");
-            model.addAttribute("tiposMembresia", membresiaService.findAll());
+            model.addAttribute("tiposMembresia", membresiaService.findActive());
 //            redirectAttributes.addFlashAttribute("error", "Se ha presentado un error al momento de crear el registro del pago.");
 //            return "redirect:/pagos";
             return "pagos/nuevo-pago";

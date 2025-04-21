@@ -26,7 +26,7 @@
             </div>
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <form th:action="@{/pagos/create-pago}" th:object="${pagoDTO}" method="post">
+                    <form id="pagoForm" th:action="@{/pagos/create-pago}" th:object="${pagoDTO}" method="post">
 
                         <!-- Mostrar errores globales -->
                         <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
@@ -142,9 +142,43 @@
                             <a th:href="@{/pagos}" class="btn btn-secondary me-2">
                                 <i class="bi bi-arrow-left-circle"></i> Cancelar
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#confirmPagoModal">
                                 <i class="bi bi-check-circle"></i> Registrar Pago
                             </button>
+                        </div>
+
+                        <!-- Modal de Confirmación -->
+                        <div class="modal fade" id="confirmPagoModal" tabindex="-1"
+                             aria-labelledby="confirmPagoLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content rounded-3 shadow">
+                                    <div class="modal-header bg-primary text-white border-0 rounded-top">
+                                        <h5 class="modal-title" id="confirmPagoLabel">
+                                            <i class="bi bi-credit-card-2-front-fill me-2"></i> Confirmar Pago
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="fs-6">
+                                            ¿Seguro que deseas registrar el pago de
+                                            <strong id="modalMonto">0.00</strong> MXN?
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer border-0">
+                                        <button type="button" class="btn btn-outline-secondary"
+                                                data-bs-dismiss="modal">
+                                            <i class="bi bi-x-circle"></i> Cancelar
+                                        </button>
+                                        <!-- Este botón dispara el submit del form sin código extra -->
+                                        <button type="submit" form="pagoForm" class="btn btn-primary">
+                                            <i class="bi bi-check-circle-fill"></i> Sí, registrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -152,6 +186,7 @@
         </div>
     </div>
 </div>
+
 
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
 
@@ -275,6 +310,19 @@
                 dt.setDate(dt.getDate() + dias);
                 $('#fechaFin').val(dt.toISOString().slice(0, 10));
             }
+        });
+
+        // Cuando se vaya a mostrar el modal…
+        $('#confirmPagoModal').on('show.bs.modal', function () {
+            // Leer el valor actual del campo monto y formatearlo a 2 decimales
+            let raw = $('#monto').val() || '0';
+            let num = parseFloat(raw);
+            let texto = num.toLocaleString('es-MX', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            // Inyectarlo en el <strong id="modalMonto">
+            $('#modalMonto').text(texto);
         });
 
     });
