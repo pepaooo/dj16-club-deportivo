@@ -161,10 +161,6 @@ public class PagoMembresiaController {
             // TODO. Ajustar con el usuario de la sesión.
             ajuste.setRegistradoPor(usuarioService.findById(1));
             pagoAjusteService.save(ajuste);
-//        } catch (PagoInactivoException e) {
-//            bindingResult.reject("global.error", e.getMessage());
-//            model.addAttribute("pago", pago);
-//            return "pagos/ajustar-pago";
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();
             log.error("Error de integridad de datos: {}", errorMessage);
