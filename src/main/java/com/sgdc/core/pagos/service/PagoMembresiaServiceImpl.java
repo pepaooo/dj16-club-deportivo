@@ -2,6 +2,7 @@ package com.sgdc.core.pagos.service;
 
 import com.sgdc.core.membresia.domain.HistorialMembresia;
 import com.sgdc.core.membresia.domain.Membresia;
+import com.sgdc.core.membresia.exception.MembresiaInactivaException;
 import com.sgdc.core.membresia.service.HistorialMembresiaService;
 import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Miembro;
@@ -10,6 +11,7 @@ import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
+import com.sgdc.core.pagos.exception.PagoInvalidoException;
 import com.sgdc.core.pagos.repository.PagoMembresiaRepository;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.EntityNotFoundException;
@@ -252,10 +254,20 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
 
     private PagoMembresia buildAndSaveNuevo(PagoMembresiaDTO dto) {
         Miembro miembro = miembroService.findById(dto.getIdMiembro());
+        // 1) Validamos el estatus de la membresía
+        Membresia planNuevo = membresiaService.findById(dto.getMembresiaId());
+        if (planNuevo.getEstatus().equalsIgnoreCase("Inactivo")){
+            throw new MembresiaInactivaException("La membresía no está activa");
+        }
+        // 2) Validamos la fecha de inicio, no puede ser en el pasado
+        LocalDate inicioNuevo = dto.getFechaInicio();
+        // Traza el now hasta minutos para ignorar segundos/nanos
+        LocalDate ahora = LocalDate.now();
+        if (inicioNuevo.isBefore(ahora)) {
+            throw new PagoInvalidoException("La fecha de inicio del pago no puede ser en el pasado");
+        }
         // -------------------------------------------------------
         // 1) Calculamos el rango del nuevo pago
-        LocalDate inicioNuevo = dto.getFechaInicio();
-        Membresia planNuevo = membresiaService.findById(dto.getMembresiaId());
         LocalDate finNuevo = inicioNuevo.plusDays(planNuevo.getDuracionDias());
         // -------------------------------------------------------
         // 2) Insertamos el nuevo pago

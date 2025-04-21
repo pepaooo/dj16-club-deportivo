@@ -34,7 +34,7 @@
                         <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
                             Verifique los siguientes inconvenientes:
                             <ul>
-                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err.defaultMessage}"></li>
+                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
                             </ul>
                         </div>
 

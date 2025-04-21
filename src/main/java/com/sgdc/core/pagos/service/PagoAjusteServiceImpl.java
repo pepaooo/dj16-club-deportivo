@@ -3,6 +3,8 @@ package com.sgdc.core.pagos.service;
 import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.exception.PagoInactivoException;
 import com.sgdc.core.pagos.repository.PagoAjusteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.Optional;
 
 @Service
 public class PagoAjusteServiceImpl implements PagoAjusteService {
+
+    private static final Logger log = LoggerFactory.getLogger(PagoAjusteServiceImpl.class);
 
     private final PagoAjusteRepository repository;
 
@@ -29,8 +33,10 @@ public class PagoAjusteServiceImpl implements PagoAjusteService {
 
     @Override
     public void save(PagoAjuste pagoAjuste) {
-        // Validamos que el estatus del pago sea "Activo"
-        if (!pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Activo")) {
+        // Validamos que el estatus del pago sea "Activo" o "Pendiente"
+        log.debug("save {}", pagoAjuste);
+        if (!pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Activo")
+                && !pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Pendiente")) {
             throw new PagoInactivoException("El pago no está activo y no se puede ajustar.");
         }
         repository.save(pagoAjuste);

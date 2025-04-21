@@ -1,6 +1,7 @@
 package com.sgdc.core.pagos.domain;
 
 import com.sgdc.core.usuarios.domain.Usuario;
+import com.sgdc.core.validation.NotZero;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ public class PagoAjuste {
     private PagoMembresia pagoMembresia;
 
     @NotNull(message = "El monto no puede estar vacío")
-    //@DecimalMin(value = "0.00", message = "El monto debe ser mayor o igual a 0.00")
+    @NotZero(message = "El monto de ajuste no puede ser cero")
     @Column(name = "monto_ajuste", nullable = false, precision = 10, scale = 2)
     private BigDecimal montoAjuste;
 

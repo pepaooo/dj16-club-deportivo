@@ -24,6 +24,11 @@ public class MembresiaServiceImpl implements MembresiaService {
     }
 
     @Override
+    public List<Membresia> findActive() {
+        return repository.findByEstatus("Activo");
+    }
+
+    @Override
     public Membresia findById(Integer id) {
         return repository.findById(id).orElseThrow(() -> new RuntimeException("No se encontró la membresía con ID: " + id));
     }

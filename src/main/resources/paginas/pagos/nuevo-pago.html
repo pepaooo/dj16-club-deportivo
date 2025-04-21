@@ -26,13 +26,13 @@
             </div>
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <form th:action="@{/pagos/create-pago}" th:object="${pagoDto}" method="post">
+                    <form th:action="@{/pagos/create-pago}" th:object="${pagoDTO}" method="post">
 
                         <!-- Mostrar errores globales -->
                         <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger" role="alert">
                             Verifique los siguientes inconvenientes:
                             <ul>
-                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err.defaultMessage}"></li>
+                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
                             </ul>
                         </div>
 
@@ -80,7 +80,7 @@
                                 <option th:each="tm : ${tiposMembresia}"
                                         th:value="${tm.id}"
                                         th:text="${tm.nombre}"
-                                        th:selected="${tm.id} == ${pagoDto.membresiaId}"></option>
+                                        th:selected="${tm.id} == ${pagoDTO.membresiaId}"></option>
                             </select>
                             <div class="text-danger" th:if="${#fields.hasErrors('membresiaId')}"
                                  th:errors="*{membresiaId}"></div>

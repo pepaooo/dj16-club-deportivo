@@ -9,6 +9,8 @@ public interface MembresiaService {
 
     List<Membresia> findAll();
 
+    List<Membresia> findActive();
+
     Membresia findById(Integer id);
 
     List<Membresia> search(String keyword);

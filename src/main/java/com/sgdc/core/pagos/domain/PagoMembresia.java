@@ -42,7 +42,7 @@ public class PagoMembresia {
     private LocalDateTime fechaPago;
 
     @NotNull(message = "La fecha de inicio no puede estar vacía")
-    @FutureOrPresent(message = "La fecha de inicio debe ser hoy o en el futuro")
+    //@FutureOrPresent(message = "La fecha de inicio debe ser hoy o en el futuro")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_inicio", nullable = false)
     private LocalDate fechaInicio;

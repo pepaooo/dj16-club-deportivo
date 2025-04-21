@@ -1,5 +1,6 @@
 package com.sgdc.core.pagos.controller;
 
+import com.sgdc.core.membresia.exception.MembresiaInactivaException;
 import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
@@ -8,6 +9,7 @@ import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 import com.sgdc.core.pagos.exception.PagoInactivoException;
+import com.sgdc.core.pagos.exception.PagoInvalidoException;
 import com.sgdc.core.pagos.service.PagoAjusteService;
 import com.sgdc.core.pagos.service.PagoMembresiaService;
 import com.sgdc.core.usuarios.domain.UsuarioDTO;
@@ -83,40 +85,45 @@ public class PagoMembresiaController {
 
     @GetMapping("new")
     public String newPagoMembresia(Model model) {
-        model.addAttribute("pagoDto", new PagoMembresiaDTO());
+        model.addAttribute("pagoDTO", new PagoMembresiaDTO());
         model.addAttribute("tiposMembresia", membresiaService.findAll());
         // Agregamos los atributos adicionales al bean necesarios para la vista.
         return "pagos/nuevo-pago";
     }
 
     @PostMapping("create-pago")
-    public String createPagoMembresia(@Valid PagoMembresiaDTO pagoDto, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
-        log.info("Pago a guardar: {}", pagoDto);
+    public String createPagoMembresia(@Valid @ModelAttribute("pagoDTO") PagoMembresiaDTO pagoDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+        log.info("Pago a guardar: {}", pagoDTO);
         if (bindingResult.hasErrors()) {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
-            model.addAttribute("pagoDto", pagoDto);
+            model.addAttribute("pagoDTO", pagoDTO);
             model.addAttribute("tiposMembresia", membresiaService.findAll());
             return "pagos/nuevo-pago";
         }
 
         try {
             // TODO. Ajustar con el usuario de la sesión.
-            pagoDto.setUsuarioDTO(UsuarioDTO.builder().id(1).build());
-            pagoMembresiaService.save(pagoDto);
+            pagoDTO.setUsuarioDTO(UsuarioDTO.builder().id(1).build());
+            pagoMembresiaService.save(pagoDTO);
+        } catch (MembresiaInactivaException e) {
+            bindingResult.reject("global.error", "Al momento de registrar el pago, la membresía está inactiva.");
+            model.addAttribute("tiposMembresia", membresiaService.findAll());
+            return "pagos/nuevo-pago";
+        } catch (PagoInvalidoException e) {
+            bindingResult.reject("global.error", e.getMessage());
+            model.addAttribute("tiposMembresia", membresiaService.findAll());
+            return "pagos/nuevo-pago";
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();
             log.error("Error de integridad de datos: {}", errorMessage);
-            // TODO. Revisar la implementación de los errores, ya que no se están mostrando en la vista.
 //            // Agregamos un error global que no se asocia a un campo en particular
-//            bindingResult.reject("global.error", "Se ha presentado un error al momento de crear el registro del pago.");
-//            model.addAttribute("pagoDto", pagoDto);
-//            //model.addAttribute("org.springframework.validation.BindingResult.pagoDto", bindingResult);
-//            model.addAttribute("tiposMembresia", membresiaService.findAll());
-//            return "pagos/nuevo-pago";
-            redirectAttributes.addFlashAttribute("error", "Se ha presentado un error al momento de crear el registro del pago.");
-            return "redirect:/pagos";
+            bindingResult.reject("global.error", "Se ha presentado un error al momento de crear el registro del pago.");
+            model.addAttribute("tiposMembresia", membresiaService.findAll());
+//            redirectAttributes.addFlashAttribute("error", "Se ha presentado un error al momento de crear el registro del pago.");
+//            return "redirect:/pagos";
+            return "pagos/nuevo-pago";
         }
 
         redirectAttributes.addFlashAttribute("exito", "El pago de membresía se ha guardado correctamente");
@@ -127,29 +134,25 @@ public class PagoMembresiaController {
     public String ajustarPagoMembresia(@RequestParam(value = "id") Integer idPagoMembresia, Model model) {
         PagoMembresia pago = pagoMembresiaService.findById(idPagoMembresia);
         model.addAttribute("pago", pago);
-
         // Inicializamos el objeto PagoAjuste y asignamos el pagoMembresia
         PagoAjuste ajuste = new PagoAjuste();
         ajuste.setPagoMembresia(pago);
         model.addAttribute("ajuste", ajuste);
-
         return "pagos/ajustar-pago";
     }
 
     @PostMapping("ajustar-pago")
-    public String ajustarPagoMembresia(@Valid PagoAjuste ajuste, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String ajustarPagoMembresia(@Valid @ModelAttribute("ajuste") PagoAjuste ajuste, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         log.info("Pago a ajustar: {}", ajuste);
         // Recuperamos el pagoMembresia usando el id recibido
         PagoMembresia pago = pagoMembresiaService.findById(ajuste.getPagoMembresia().getId());
         ajuste.setPagoMembresia(pago);
 
         if (bindingResult.hasErrors()) {
-            // TODO. Revisar la implementación de los errores, ya que no se están mostrando en la vista.
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
             model.addAttribute("pago", pago);
-            model.addAttribute("ajuste", ajuste);
             return "pagos/ajustar-pago";
         }
 
@@ -158,13 +161,15 @@ public class PagoMembresiaController {
             // TODO. Ajustar con el usuario de la sesión.
             ajuste.setRegistradoPor(usuarioService.findById(1));
             pagoAjusteService.save(ajuste);
+//        } catch (PagoInactivoException e) {
+//            bindingResult.reject("global.error", e.getMessage());
+//            model.addAttribute("pago", pago);
+//            return "pagos/ajustar-pago";
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();
             log.error("Error de integridad de datos: {}", errorMessage);
-            if (errorMessage.contains("uq_miembro")) {
-                // Agregamos un error global que no se asocia a un campo en particular
-                bindingResult.reject("global.error", "Se ha presentado un error al guardar el ajuste.");
-            }
+            bindingResult.reject("global.error", "Se ha presentado un error al guardar el ajuste. Por favor, verifique los datos.");
+            model.addAttribute("pago", pago);
             return "pagos/ajustar-pago";
         }
 
@@ -199,22 +204,5 @@ public class PagoMembresiaController {
         redirectAttributes.addFlashAttribute("error", ex.getMessage());
         return "redirect:/pagos";
     }
-
-
-//    @InitBinder
-//    public void initBinder(WebDataBinder binder) {
-//        binder.registerCustomEditor(PagoMembresia.class, new PropertyEditorSupport() {
-//            @Override
-//            public void setAsText(String text) throws IllegalArgumentException {
-//                try {
-//                    Integer id = Integer.parseInt(text);
-//                    log.info("Convirtiendo - String '{}' a PagoMembresia con ID {}", text, id);
-//                    setValue(pagoMembresiaService.findById(id));
-//                } catch (NumberFormatException e) {
-//                    setValue(null);
-//                }
-//            }
-//        });
-//    }
 
 }
