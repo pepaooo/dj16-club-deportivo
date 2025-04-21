@@ -81,10 +81,10 @@ public class PagoMembresia {
 //            return this.fechaFin.isAfter(now) ? "Activo" : "Vencido";
             if (this.fechaInicio.isAfter(now)) {
                 return "Pendiente";
-            } else if (this.fechaFin.isAfter(now)) {
-                return "Activo";
-            } else {
+            } else if (this.fechaFin.isBefore(now)) {
                 return "Vencido";
+            } else {
+                return "Activo";
             }
         }
         return "Desconocido";

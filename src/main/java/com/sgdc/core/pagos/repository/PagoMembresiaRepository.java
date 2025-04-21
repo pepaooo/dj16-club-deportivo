@@ -23,8 +23,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
                 FROM PagoMembresia p
                WHERE p.miembro.id   = :miembroId
                  AND p.cancelado = false
-                 AND p.fechaInicio <= CURRENT_TIMESTAMP
-                 AND p.fechaFin    >= CURRENT_TIMESTAMP
+                 AND p.fechaInicio <= CURRENT_DATE
+                 AND p.fechaFin    >= CURRENT_DATE
             """)
     Optional<PagoMembresia> findActiveByMiembro(@Param("miembroId") Integer miembroId);
 
@@ -68,8 +68,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
                 p.fechaFin,
                 CASE
                   WHEN p.cancelado = true THEN 'Cancelado'
-                  WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente'
-                  WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo'
+                  WHEN p.fechaInicio > CURRENT_DATE THEN 'Pendiente'
+                  WHEN p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE THEN 'Activo'
                   ELSE 'Vencido'
                 END
               )
@@ -94,8 +94,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "p.fechaFin, " +
             "CASE " +
             "   WHEN p.cancelado = true THEN 'Cancelado' " +
-            "   WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' " +
-            "   WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' " +
+            "   WHEN p.fechaInicio > CURRENT_DATE THEN 'Pendiente' " +
+            "   WHEN p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE THEN 'Activo' " +
             "   ELSE 'Vencido' END" +
             ") " +
             "FROM PagoMembresia p " +
@@ -103,8 +103,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "JOIN p.membresia tm " +
             "WHERE m.id = :idMiembro " +
             "AND p.cancelado = false " +
-            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
-            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
+            "AND (p.fechaInicio > CURRENT_DATE OR " +
+            "(p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE)) " +
             "ORDER BY p.id DESC")
     List<PagoMembresiaResumenDTO> findResumenPagosByMiembro(@Param("idMiembro") Integer idMiembro);
 
@@ -112,8 +112,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "p.id, m.id, m.nombre, m.apellidoPaterno, m.apellidoMaterno, tm.id, tm.nombre, p.monto , p.fechaInicio, p.fechaFin, " +
             "CASE " +
             "   WHEN p.cancelado = true THEN 'Cancelado' " +
-            "   WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' " +
-            "   WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' " +
+            "   WHEN p.fechaInicio > CURRENT_DATE THEN 'Pendiente' " +
+            "   WHEN p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE THEN 'Activo' " +
             "   ELSE 'Vencido' END" +
             ") " +
             "FROM PagoMembresia p " +
@@ -121,8 +121,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "LEFT JOIN p.membresia tm " +
             "WHERE m.id = :idMiembro " +
             "AND p.cancelado = false " +
-            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
-            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
+            "AND (p.fechaInicio > CURRENT_DATE OR " +
+            "(p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE)) " +
             "AND (LOWER(m.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "   OR LOWER(m.apellidoPaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "   OR LOWER(m.apellidoMaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
@@ -145,8 +145,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "p.fechaFin, " +
             "CASE " +
             "   WHEN p.cancelado = true THEN 'Cancelado' " +
-            "   WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' " +
-            "   WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' " +
+            "   WHEN p.fechaInicio > CURRENT_DATE THEN 'Pendiente' " +
+            "   WHEN p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE THEN 'Activo' " +
             "   ELSE 'Vencido' END" +
             ") " +
             "FROM PagoMembresia p " +
@@ -154,8 +154,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "JOIN p.membresia tm " +
             "WHERE " +
             "p.cancelado = false " +
-            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
-            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
+            "AND (p.fechaInicio > CURRENT_DATE OR " +
+            "(p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE)) " +
             "ORDER BY p.id DESC")
     List<PagoMembresiaResumenDTO> findResumenPagos();
 
@@ -163,8 +163,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "p.id, m.id, m.nombre, m.apellidoPaterno, m.apellidoMaterno, tm.id, tm.nombre, p.monto , p.fechaInicio, p.fechaFin, " +
             "CASE " +
             "   WHEN p.cancelado = true THEN 'Cancelado' " +
-            "   WHEN p.fechaInicio > CURRENT_TIMESTAMP THEN 'Pendiente' " +
-            "   WHEN p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP THEN 'Activo' " +
+            "   WHEN p.fechaInicio > CURRENT_DATE THEN 'Pendiente' " +
+            "   WHEN p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE THEN 'Activo' " +
             "   ELSE 'Vencido' END" +
             ") " +
             "FROM PagoMembresia p " +
@@ -172,8 +172,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "LEFT JOIN p.membresia tm " +
             "WHERE " +
             "p.cancelado = false " +
-            "AND (p.fechaInicio > CURRENT_TIMESTAMP OR " +
-            "(p.fechaInicio <= CURRENT_TIMESTAMP AND p.fechaFin >= CURRENT_TIMESTAMP)) " +
+            "AND (p.fechaInicio > CURRENT_DATE OR " +
+            "(p.fechaInicio <= CURRENT_DATE AND p.fechaFin >= CURRENT_DATE)) " +
             "AND (LOWER(m.nombre) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "   OR LOWER(m.apellidoPaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "   OR LOWER(m.apellidoMaterno) LIKE LOWER(CONCAT('%', :keyword, '%')) " +

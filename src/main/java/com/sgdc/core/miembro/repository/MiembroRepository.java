@@ -21,8 +21,8 @@ public interface MiembroRepository extends JpaRepository<Miembro, Integer>, JpaS
                 ON p.miembro.id = m.id
              WHERE (:idMembresia IS NULL
                     OR p.membresia.id = :idMembresia)
-               AND p.fechaInicio <= CURRENT_TIMESTAMP
-               AND p.fechaFin    >= CURRENT_TIMESTAMP
+               AND p.fechaInicio <= CURRENT_DATE
+               AND p.fechaFin    >= CURRENT_DATE
                AND (:fechaInicio IS NULL OR m.fechaInscripcion >= :fechaInicio)
                AND (:fechaFin    IS NULL OR m.fechaInscripcion <= :fechaFin)
              ORDER BY m.id DESC
@@ -51,11 +51,11 @@ public interface MiembroRepository extends JpaRepository<Miembro, Integer>, JpaS
                SELECT MAX(p2.fechaInicio)
                  FROM PagoMembresia p2
                 WHERE p2.miembro.id = m.id
-                  AND p2.fechaInicio <= CURRENT_TIMESTAMP
+                  AND p2.fechaInicio <= CURRENT_DATE
              )
          AND p.cancelado = false
-         AND p.fechaInicio <= CURRENT_TIMESTAMP
-         AND p.fechaFin    >= CURRENT_TIMESTAMP
+         AND p.fechaInicio <= CURRENT_DATE
+         AND p.fechaFin    >= CURRENT_DATE
          AND ( :q IS NULL
                OR LOWER(m.nombre)             LIKE LOWER(CONCAT('%', :q, '%'))
                OR LOWER(m.apellidoPaterno)    LIKE LOWER(CONCAT('%', :q, '%'))
