@@ -1,7 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       lang="en">
-<head th:replace="~{plantillas/plantilla :: head}"></head>
+<head>
+    <div th:insert="~{plantillas/plantilla :: headContent}"></div>
+    <style>
+        .navbar-nav .nav-item {
+            margin: 0 0.75rem;
+        }
+        .card-report {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .card-report:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
 <body>
 <header th:replace="~{plantillas/plantilla :: header}"></header>
 
