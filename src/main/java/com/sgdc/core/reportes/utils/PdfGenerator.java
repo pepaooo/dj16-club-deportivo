@@ -29,166 +29,112 @@ public class PdfGenerator {
      * @return Un arreglo de bytes con el contenido del PDF.
      */
     public static byte[] generateMiembrosReport(List<Miembro> miembros) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // 1. Definir encabezados y anchos
+        List<String> headers = List.of(
+                "ID Miembro", "Nombre Completo", "Correo Electrónico",
+                "Fecha Inscripción"
+        );
+        float[] widths = {50f, 150f, 100f, 100f};
 
-        try {
-            // Inicializamos el PdfWriter, PdfDocument y Document.
-            PdfWriter writer = new PdfWriter(baos);
-            PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
+        // 2. Convertir cada Miembro a List<String>
+        var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        List<List<String>> rows = miembros.stream().map(m -> List.of(
+                String.valueOf(m.getId()),
+                m.getNombre() + " " + m.getApellidoPaterno() + " " + m.getApellidoMaterno(),
+                m.getCorreoElectronico() != null ? m.getCorreoElectronico() : "",
+                m.getFechaInscripcion() != null
+                        ? m.getFechaInscripcion().format(formatter) : ""
+        )).toList();
 
-            // Título del reporte
-            Paragraph title = new Paragraph("Reporte de Miembros")
-                    .setFontSize(18)
-                    //.setBold()
-                    .setTextAlignment(TextAlignment.CENTER);
-            document.add(title);
-
-            document.add(new Paragraph("\n"));
-
-            // Definimos los anchos de columnas
-            //float[] columnWidths = {50, 150, 100, 100, 80};
-            float[] columnWidths = {50, 150, 100, 100};
-            Table table = new Table(UnitValue.createPercentArray(columnWidths));
-            table.setWidth(UnitValue.createPercentValue(100));
-
-            // Agregamos la fila de encabezado
-            addTableHeaderCell(table, "ID Miembro");
-            addTableHeaderCell(table, "Nombre Completo");
-            addTableHeaderCell(table, "Correo Electrónico");
-            addTableHeaderCell(table, "Fecha Inscripción");
-            //addTableHeaderCell(table, "Estatus");
-
-            // Usar DateTimeFormatter para formatear LocalDateTime
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
-            // Agregamos una fila por cada miembro.
-            for (Miembro miembro : miembros) {
-                // ID del Miembro
-                table.addCell(new Cell().add(new Paragraph(String.valueOf(miembro.getId()))));
-
-                // Nombre Completo
-                String nombreCompleto = miembro.getNombre() + " " + miembro.getApellidoPaterno() + " " + miembro.getApellidoMaterno();
-                table.addCell(new Cell().add(new Paragraph(nombreCompleto)));
-
-                // Correo Electrónico
-                String correoElectronico = (miembro.getCorreoElectronico() != null) ?
-                        miembro.getCorreoElectronico() : "";
-                table.addCell(new Cell().add(new Paragraph(correoElectronico)));
-
-                // Fecha de Inscripción
-                String fechaInscripcion = (miembro.getFechaInscripcion() != null) ?
-                        miembro.getFechaInscripcion().format(formatter) : "";
-                table.addCell(new Cell().add(new Paragraph(fechaInscripcion)));
-
-                // Estatus
-//                String estatus = (miembro.getEstatus() != null) ? miembro.getEstatus() : "";
-//                table.addCell(new Cell().add(new Paragraph(estatus)));
-                //table.addCell(new Cell().add(new Paragraph("Activo")));
-            }
-
-            // Agregamos la tabla al documento y cerramos el documento
-            document.add(table);
-            document.close();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-
-        return baos.toByteArray();
+        // 3. Llamar al metodo genérico
+        return generateReport("Reporte de Miembros", headers, widths, rows);
     }
 
+    /**
+     * Genera un reporte en PDF para la lista de reservas.
+     *
+     * @param reservas Lista de reservas a incluir en el reporte.
+     * @return Un arreglo de bytes con el contenido del PDF.
+     */
     public static byte[] generateReservasReport(List<Reserva> reservas) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // 1. Definir encabezados y anchos
+        List<String> headers = List.of(
+                "ID Reserva", "Instalación", "Miembro",
+                "Inicio", "Fin", "Estado"
+        );
+        float[] widths = {50f, 100f, 150f, 100f, 100f, 80f};
 
+        // 2. Convertir cada Reserva a List<String>
+        var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        List<List<String>> rows = reservas.stream().map(r -> List.of(
+                String.valueOf(r.getId()),
+                r.getInstalacion() != null ? r.getInstalacion().getNombre() : "",
+                r.getMiembro() != null
+                        ? (r.getMiembro().getNombre() + " " + r.getMiembro().getApellidoPaterno())
+                        : "",
+                r.getFechaHoraInicio() != null
+                        ? r.getFechaHoraInicio().format(formatter) : "",
+                r.getFechaHoraFin() != null
+                        ? r.getFechaHoraFin().format(formatter) : "",
+                r.getEstadoReserva() != null ? r.getEstadoReserva() : ""
+        )).toList();
+
+        // 3. Llamar al metodo genérico
+        return generateReport("Reporte de Reservas", headers, widths, rows);
+    }
+
+    /**
+     * Genera un PDF con tabla genérica.
+     *
+     * @param title        Título del reporte.
+     * @param headers      Lista de encabezados (ej. ["ID", "Nombre", "Fecha"]).
+     * @param columnWidths Anchos relativos de columnas (ej. {50f, 150f, 100f}).
+     * @param rows         Filas de datos, cada fila es una lista de Strings.
+     * @return Bytes del PDF generado.
+     */
+    public static byte[] generateReport(
+            String title,
+            List<String> headers,
+            float[] columnWidths,
+            List<List<String>> rows) {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            // Inicializamos PdfWriter, PdfDocument y Document
             PdfWriter writer = new PdfWriter(baos);
             PdfDocument pdf = new PdfDocument(writer);
             Document document = new Document(pdf);
 
             // Título
-            Paragraph title = new Paragraph("Reporte de Reservas")
+            document.add(new Paragraph(title)
                     .setFontSize(18)
-                    .setTextAlignment(TextAlignment.CENTER);
-            document.add(title);
+                    .setTextAlignment(TextAlignment.CENTER));
             document.add(new Paragraph("\n"));
 
-            // Definimos anchos de columna (proporciones)
-            float[] columnWidths = {50f, 100f, 150f, 100f, 100f, 80f};
+            // Tabla
             Table table = new Table(UnitValue.createPercentArray(columnWidths));
             table.setWidth(UnitValue.createPercentValue(100));
 
             // Encabezados
-            addTableHeaderCell(table, "ID Reserva");
-            addTableHeaderCell(table, "Instalación");
-            addTableHeaderCell(table, "Miembro");
-            addTableHeaderCell(table, "Inicio");
-            addTableHeaderCell(table, "Fin");
-            addTableHeaderCell(table, "Estado");
-
-            // Formateador de fechas
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-
-            // Filas de datos
-            for (Reserva r : reservas) {
-                // ID
-                table.addCell(new Cell().add(
-                        new Paragraph(String.valueOf(r.getId()))
-                ));
-
-                // Instalación
-                String instName = r.getInstalacion() != null
-                        ? r.getInstalacion().getNombre() : "";
-                table.addCell(new Cell().add(new Paragraph(instName)));
-
-                // Miembro (nombre completo)
-                String miembroName = "";
-                if (r.getMiembro() != null) {
-                    miembroName = r.getMiembro().getNombre()
-                            + " " + r.getMiembro().getApellidoPaterno()
-                            + " " + r.getMiembro().getApellidoMaterno();
-                }
-                table.addCell(new Cell().add(new Paragraph(miembroName)));
-
-                // Fecha de inicio
-                String inicio = r.getFechaHoraInicio() != null
-                        ? r.getFechaHoraInicio().format(formatter) : "";
-                table.addCell(new Cell().add(new Paragraph(inicio)));
-
-                // Fecha de fin
-                String fin = r.getFechaHoraFin() != null
-                        ? r.getFechaHoraFin().format(formatter) : "";
-                table.addCell(new Cell().add(new Paragraph(fin)));
-
-                // Estado
-                String estado = r.getEstadoReserva() != null
-                        ? r.getEstadoReserva() : "";
-                table.addCell(new Cell().add(new Paragraph(estado)));
+            for (String h : headers) {
+                Cell headerCell = new Cell().add(new Paragraph(h));
+                headerCell.setBackgroundColor(new DeviceGray(0.75f));
+                headerCell.setTextAlignment(TextAlignment.CENTER);
+                table.addHeaderCell(headerCell);
             }
 
-            // Añadimos la tabla y cerramos
+            // Filas
+            for (List<String> row : rows) {
+                for (String cellValue : row) {
+                    table.addCell(new Cell().add(new Paragraph(cellValue)));
+                }
+            }
+
             document.add(table);
             document.close();
         } catch (Exception e) {
-            log.error("Error generando reporte de reservas", e);
+            log.error("Error generando reporte genérico", e);
         }
-
         return baos.toByteArray();
-    }
-
-    /**
-     * Metodo auxiliar para agregar celdas de encabezado a la tabla con estilos predefinidos.
-     *
-     * @param table   La tabla a la que se le añadirá la celda.
-     * @param content El texto de la celda de encabezado.
-     * @throws Exception Si ocurre algún error al agregar la celda.
-     */
-    private static void addTableHeaderCell(Table table, String content) throws Exception {
-        Cell headerCell = new Cell().add(new Paragraph(content));
-        //headerCell.setBold();
-        headerCell.setBackgroundColor(new DeviceGray(0.75f));
-        headerCell.setTextAlignment(TextAlignment.CENTER);
-        table.addHeaderCell(headerCell);
     }
 
 }
