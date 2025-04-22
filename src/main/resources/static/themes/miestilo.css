@@ -69,3 +69,20 @@ table thead {
     background-color: #6c757d; /* Bootstrap Secondary */
     color: #fff;
 }
+
+/* Estilos para simetría de tabla */
+.table-fixed {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.table-fixed-items {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Para tablas con table-layout: fixed */
+.table-fixed-items th:last-child,
+.table-fixed-items td:last-child {
+    text-align: center;
+}
