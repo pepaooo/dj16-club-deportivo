@@ -10,6 +10,8 @@ import com.sgdc.core.membresia.repository.MembresiaRepository;
 import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.repository.InstalacionRepository;
 import jakarta.persistence.criteria.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class MembresiaServiceImpl implements MembresiaService {
+
+    private static final Logger log = LoggerFactory.getLogger(MembresiaServiceImpl.class);
 
     private final MembresiaRepository repository;
 
@@ -95,6 +99,7 @@ public class MembresiaServiceImpl implements MembresiaService {
     @Override
     public void save(MembresiaDTO dto) {
         Membresia membresia = this.toEntity(dto);
+        log.info("Membresia save " + membresia);
         // Si no se especifica estatus, se asigna "Activo" por defecto
         if (membresia.getEstatus() == null || membresia.getEstatus().isEmpty()) {
             membresia.setEstatus("Activo");
@@ -126,10 +131,12 @@ public class MembresiaServiceImpl implements MembresiaService {
 
     public Membresia toEntity(MembresiaDTO dto) {
         Membresia m = new Membresia();
+        m.setId(dto.getId());
         m.setNombre(dto.getNombre());
-        m.setDescripcion(dto.getDescripcion());
         m.setTarifa(dto.getTarifa());
         m.setDuracionDias(dto.getDuracionDias());
+        m.setEstatus(dto.getEstatus());
+        m.setDescripcion(dto.getDescripcion());
         // buscar y asignar beneficios
         List<Beneficio> bens = beneficioRepo.findAllById(dto.getBeneficiosIds());
         m.setBeneficios(new HashSet<>(bens));
