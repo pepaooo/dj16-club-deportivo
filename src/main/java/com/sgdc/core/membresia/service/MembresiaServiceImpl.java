@@ -80,6 +80,7 @@ public class MembresiaServiceImpl implements MembresiaService {
         Specification<Membresia> spec = (root, query, cb) -> {
             // Para atributos de tipo String se hace directamente.
             Expression<String> nombreExpr = cb.lower(root.get("nombre"));
+            Expression<String> descripcionExpr = cb.lower(root.get("descripcion"));
             Expression<String> estatusExpr = cb.lower(root.get("estatus"));
             // Para atributos numéricos, se puede usar una función para convertir a cadena, si lo soporta el dialecto
             Expression<String> tarifaExpr = cb.function("str", String.class, root.get("tarifa"));
@@ -87,6 +88,7 @@ public class MembresiaServiceImpl implements MembresiaService {
 
             return cb.or(
                     cb.like(nombreExpr, pattern),
+                    cb.like(descripcionExpr, pattern),
                     cb.like(estatusExpr, pattern),
                     cb.like(cb.lower(tarifaExpr), pattern),
                     cb.like(cb.lower(duracionExpr), pattern)
