@@ -24,6 +24,11 @@ public class BeneficioServiceImpl implements BeneficioService {
     }
 
     @Override
+    public List<Beneficio> findByMembresia(Integer idMembresia) {
+        return repository.findAllByMembresiaId(idMembresia);
+    }
+
+    @Override
     public Optional<Beneficio> findById(Integer id) {
         return repository.findById(id);
     }

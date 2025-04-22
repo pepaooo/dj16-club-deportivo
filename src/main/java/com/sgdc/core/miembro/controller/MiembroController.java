@@ -1,7 +1,11 @@
 package com.sgdc.core.miembro.controller;
 
+import com.sgdc.core.membresia.domain.Beneficio;
 import com.sgdc.core.membresia.domain.HistorialMembresia;
+import com.sgdc.core.membresia.domain.Membresia;
+import com.sgdc.core.membresia.service.BeneficioService;
 import com.sgdc.core.membresia.service.HistorialMembresiaService;
+import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Genero;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -36,10 +41,14 @@ public class MiembroController {
 
     private final PagoMembresiaService pagoMembresiaService;
 
-    public MiembroController(MiembroService miembroService, HistorialMembresiaService historialMembresiaService, PagoMembresiaService pagoMembresiaService) {
+    private final BeneficioService beneficioService;
+
+
+    public MiembroController(MiembroService miembroService, HistorialMembresiaService historialMembresiaService, PagoMembresiaService pagoMembresiaService, BeneficioService beneficioService) {
         this.miembroService = miembroService;
         this.historialMembresiaService = historialMembresiaService;
         this.pagoMembresiaService = pagoMembresiaService;
+        this.beneficioService = beneficioService;
     }
 
     @GetMapping
@@ -53,13 +62,22 @@ public class MiembroController {
 
     @GetMapping("get")
     public String getMiembro(@RequestParam(value = "id") Integer idMiembro, Model model) {
-        // TODO. Revisar si las fechas en la base de datos se pueden almacenar en UTC y luego convertirlas a la zona horaria local.
         Miembro miembro = miembroService.findById(idMiembro);
         log.info("getMiembro: {}", miembro);
         List<PagoMembresiaResumenDTO> pagos = pagoMembresiaService.resumenPagosByMiembro(idMiembro, null);
         log.info("pagos del id miembro {} : {}", idMiembro, pagos);
         model.addAttribute("miembro", miembro);
         model.addAttribute("pagosMembresiaDTO", pagos);
+        List<Beneficio> beneficios = new ArrayList<>();
+        // Obtenemos los beneficios vigentes (Estatus = Activo)
+        PagoMembresiaResumenDTO pagoActivo = pagos.stream()
+                .filter(p -> p.getEstatusMembresia().equals("Activo"))
+                .findFirst()
+                .orElse(null);
+        if (pagoActivo != null && pagoActivo.getIdMembresiaActual() != null) {
+            beneficios = beneficioService.findByMembresia(pagoActivo.getIdMembresiaActual());
+        }
+        model.addAttribute("beneficios", beneficios);
         return "miembros/ver-miembro";
     }
 
@@ -147,9 +165,9 @@ public class MiembroController {
 
 
     @GetMapping("historial-membresias")
-    public String viewHistoialMembresias(@RequestParam(value = "id") Integer idMiembro,
-                                         @RequestParam(value = "q", required = false) String keyword,
-                                         Model model) {
+    public String viewHistorialMembresias(@RequestParam(value = "id") Integer idMiembro,
+                                          @RequestParam(value = "q", required = false) String keyword,
+                                          Model model) {
         Miembro miembro = miembroService.findById(idMiembro);
         List<HistorialMembresia> historialMembresias = historialMembresiaService.search(idMiembro, keyword);
         model.addAttribute("historialMembresias", historialMembresias);

@@ -15,4 +15,6 @@ public interface BeneficioService {
     void save(Beneficio beneficio);
 
     void delete(Integer id);
+
+    List<Beneficio> findByMembresia(Integer idMembresia);
 }
