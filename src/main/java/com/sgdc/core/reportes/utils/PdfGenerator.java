@@ -10,6 +10,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.reservas.domain.Reserva;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,6 +97,85 @@ public class PdfGenerator {
         return baos.toByteArray();
     }
 
+    public static byte[] generateReservasReport(List<Reserva> reservas) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            // Inicializamos PdfWriter, PdfDocument y Document
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+
+            // Título
+            Paragraph title = new Paragraph("Reporte de Reservas")
+                    .setFontSize(18)
+                    .setTextAlignment(TextAlignment.CENTER);
+            document.add(title);
+            document.add(new Paragraph("\n"));
+
+            // Definimos anchos de columna (proporciones)
+            float[] columnWidths = {50f, 100f, 150f, 100f, 100f, 80f};
+            Table table = new Table(UnitValue.createPercentArray(columnWidths));
+            table.setWidth(UnitValue.createPercentValue(100));
+
+            // Encabezados
+            addTableHeaderCell(table, "ID Reserva");
+            addTableHeaderCell(table, "Instalación");
+            addTableHeaderCell(table, "Miembro");
+            addTableHeaderCell(table, "Inicio");
+            addTableHeaderCell(table, "Fin");
+            addTableHeaderCell(table, "Estado");
+
+            // Formateador de fechas
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            // Filas de datos
+            for (Reserva r : reservas) {
+                // ID
+                table.addCell(new Cell().add(
+                        new Paragraph(String.valueOf(r.getId()))
+                ));
+
+                // Instalación
+                String instName = r.getInstalacion() != null
+                        ? r.getInstalacion().getNombre() : "";
+                table.addCell(new Cell().add(new Paragraph(instName)));
+
+                // Miembro (nombre completo)
+                String miembroName = "";
+                if (r.getMiembro() != null) {
+                    miembroName = r.getMiembro().getNombre()
+                            + " " + r.getMiembro().getApellidoPaterno()
+                            + " " + r.getMiembro().getApellidoMaterno();
+                }
+                table.addCell(new Cell().add(new Paragraph(miembroName)));
+
+                // Fecha de inicio
+                String inicio = r.getFechaHoraInicio() != null
+                        ? r.getFechaHoraInicio().format(formatter) : "";
+                table.addCell(new Cell().add(new Paragraph(inicio)));
+
+                // Fecha de fin
+                String fin = r.getFechaHoraFin() != null
+                        ? r.getFechaHoraFin().format(formatter) : "";
+                table.addCell(new Cell().add(new Paragraph(fin)));
+
+                // Estado
+                String estado = r.getEstadoReserva() != null
+                        ? r.getEstadoReserva() : "";
+                table.addCell(new Cell().add(new Paragraph(estado)));
+            }
+
+            // Añadimos la tabla y cerramos
+            document.add(table);
+            document.close();
+        } catch (Exception e) {
+            log.error("Error generando reporte de reservas", e);
+        }
+
+        return baos.toByteArray();
+    }
+
     /**
      * Metodo auxiliar para agregar celdas de encabezado a la tabla con estilos predefinidos.
      *
@@ -110,4 +190,5 @@ public class PdfGenerator {
         headerCell.setTextAlignment(TextAlignment.CENTER);
         table.addHeaderCell(headerCell);
     }
+
 }

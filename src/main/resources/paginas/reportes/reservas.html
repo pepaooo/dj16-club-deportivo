@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<div class="container mt-4">
+    <h2>Reporte de Reservas</h2>
+
+    <!-- Filtros -->
+    <form th:action="@{/reportes/reservas}" method="get">
+        <div class="row mb-3">
+            <!-- Filtrar por Instalación -->
+            <div class="col-md-3">
+                <label for="idInstalacion" class="form-label">Instalación:</label>
+                <select class="form-select" id="idInstalacion" name="idInstalacion">
+                    <option value="">-- Todas --</option>
+                    <option th:each="inst : ${listaInstalaciones}"
+                            th:value="${inst.id}"
+                            th:text="${inst.nombre}">
+                    </option>
+                </select>
+            </div>
+            <!-- Filtrar por Miembro -->
+            <div class="col-md-3">
+                <label for="idMiembro" class="form-label">Miembro:</label>
+                <select class="form-select" id="idMiembro" name="idMiembro">
+                    <option value="">-- Todos --</option>
+                    <option th:each="m : ${listaMiembros}"
+                            th:value="${m.id}"
+                            th:text="${m.nombre + ' ' + m.apellidoPaterno}">
+                    </option>
+                </select>
+            </div>
+            <!-- Rango fecha de inicio -->
+            <div class="col-md-3">
+                <label for="fechaInicio" class="form-label">Desde (Fecha/Hora):</label>
+                <input type="datetime-local" class="form-control" id="fechaInicio" name="fechaInicio"
+                       th:value="${param.fechaInicio}">
+            </div>
+            <!-- Rango fecha de fin -->
+            <div class="col-md-3">
+                <label for="fechaFin" class="form-label">Hasta (Fecha/Hora):</label>
+                <input type="datetime-local" class="form-control" id="fechaFin" name="fechaFin"
+                       th:value="${param.fechaFin}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Filtrar Reporte</button>
+            <a th:href="@{/reportes/reservas/exportPdf(
+                           idInstalacion=${param.idInstalacion},
+                           idMiembro=${param.idMiembro},
+                           fechaInicio=${param.fechaInicio},
+                           fechaFin=${param.fechaFin})}"
+               class="btn btn-secondary">
+                Exportar a PDF
+            </a>
+        </div>
+    </form>
+
+    <!-- Resultados -->
+    <div class="mt-4">
+        <h3>Resultados</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>ID Reserva</th>
+                    <th>Instalación</th>
+                    <th>Miembro</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="res : ${resultados}">
+                    <td th:text="${res.id}"></td>
+                    <td th:text="${res.instalacion.nombre}"></td>
+                    <td th:text="${res.miembro.nombre + ' ' + res.miembro.apellidoPaterno}"></td>
+                    <td th:text="${#temporals.format(res.fechaHoraInicio, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${#temporals.format(res.fechaHoraFin,   'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${res.estadoReserva}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(resultados)}">
+                    <td colspan="6" class="text-center">No se encontraron resultados.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

@@ -26,5 +26,14 @@ public interface ReservaService {
                                                    LocalDateTime fin,
                                                    Integer excludeId);
 
+    List<Reserva> searchReservas(Integer idInstalacion,
+                                 Integer idMiembro,
+                                 LocalDateTime fechaInicio,
+                                 LocalDateTime fechaFin);
+
+    byte[] generatePdfReport(Integer idInstalacion,
+                             Integer idMiembro,
+                             LocalDateTime fechaInicio,
+                             LocalDateTime fechaFin);
 
 }

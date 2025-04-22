@@ -42,4 +42,13 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer>, JpaS
             @Param("excludeId") Integer excludeId
     );
 
+    @Query("""
+              SELECT r 
+                FROM Reserva r 
+               WHERE (:idInstalacion IS NULL OR r.instalacion.id = :idInstalacion)
+                 AND (:idMiembro IS NULL OR r.miembro.id = :idMiembro)
+                 AND (:fechaInicio IS NULL OR r.fechaHoraInicio >= :fechaInicio)
+                 AND (:fechaFin IS NULL OR r.fechaHoraFin <= :fechaFin)
+            """)
+    List<Reserva> findByFilters(@Param("idInstalacion") Integer idInstalacion, @Param("idMiembro") Integer idMiembro, @Param("fechaInicio")  LocalDateTime fechaInicio, @Param("fechaFin")  LocalDateTime fechaFin);
 }

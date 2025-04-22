@@ -1,6 +1,7 @@
 package com.sgdc.core.reservas.service;
 
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.reportes.utils.PdfGenerator;
 import com.sgdc.core.reservas.domain.EstadoReserva;
 import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.Reserva;
@@ -176,5 +177,22 @@ public class ReservaServiceImpl implements ReservaService {
     @Override
     public List<Reserva> buscarPendientesSolapadas(Integer instalacionId, LocalDateTime inicio, LocalDateTime fin, Integer excludeId) {
         return repository.findPendientesSolapadas(instalacionId, inicio, fin, excludeId);
+    }
+
+    @Override
+    public List<Reserva> searchReservas(Integer idInstalacion, Integer idMiembro, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        // Si todos los filtros son nulos, se devolverán todos los registros.
+        if (idInstalacion == null && idMiembro == null && fechaInicio == null && fechaFin == null) {
+            return repository.findAllByOrderByIdDesc();
+        }
+        return repository.findByFilters(idInstalacion, idMiembro, fechaInicio, fechaFin);
+    }
+
+    @Override
+    public byte[] generatePdfReport(Integer idInstalacion, Integer idMiembro, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        // Obtener las reservas filtradas
+        List<Reserva> reservas = searchReservas(idInstalacion, idMiembro, fechaInicio, fechaFin);
+        // Generar el informe PDF
+        return PdfGenerator.generateReservasReport(reservas);
     }
 }
