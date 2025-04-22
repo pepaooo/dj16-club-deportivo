@@ -45,7 +45,7 @@ public class ReporteMiembrosController {
         model.addAttribute("resultados", resultados);
         // Se carga la lista de tipos de membresías para el campo select.
         model.addAttribute("listaMembresias", membresiaService.findAll());
-        return "reportes/membresias";
+        return "reportes/miembros";
     }
 
     @GetMapping("/exportPdf")

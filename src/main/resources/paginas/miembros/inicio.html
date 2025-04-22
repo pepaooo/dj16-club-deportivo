@@ -50,20 +50,16 @@
     <div class="table-responsive">
         <table class="table table-striped table-hover table-fixed-items">
             <colgroup>
-                <col style="width: 5%">
-                <col style="width: 15%">
-                <col style="width: 15%">
-                <col style="width: 15%">
-                <col style="width: 20%">
+                <col style="width: 10%">
+                <col style="width: 40%">
+                <col style="width: 30%">
                 <col style="width: 15%">
                 <col style="width: 15%">
             </colgroup>
             <thead style="background-color: #e9f5ff; color: #0d6efd">
             <tr>
-                <th>ID</th>
+                <th>Miembro</th>
                 <th>Nombre</th>
-                <th>Apellido paterno</th>
-                <th>Apellido materno</th>
                 <th>Correo</th>
                 <th>Fecha inscripción</th>
                 <th>Acciones</th>
@@ -72,9 +68,7 @@
             <tbody>
             <tr th:each="miembro : ${miembros}">
                 <td th:text="${miembro.id}"></td>
-                <td th:text="${miembro.nombre}"></td>
-                <td th:text="${miembro.apellidoPaterno}"></td>
-                <td th:text="${miembro.apellidoMaterno}"></td>
+                <td th:text="${miembro.nombre + ' ' + miembro.apellidoPaterno + ' ' + miembro.apellidoMaterno}"></td>
                 <td th:text="${miembro.correoElectronico}"></td>
                 <td th:text="${#temporals.format(miembro.fechaInscripcion, 'dd/MM/yyyy HH:mm')}"></td>
                 <td>

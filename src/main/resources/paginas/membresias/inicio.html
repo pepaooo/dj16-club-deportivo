@@ -101,7 +101,7 @@
             <tr th:each="membresia : ${membresias}">
                 <td th:text="${membresia.id}"></td>
                 <td th:text="${membresia.nombre}"></td>
-                <td>$ <span th:text="${membresia.tarifa}"></span></td>
+                <td th:text="${#numbers.formatCurrency(membresia.tarifa)}"></td>
                 <td th:text="${membresia.descripcion}"></td>
                 <td th:text="${membresia.duracionDias}"></td>
                 <td th:text="${membresia.estatus}"></td>

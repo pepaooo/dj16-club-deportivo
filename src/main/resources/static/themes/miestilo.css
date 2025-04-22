@@ -86,3 +86,10 @@ table thead {
 .table-fixed-items td:last-child {
     text-align: center;
 }
+
+/* Todas las celdas de la tabla harán wrap */
+.table-fixed-items td {
+    white-space: normal;      /* permite salto de línea */
+    word-break: break-word;   /* quiebra palabras muy largas */
+    overflow-wrap: anywhere;  /* wrap moderno */
+}
