@@ -5,15 +5,13 @@ import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "pago_membresia", uniqueConstraints = {@UniqueConstraint(columnNames = {"id_miembro", "fecha_pago"})})
@@ -21,6 +19,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+//@ToString(exclude = {"miembro", "membresia", "registradoPor", "ajustes"})
+@ToString(exclude = {"ajustes"})
 public class PagoMembresia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +68,9 @@ public class PagoMembresia {
 
     @Column(name = "motivo_cancelacion", length = 255)
     private String motivoCancelacion;
+
+    @OneToMany(mappedBy = "pagoMembresia", fetch = FetchType.LAZY)
+    private List<PagoAjuste> ajustes;
 
     /**
      * Metodo para obtener el estatus de la membresía.

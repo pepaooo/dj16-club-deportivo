@@ -10,6 +10,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.reportes.domain.dto.PagoReportDTO;
 import com.sgdc.core.reservas.domain.Reserva;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,42 @@ public class PdfGenerator {
 
         // 3. Llamar al metodo genérico
         return generateReport("Reporte de Reservas", headers, widths, rows);
+    }
+
+    /**
+     * Genera un reporte en PDF para la lista de pagos.
+     *
+     * @param pagos Lista de reservas a incluir en el reporte.
+     * @return Un arreglo de bytes con el contenido del PDF.
+     */
+    public static byte[] generatePagosReport(List<PagoReportDTO> pagos) {
+        // 1. Encabezados y anchos
+        List<String> headers = List.of(
+                "ID Pago", "Miembro", "Membresía",
+                "Monto Original", "Monto Real", "Fecha Pago", "Inicio", "Fin", "Cancelado"
+        );
+        float[] widths = {50f, 120f, 120f, 80f, 80f, 100f, 80f, 80f, 60f};
+
+        // 2. Generar filas
+        var fmtDateTime = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        var fmtDate = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        List<List<String>> rows = pagos.stream().map(p -> List.of(
+                String.valueOf(p.getId()),
+                (p.getMiembro() != null
+                        ? p.getMiembro()
+                        : ""),
+                (p.getMembresia() != null ? p.getMembresia() : ""),
+                p.getMontoOriginal().toString(),
+                p.getMontoReal().toString(),
+                p.getFechaPago() != null ? p.getFechaPago().format(fmtDateTime) : "",
+                p.getFechaInicio() != null
+                        ? p.getFechaInicio().format(fmtDate) : "",
+                p.getFechaFin() != null ? p.getFechaFin().format(fmtDate) : "",
+                p.isCancelado() ? "Sí" : "No"
+        )).toList();
+
+        // 3. Llamada al metodo genérico
+        return generateReport("Reporte de Pagos", headers, widths, rows);
     }
 
     /**

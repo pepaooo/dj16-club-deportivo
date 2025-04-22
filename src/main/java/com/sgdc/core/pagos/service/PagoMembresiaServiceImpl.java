@@ -14,6 +14,8 @@ import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
 import com.sgdc.core.pagos.exception.PagoInvalidoException;
 import com.sgdc.core.pagos.repository.PagoMembresiaRepository;
+import com.sgdc.core.reportes.domain.dto.PagoReportDTO;
+import com.sgdc.core.reportes.utils.PdfGenerator;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Expression;
@@ -301,6 +303,45 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         historialMembresiaService.save(hist);
 
         return nuevo;
+    }
+
+
+    @Override
+    public List<PagoReportDTO> searchPagosReport(Integer idMiembro, Integer idMembresia,
+                                                 LocalDateTime inicio, LocalDateTime fin) {
+        List<PagoMembresia> pagos = this.searchPagos(idMiembro, idMembresia, inicio, fin);
+        return pagos.stream().map(p -> {
+            PagoReportDTO dto = new PagoReportDTO();
+            dto.setId(p.getId());
+            dto.setMiembro(p.getMiembro().getNombre() + " " + p.getMiembro().getApellidoPaterno() + " " + p.getMiembro().getApellidoMaterno());
+            dto.setMembresia(p.getMembresia().getNombre());
+            dto.setMontoOriginal(p.getMonto());
+            // Sumar todos los ajustes (pueden ser positivos o negativos)
+            BigDecimal sumaAjustes = p.getAjustes().stream()
+                    .map(PagoAjuste::getMontoAjuste)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            dto.setMontoReal(p.getMonto().add(sumaAjustes));
+            dto.setFechaPago(p.getFechaPago());
+            dto.setFechaInicio(p.getFechaInicio());
+            dto.setFechaFin(p.getFechaFin());
+            dto.setCancelado(p.isCancelado());
+            return dto;
+        }).toList();
+    }
+
+    @Override
+    public byte[] generatePdfReport(Integer idMiembro, Integer idMembresia,
+                                    LocalDateTime inicio, LocalDateTime fin) {
+        List<PagoReportDTO> pagos = searchPagosReport(idMiembro, idMembresia, inicio, fin);
+        return PdfGenerator.generatePagosReport(pagos);
+    }
+
+    private List<PagoMembresia> searchPagos(Integer idMiembro, Integer idMembresia,
+                                           LocalDateTime inicio, LocalDateTime fin) {
+        if (idMiembro == null && idMembresia == null && inicio == null && fin == null) {
+            return pagoMembresiaRepository.findAllByOrderByIdDesc();
+        }
+        return pagoMembresiaRepository.findByFilters(idMiembro, idMembresia, inicio, fin);
     }
 
     private static Usuario buildUsuario(PagoMembresiaDTO dto) {

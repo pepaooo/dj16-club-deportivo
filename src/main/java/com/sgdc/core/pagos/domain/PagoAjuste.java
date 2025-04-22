@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "pago_ajuste")
 @Data
+@ToString
 public class PagoAjuste {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +25,7 @@ public class PagoAjuste {
     //@NotNull
     @ManyToOne
     @JoinColumn(name = "id_pago", nullable = false)
+    @ToString.Exclude
     private PagoMembresia pagoMembresia;
 
     @NotNull(message = "El monto no puede estar vacío")

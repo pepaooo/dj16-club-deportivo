@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<div class="container mt-4">
+    <h2>Reporte de Pagos</h2>
+
+    <!-- Filtros -->
+    <form th:action="@{/reportes/pagos}" method="get">
+        <div class="row mb-3">
+            <!-- Miembro -->
+            <div class="col-md-3">
+                <label for="idMiembro" class="form-label">Miembro:</label>
+                <select id="idMiembro" name="idMiembro" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option th:each="m : ${listaMiembros}"
+                            th:value="${m.id}"
+                            th:text="${m.nombre + ' ' + m.apellidoPaterno + ' ' + m.apellidoMaterno}">
+                    </option>
+                </select>
+            </div>
+            <!-- Membresía -->
+            <div class="col-md-3">
+                <label for="idMembresia" class="form-label">Membresía:</label>
+                <select id="idMembresia" name="idMembresia" class="form-select">
+                    <option value="">-- Todas --</option>
+                    <option th:each="mb : ${listaMembresias}"
+                            th:value="${mb.id}"
+                            th:text="${mb.nombre}">
+                    </option>
+                </select>
+            </div>
+            <!-- Fecha Pago Desde -->
+            <div class="col-md-3">
+                <label for="fechaPagoInicio" class="form-label">Fecha Pago Desde:</label>
+                <input type="date" id="fechaPagoInicio" name="fechaPagoInicio"
+                       class="form-control" th:value="${param.fechaPagoInicio}">
+            </div>
+            <!-- Fecha Pago Hasta -->
+            <div class="col-md-3">
+                <label for="fechaPagoFin" class="form-label">Fecha Pago Hasta:</label>
+                <input type="date" id="fechaPagoFin" name="fechaPagoFin"
+                       class="form-control" th:value="${param.fechaPagoFin}">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">
+                Filtrar Reporte
+            </button>
+            <a th:href="@{/reportes/pagos/exportPdf(
+                     idMiembro=${param.idMiembro},
+                     idMembresia=${param.idMembresia},
+                     fechaPagoInicio=${param.fechaPagoInicio},
+                     fechaPagoFin=${param.fechaPagoFin})}"
+               class="btn btn-secondary">
+                Exportar a PDF
+            </a>
+        </div>
+    </form>
+
+    <!-- Resultados -->
+    <div class="mt-4 table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+            <tr>
+                <th>ID Pago</th>
+                <th>Miembro</th>
+                <th>Membresía</th>
+                <th>Monto Original</th>
+                <th>Monto Real</th>
+                <th>Fecha Pago</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Cancelado</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${resultados}">
+                <td th:text="${p.id}"></td>
+                <td th:text="${p.miembro}"></td>
+                <td th:text="${p.membresia}"></td>
+                <td th:text="${#numbers.formatCurrency(p.montoOriginal)}"></td>
+                <td th:text="${#numbers.formatCurrency(p.montoReal)}"></td>
+                <td th:text="${#temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${#temporals.format(p.fechaInicio, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(p.fechaFin, 'dd/MM/yyyy')}"></td>
+                <td th:text="${p.cancelado}? 'Sí' : 'No'"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(resultados)}">
+                <td colspan="8" class="text-center">No se encontraron registros.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

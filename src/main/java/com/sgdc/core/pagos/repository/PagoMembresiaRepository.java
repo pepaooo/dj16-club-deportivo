@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -182,5 +183,21 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             "   OR LOWER(FUNCTION('DATE_FORMAT', p.fechaFin, '%Y-%m-%d')) LIKE LOWER(CONCAT('%', :keyword, '%'))" +
             ") ORDER BY p.id DESC")
     List<PagoMembresiaResumenDTO> searchResumenPagos(@Param("keyword") String keyword);
+
+    List<PagoMembresia> findAllByOrderByIdDesc();
+
+    @Query("""
+              SELECT p FROM PagoMembresia p
+               WHERE (:idMiembro   IS NULL OR p.miembro.id = :idMiembro)
+                 AND (:idMembresia IS NULL OR p.membresia.id = :idMembresia)
+                 AND (:fechaInicio IS NULL OR p.fechaPago    >= :fechaInicio)
+                 AND (:fechaFin    IS NULL OR p.fechaPago    <= :fechaFin)
+            """)
+    List<PagoMembresia> findByFilters(
+            @Param("idMiembro") Integer idMiembro,
+            @Param("idMembresia") Integer idMembresia,
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin
+    );
 
 }

@@ -1,14 +1,14 @@
 package com.sgdc.core.pagos.service;
 
-import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaDTO;
 import com.sgdc.core.pagos.domain.dto.PagoMembresiaResumenDTO;
+import com.sgdc.core.reportes.domain.dto.PagoReportDTO;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface PagoMembresiaService {
 
@@ -33,4 +33,14 @@ public interface PagoMembresiaService {
     void save(PagoMembresiaDTO pagoMembresiaDTO);
 
     void cancelarPago(Integer idPago, String motivo);
+
+    List<PagoReportDTO> searchPagosReport(Integer idMiembro,
+                                    Integer idMembresia,
+                                    LocalDateTime fechaInicio,
+                                    LocalDateTime fechaFin);
+
+    byte[] generatePdfReport(Integer idMiembro,
+                             Integer idMembresia,
+                             LocalDateTime fechaInicio,
+                             LocalDateTime fechaFin);
 }
