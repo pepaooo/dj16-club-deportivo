@@ -77,8 +77,8 @@
                 <i class="bi bi-arrow-left-circle"></i> Volver
             </a>
             <!-- Botón Ajustar -->
-<!--               th:if="${pago.estatus == 'Activo' or pago.estatus == 'Pendiente'}"-->
             <a class="btn btn-warning"
+               th:if="${pago.estatus == 'Activo' or pago.estatus == 'Pendiente'}"
                th:href="@{'/pagos/ajustar?id=' + ${pago.id}}">
                 <i class="bi bi-pencil-square"></i> Ajustar Pago
             </a>

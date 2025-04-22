@@ -39,10 +39,20 @@
 
     <!-- Tabla de Historial de Pagos -->
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover table-fixed-items">
+            <colgroup>
+                <col style="width: 5%">
+                <col style="width: 15%">
+                <col style="width: 10%">
+                <col style="width: 15%">
+                <col style="width: 15%">
+                <col style="width: 15%">
+                <col style="width: 10%">
+                <col style="width: 15%">
+            </colgroup>
             <thead style="background-color: #e9f5ff; color: #0d6efd">
             <tr>
-                <th>ID Pago</th>
+                <th>Pago</th>
                 <th>Membresía</th>
                 <th>Monto</th>
                 <th>Fecha de Pago</th>
@@ -56,7 +66,7 @@
             <tr th:each="pago : ${historialPagos}">
                 <td th:text="${pago.id}"></td>
                 <td th:text="${pago.membresia.nombre}"></td>
-                <td>$<span th:text="${pago.monto}"></span></td>
+                <td th:text="${#numbers.formatCurrency(pago.monto)}"></td>
                 <td th:text="${#temporals.format(pago.fechaPago, 'yyyy-MM-dd HH:mm')}"></td>
                 <td th:text="${#temporals.format(pago.fechaInicio, 'yyyy-MM-dd')}"></td>
                 <td th:text="${#temporals.format(pago.fechaFin, 'yyyy-MM-dd')}"></td>
