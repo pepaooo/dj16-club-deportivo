@@ -28,29 +28,25 @@
                 <div class="col-md-6">
                     <p>
                         <strong>ID:</strong>
-                        <span th:text="${membresia.id}">1</span>
+                        <span th:text="${membresia.id}"></span>
                     </p>
                     <p>
                         <strong>Nombre:</strong>
-                        <span th:text="${membresia.nombre}">Mensual</span>
+                        <span th:text="${membresia.nombre}"></span>
                     </p>
                     <p>
                         <strong>Descripción:</strong>
-                        <span th:text="${membresia.descripcion}"
-                    >Descripcion</span
-                    >
+                        <span th:text="${membresia.descripcion}"></span>
                     </p>
                 </div>
                 <!-- Segunda Columna -->
                 <div class="col-md-6">
                     <p>
-                        <strong>Tarifa:</strong> $<span th:text="${membresia.tarifa}"
-                    >50.00</span
-                    >
+                        <strong>Tarifa:</strong> $<span th:text="${membresia.tarifa}"></span>
                     </p>
                     <p>
                         <strong>Duración (días):</strong>
-                        <span th:text="${membresia.duracionDias}">30</span>
+                        <span th:text="${membresia.duracionDias}"></span>
                     </p>
                     <p>
                         <strong>Estatus:</strong>
@@ -81,7 +77,63 @@
             </div>
         </div>
     </div>
-    <!-- TODO. Beneficios Asignados -->
+
+    <!-- Beneficios Asignados -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <strong>Beneficios Asignados</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ben : ${membresia.beneficios}">
+                    <td th:text="${ben.nombre}">Acceso al gimnasio</td>
+                    <td th:text="${ben.descripcion}">Uso ilimitado de equipo</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(membresia.beneficios)}">
+                    <td colspan="2" class="text-center py-3">
+                        No hay beneficios asignados
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Instalaciones Asignadas -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <strong>Instalaciones Asignadas</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="inst : ${membresia.instalaciones}">
+                    <td th:text="${inst.nombre}">Cancha de Tenis</td>
+                    <td th:text="${inst.descripcion}">Superficie de polvo de ladrillo</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(membresia.instalaciones)}">
+                    <td colspan="2" class="text-center py-3">
+                        No hay instalaciones asignadas
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 
 </div>
 

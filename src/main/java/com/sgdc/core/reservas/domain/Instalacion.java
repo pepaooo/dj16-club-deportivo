@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -25,7 +26,7 @@ import java.util.Set;
         )
 })
 @Data
-@ToString(exclude = "membresias")
+@ToString
 public class Instalacion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +48,8 @@ public class Instalacion {
     private String estado;
 
     @ManyToMany(mappedBy = "instalaciones")
+    @EqualsAndHashCode.Exclude  // <-- excluir de equals/hashCode
+    @ToString.Exclude
     private Set<Membresia> membresias = new HashSet<>();
 
 }

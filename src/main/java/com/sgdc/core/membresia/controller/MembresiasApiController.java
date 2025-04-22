@@ -1,7 +1,7 @@
 package com.sgdc.core.membresia.controller;
 
-import com.sgdc.core.membresia.domain.Membresia;
-import com.sgdc.core.membresia.domain.dto.MembresiaDetalleDTO;
+import com.sgdc.core.membresia.domain.dto.MembresiaDTO;
+import com.sgdc.core.membresia.domain.dto.MembresiaDetalleApiDTO;
 import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.reservas.domain.dto.InstalacionDTO;
 import com.sgdc.core.reservas.service.InstalacionService;
@@ -40,8 +40,8 @@ public class MembresiasApiController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MembresiaDetalleDTO> getDetalle(@PathVariable Integer id) {
-        Membresia m = membresiaService.findById(id);
+    public ResponseEntity<MembresiaDetalleApiDTO> getDetalle(@PathVariable Integer id) {
+        MembresiaDTO m = membresiaService.findById(id);
         return ResponseEntity.ok(convertToDto(m));
     }
 
@@ -50,8 +50,13 @@ public class MembresiasApiController {
         return instalacionService.findByMembresiaId(id);
     }
 
-    private MembresiaDetalleDTO convertToDto(Membresia m) {
-        return modelMapper.map(m, MembresiaDetalleDTO.class);
+    private MembresiaDetalleApiDTO convertToDto(MembresiaDTO m) {
+//        return MembresiaDetalleApiDTO.builder()
+//                .nombre(m.getNombre())
+//                .tarifa(m.getTarifa())
+//                .duracionDias(m.getDuracionDias())
+//                .build();
+        return modelMapper.map(m, MembresiaDetalleApiDTO.class);
     }
 
 }

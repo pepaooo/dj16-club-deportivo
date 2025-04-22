@@ -2,6 +2,7 @@ package com.sgdc.core.pagos.service;
 
 import com.sgdc.core.membresia.domain.HistorialMembresia;
 import com.sgdc.core.membresia.domain.Membresia;
+import com.sgdc.core.membresia.domain.dto.MembresiaDTO;
 import com.sgdc.core.membresia.exception.MembresiaInactivaException;
 import com.sgdc.core.membresia.service.HistorialMembresiaService;
 import com.sgdc.core.membresia.service.MembresiaService;
@@ -19,6 +20,7 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -43,12 +45,14 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
     private final MiembroService miembroService;
     private final MembresiaService membresiaService;
     private final HistorialMembresiaService historialMembresiaService;
+    private final ModelMapper modelMapper;
 
-    public PagoMembresiaServiceImpl(PagoMembresiaRepository pagoMembresiaRepository, MiembroService miembroService, MembresiaService membresiaService, HistorialMembresiaService historialMembresiaService) {
+    public PagoMembresiaServiceImpl(PagoMembresiaRepository pagoMembresiaRepository, MiembroService miembroService, MembresiaService membresiaService, HistorialMembresiaService historialMembresiaService, ModelMapper modelMapper) {
         this.pagoMembresiaRepository = pagoMembresiaRepository;
         this.miembroService = miembroService;
         this.membresiaService = membresiaService;
         this.historialMembresiaService = historialMembresiaService;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -255,7 +259,10 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
     private PagoMembresia buildAndSaveNuevo(PagoMembresiaDTO dto) {
         Miembro miembro = miembroService.findById(dto.getIdMiembro());
         // 1) Validamos el estatus de la membresía
-        Membresia planNuevo = membresiaService.findById(dto.getMembresiaId());
+        MembresiaDTO planNuevoDTO = membresiaService.findById(dto.getMembresiaId());
+        log.info("Plan nuevo : {}", planNuevoDTO.getEstatus());
+        Membresia planNuevo = modelMapper.map(planNuevoDTO, Membresia.class);
+        log.info("Plan nuevo: {}", planNuevo.getEstatus());
         if (planNuevo.getEstatus().equalsIgnoreCase("Inactivo")){
             throw new MembresiaInactivaException("La membresía no está activa");
         }

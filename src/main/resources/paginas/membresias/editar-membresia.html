@@ -62,6 +62,37 @@
                             <input type="number" class="form-control" id="duracion_dias" th:field="*{duracionDias}" placeholder="Ingrese la duración en días" required />
                             <div class="text-danger" th:if="${#fields.hasErrors('duracionDias')}" th:errors="*{duracionDias}"></div>
                         </div>
+                        <!-- Beneficios -->
+                        <div class="mb-3">
+                            <label for="beneficios" class="form-label">Beneficios</label>
+                            <select id="beneficios"
+                                    class="form-select"
+                                    multiple
+                                    th:field="*{beneficiosIds}">
+                                <option th:each="b : ${todosBeneficios}"
+                                        th:value="${b.id}"
+                                        th:text="${b.nombre}"></option>
+                            </select>
+                            <div class="text-danger"
+                                 th:if="${#fields.hasErrors('beneficiosIds')}"
+                                 th:errors="*{beneficiosIds}"></div>
+                        </div>
+
+                        <!-- Instalaciones -->
+                        <div class="mb-3">
+                            <label for="instalaciones" class="form-label">Instalaciones</label>
+                            <select id="instalaciones"
+                                    class="form-select"
+                                    multiple
+                                    th:field="*{instalacionesIds}">
+                                <option th:each="i : ${todasInstalaciones}"
+                                        th:value="${i.id}"
+                                        th:text="${i.nombre}"></option>
+                            </select>
+                            <div class="text-danger"
+                                 th:if="${#fields.hasErrors('instalacionesIds')}"
+                                 th:errors="*{instalacionesIds}"></div>
+                        </div>
                         <!-- Botones de Acción -->
                         <div class="d-flex justify-content-end">
                             <a th:href="@{/membresias}" class="btn btn-secondary me-2">

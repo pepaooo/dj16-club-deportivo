@@ -4,10 +4,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "beneficio")
 @Data
+@ToString
 public class Beneficio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,4 +28,10 @@ public class Beneficio {
     @NotBlank(message = "La descripción del beneficio no puede estar vacío")
     @Column(name = "descripcion", nullable = false)
     private String descripcion;
+
+    // Relación ManyToMany con Membresia (lado inverso)
+    @ManyToMany(mappedBy = "beneficios")
+    @EqualsAndHashCode.Exclude  // <-- excluir de equals/hashCode
+    @ToString.Exclude
+    private Set<Membresia> membresias = new HashSet<>();
 }

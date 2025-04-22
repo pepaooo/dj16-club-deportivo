@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -26,7 +27,7 @@ import java.util.Set;
         )
 })
 @Data
-@ToString(exclude = "instalaciones")
+@ToString
 public class Membresia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,12 +55,24 @@ public class Membresia {
     @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
+    // Relación ManyToMany con Beneficio
+    @ManyToMany
+    @JoinTable(name = "membresia_beneficio",
+            joinColumns = @JoinColumn(name = "id_membresia"),
+            inverseJoinColumns = @JoinColumn(name = "id_beneficio"))
+    @EqualsAndHashCode.Exclude  // <-- excluir de equals/hashCode
+    @ToString.Exclude
+    private Set<Beneficio> beneficios = new HashSet<>();
+
+    // Relación ManyToMany con Instalacion
     @ManyToMany
     @JoinTable(
             name = "membresia_instalacion",
             joinColumns = @JoinColumn(name = "id_membresia"),
             inverseJoinColumns = @JoinColumn(name = "id_instalacion")
     )
+    @EqualsAndHashCode.Exclude  // <-- excluir de equals/hashCode
+    @ToString.Exclude
     private Set<Instalacion> instalaciones = new HashSet<>();
 
 }

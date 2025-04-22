@@ -1,9 +1,12 @@
 package com.sgdc.core.membresia.controller;
 
 import com.sgdc.core.membresia.domain.Membresia;
+import com.sgdc.core.membresia.domain.dto.MembresiaDTO;
+import com.sgdc.core.membresia.service.BeneficioService;
 import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.pagos.domain.PagoMembresia;
+import com.sgdc.core.reservas.service.InstalacionService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +32,14 @@ public class MembresiasController {
 
     private final MembresiaService membresiaService;
 
-    public MembresiasController(MembresiaService membresiaService) {
+    private final BeneficioService beneficioService;
+
+    private final InstalacionService instalacionService;
+
+    public MembresiasController(MembresiaService membresiaService, BeneficioService beneficioService, InstalacionService instalacionService) {
         this.membresiaService = membresiaService;
+        this.beneficioService = beneficioService;
+        this.instalacionService = instalacionService;
     }
 
     @GetMapping
@@ -54,33 +63,38 @@ public class MembresiasController {
 
     @GetMapping("get")
     public String getMembresia(@RequestParam(value = "id") Integer idMembresia, Model model) {
-        Membresia membresia = membresiaService.findById(idMembresia);
+        MembresiaDTO membresia = membresiaService.findById(idMembresia);
         model.addAttribute("membresia", membresia);
         return "membresias/ver-membresia";
     }
 
     @GetMapping("new")
     public String newMembresia(Model model) {
-        model.addAttribute("membresia", new Membresia());
+        model.addAttribute("membresia", new MembresiaDTO());
+        model.addAttribute("todosBeneficios", beneficioService.findAll());
+        model.addAttribute("todasInstalaciones", instalacionService.findAll());
         return "membresias/nueva-membresia";
     }
 
     @PostMapping("create-membresia")
-    public String createMembresia(@Valid Membresia membresia, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String createMembresia(@Valid @ModelAttribute("membresia") MembresiaDTO membresia, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         if (bindingResult.hasErrors()) {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
+            model.addAttribute("todosBeneficios", beneficioService.findAll());
+            model.addAttribute("todasInstalaciones", instalacionService.findAll());
             return "membresias/nueva-membresia";
         }
 
         try {
-            membresia.setEstatus("Activo");
             log.info("Membresía a guardar: {}", membresia);
             membresiaService.save(membresia);
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.rejectValue("nombre", "nombre", "El nombre de la membresía ya existe. Por favor, use otro.");
+            model.addAttribute("todosBeneficios", beneficioService.findAll());
+            model.addAttribute("todasInstalaciones", instalacionService.findAll());
             return "membresias/nueva-membresia";
         }
 
@@ -90,17 +104,21 @@ public class MembresiasController {
 
     @GetMapping("change")
     public String changeMembresia(@RequestParam(value = "id") Integer idMembresia, Model model) {
-        Membresia membresia = membresiaService.findById(idMembresia);
+        MembresiaDTO membresia = membresiaService.findById(idMembresia);
         model.addAttribute("membresia", membresia);
+        model.addAttribute("todosBeneficios", beneficioService.findAll());
+        model.addAttribute("todasInstalaciones", instalacionService.findAll());
         return "membresias/editar-membresia";
     }
 
     @PostMapping("change-membresia")
-    public String changeMembresia(@Valid Membresia membresia, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String changeMembresia(@Valid @ModelAttribute("membresia") MembresiaDTO membresia, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         if (bindingResult.hasErrors()) {
             for (ObjectError error : bindingResult.getAllErrors()) {
                 log.error("Ocurrió un error: {}", error.getDefaultMessage());
             }
+            model.addAttribute("todosBeneficios", beneficioService.findAll());
+            model.addAttribute("todasInstalaciones", instalacionService.findAll());
             return "membresias/editar-membresia";
         }
 
@@ -110,6 +128,8 @@ public class MembresiasController {
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.rejectValue("nombre", "nombre", "El nombre de la membresía ya existe. Por favor, use otro.");
+            model.addAttribute("todosBeneficios", beneficioService.findAll());
+            model.addAttribute("todasInstalaciones", instalacionService.findAll());
             return "membresias/editar-membresia";
         }
 
