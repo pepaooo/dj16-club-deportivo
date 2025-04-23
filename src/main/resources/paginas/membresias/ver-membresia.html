@@ -118,19 +118,22 @@
         <div class="card-body p-0">
             <table class="table table-striped mb-0 table-fixed">
                 <colgroup>
-                    <col style="width: 40%;">
-                    <col style="width: 60%;">
+                    <col style="width: 30%;">
+                    <col style="width: 50%;">
+                    <col style="width: 20%;">
                 </colgroup>
                 <thead class="table-light">
                 <tr>
                     <th>Nombre</th>
                     <th>Descripción</th>
+                    <th>Estado</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="inst : ${membresia.instalaciones}">
-                    <td th:text="${inst.nombre}">Cancha de Tenis</td>
-                    <td th:text="${inst.descripcion}">Superficie de polvo de ladrillo</td>
+                    <td th:text="${inst.nombre}"></td>
+                    <td th:text="${inst.descripcion}"></td>
+                    <td th:text="${inst.estado}"></td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(membresia.instalaciones)}">
                     <td colspan="2" class="text-center py-3">

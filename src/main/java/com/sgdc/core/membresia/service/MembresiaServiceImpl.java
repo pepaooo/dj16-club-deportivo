@@ -61,7 +61,7 @@ public class MembresiaServiceImpl implements MembresiaService {
                             .collect(Collectors.toList()));
                     dto.setInstalaciones(memb.getInstalaciones()
                             .stream()
-                            .map(i -> new InstalacionInfo(i.getNombre(), i.getDescripcion()))
+                            .map(i -> new InstalacionInfo(i.getNombre(), i.getDescripcion(), i.getEstado()))
                             .collect(Collectors.toList()));
                     return dto;
 

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class InstalacionDTO {
 
     private Integer id;
-
     private String nombre;
+    private String estado;
 
 }

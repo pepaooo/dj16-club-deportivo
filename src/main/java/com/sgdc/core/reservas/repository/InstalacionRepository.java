@@ -10,11 +10,14 @@ import java.util.List;
 
 public interface InstalacionRepository extends JpaRepository<Instalacion, Integer>, JpaSpecificationExecutor<Instalacion> {
 
+    List<Instalacion> findAllByOrderByIdDesc();
+
     @Query("""
-              SELECT i 
-                FROM Instalacion i 
-                JOIN i.membresias m 
+              SELECT i
+                FROM Instalacion i
+                JOIN i.membresias m
                WHERE m.id = :mid
+                AND i.estado = 'Disponible'
             """)
     List<Instalacion> findByMembresiaId(@Param("mid") Integer mid);
 

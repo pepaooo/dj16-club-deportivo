@@ -4,6 +4,7 @@ import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.dto.InstalacionDTO;
 import com.sgdc.core.reservas.repository.InstalacionRepository;
 import jakarta.persistence.criteria.Expression;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class InstalacionServiceImpl implements InstalacionService {
 
     @Override
     public List<Instalacion> findAll() {
-        return repository.findAll();
+        return repository.findAllByOrderByIdDesc();
     }
 
     @Override
@@ -32,7 +33,7 @@ public class InstalacionServiceImpl implements InstalacionService {
     @Override
     public List<Instalacion> search(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return repository.findAll();
+            return repository.findAllByOrderByIdDesc();
         }
         String pattern = "%" + keyword.toLowerCase() + "%";
 
@@ -50,15 +51,15 @@ public class InstalacionServiceImpl implements InstalacionService {
                     cb.like(estadoExpr, pattern)
             );
         };
-
-        return repository.findAll(spec);
+        // Ordenar por ID de forma descendente.
+        return repository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
     }
 
     @Override
     public List<InstalacionDTO> findByMembresiaId(Integer mid) {
         return repository.findByMembresiaId(mid)
                 .stream()
-                .map(i -> new InstalacionDTO(i.getId(), i.getNombre()))
+                .map(i -> new InstalacionDTO(i.getId(), i.getNombre(), i.getEstado()))
                 .toList();
     }
 

@@ -8,4 +8,5 @@ import lombok.Data;
 public class InstalacionInfo {
     private String nombre;
     private String descripcion;
+    private String estado;
 }
