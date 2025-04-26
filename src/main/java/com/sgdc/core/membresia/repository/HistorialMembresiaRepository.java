@@ -11,5 +11,4 @@ public interface HistorialMembresiaRepository extends JpaRepository<HistorialMem
 
     List<HistorialMembresia> findByMiembro_IdOrderByIdDesc(Integer idMiembro);
 
-
 }

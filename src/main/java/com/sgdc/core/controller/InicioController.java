@@ -13,12 +13,6 @@ public class InicioController {
         return "inicio";
     }
 
-    @GetMapping("usuarios")
-    public String usuarios(Model model) {
-        model.addAttribute("activePage", "/usuarios");
-        return "usuarios/inicio";
-    }
-
     @GetMapping("reportes")
     public String reportes(Model model) {
         model.addAttribute("activePage", "/reportes");

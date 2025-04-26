@@ -1,4 +1,4 @@
-package com.sgdc.core.usuarios.domain;
+package com.sgdc.core.usuarios.domain.dto;
 
 import lombok.Builder;
 import lombok.Data;

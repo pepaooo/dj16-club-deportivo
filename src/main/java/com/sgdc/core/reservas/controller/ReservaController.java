@@ -8,7 +8,7 @@ import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.service.InstalacionService;
 import com.sgdc.core.reservas.service.ReservaService;
-import com.sgdc.core.usuarios.domain.UsuarioDTO;
+import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

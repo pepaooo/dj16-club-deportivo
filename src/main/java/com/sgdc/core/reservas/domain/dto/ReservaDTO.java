@@ -1,7 +1,6 @@
 package com.sgdc.core.reservas.domain.dto;
 
-import com.sgdc.core.usuarios.domain.UsuarioDTO;
-import jakarta.persistence.Column;
+import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;

@@ -1,10 +1,7 @@
 package com.sgdc.core.pagos.domain.dto;
 
-import com.sgdc.core.usuarios.domain.UsuarioDTO;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;

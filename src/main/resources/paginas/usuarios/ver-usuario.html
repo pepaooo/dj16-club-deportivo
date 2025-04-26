@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido Principal -->
+<div class="container container-custom-details mt-4">
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i
+                    class="bi bi-person-lines-fill"
+                    style="font-size: 3rem; color: #1976d2"
+            ></i>
+            <h2 class="mt-2">Detalles del Usuario</h2>
+            <p class="text-muted">
+                Visualice la información del usuario en modo solo lectura.
+            </p>
+        </div>
+    </div>
+
+    <!-- Información en dos columnas -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <!-- Primera Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>ID:</strong>
+                        <span th:text="${usuario.id}"></span>
+                    </p>
+                    <p>
+                        <strong>Nombre de Usuario:</strong>
+                        <span th:text="${usuario.nombre}"></span>
+                    </p>
+                    <p>
+                        <strong>Estatus:</strong>
+                        <span th:text="${usuario.estatus}"></span>
+                    </p>
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span
+                                th:text="${#temporals.format(usuario.fechaCreacion, 'yyyy-MM-dd HH:mm')}"
+                        >2025-01-01</span
+                        >
+                    </p>
+                    <p>
+                        <strong>Último Acceso:</strong>
+                        <span
+                                th:text="${usuario.ultimoAcceso != null ? #temporals.format(usuario.ultimoAcceso, 'yyyy-MM-dd HH:mm') : '-'}"
+                        >-</span
+                        >
+                    </p>
+                    <!-- Si el usuario está vinculado a un miembro, se puede mostrar -->
+                    <p th:if="${usuario.miembro != null}">
+                        <strong>Miembro:</strong>
+                        <a th:href="@{'/miembros/get?id=' + ${usuario.idMiembro}}">
+                            <span th:text="${usuario.miembro}"></span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <a class="btn btn-secondary me-2" th:href="@{/usuarios}">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+            <a class="btn btn-warning"
+               th:href="@{'/usuarios/change?id=' + ${usuario.id}}">
+                <i class="bi bi-pencil-square"></i> Editar
+            </a>
+
+            <!-- Botón condicional según estatus -->
+            <div th:if="${usuario.estatus == 'Activo'}" style="display:inline-block">
+                <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deactivateUsuarioModal">
+                    <i class="bi bi-slash-circle"></i> Desactivar
+                </a>
+            </div>
+            <div th:if="${usuario.estatus != 'Activo'}" style="display:inline-block">
+                <a class="btn btn-success" data-bs-toggle="modal" data-bs-target="#activateUsuarioModal">
+                    <i class="bi bi-check-circle"></i> Activar
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Roles Asignados -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Roles Asignados</h5>
+        </div>
+        <div class="card-body">
+            <div th:if="${#lists.isEmpty(usuario.roles)}">
+                <p class="text-center">
+                    No se han asignado roles para este tipo de usuario.
+                </p>
+            </div>
+            <div
+                    class="list-group"
+                    th:if="${!#lists.isEmpty(usuario.roles)}"
+                    th:each="rol : ${usuario.roles}"
+            >
+                <div class="list-group-item">
+                    <h6 class="mb-1" th:text="${rol.nombre}">Nombre del rol</h6>
+                    <p class="mb-1" th:text="${rol.descripcion}">
+                        Descripción del rol.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal para Confirmar Desactivación -->
+<div class="modal fade" id="deactivateUsuarioModal" tabindex="-1" aria-labelledby="deactivateUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 1rem">
+            <div class="modal-header" style="background-color: #f8d7da; border-bottom: none; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                <h5 class="modal-title" id="deactivateUsuarioModalLabel" style="color: #842029">
+                    <i class="bi bi-exclamation-circle-fill"></i> Confirmar Desactivación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="font-size: 1.1rem">
+                <p class="text-left mb-0">
+                    ¿Está seguro de que desea desactivar este usuario?
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: none; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <form th:action="@{'/usuarios/deactivate?id=' + ${usuario.id}}" method="post">
+                    <!-- Incluir token CSRF si es necesario -->
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-power"></i> Desactivar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Confirmar Activación -->
+<div class="modal fade" id="activateUsuarioModal" tabindex="-1" aria-labelledby="activateUsuarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 1rem">
+            <div class="modal-header" style="background-color: #d1e7dd; border-bottom: none; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+                <h5 class="modal-title" id="activateUsuarioModalLabel" style="color: #0f5132">
+                    <i class="bi bi-exclamation-circle-fill"></i> Confirmar Activación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body" style="font-size: 1.1rem">
+                <p class="text-left mb-0">
+                    ¿Está seguro de que desea activar este usuario?
+                </p>
+            </div>
+            <div class="modal-footer" style="border-top: none; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <form th:action="@{'/usuarios/activate?id=' + ${usuario.id}}" method="post">
+                    <!-- Incluir token CSRF si es necesario -->
+                    <button type="submit" class="btn btn-outline-success">
+                        <i class="bi bi-check-circle"></i> Activar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

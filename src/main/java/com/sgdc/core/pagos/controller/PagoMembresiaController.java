@@ -12,7 +12,7 @@ import com.sgdc.core.pagos.exception.PagoInactivoException;
 import com.sgdc.core.pagos.exception.PagoInvalidoException;
 import com.sgdc.core.pagos.service.PagoAjusteService;
 import com.sgdc.core.pagos.service.PagoMembresiaService;
-import com.sgdc.core.usuarios.domain.UsuarioDTO;
+import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import com.sgdc.core.usuarios.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

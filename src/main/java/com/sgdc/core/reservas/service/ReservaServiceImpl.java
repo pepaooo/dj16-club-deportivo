@@ -69,7 +69,8 @@ public class ReservaServiceImpl implements ReservaService {
             // JOIN con miembro
             Join<Reserva, Miembro> miembroJoin = root.join("miembro", JoinType.LEFT);
             Predicate pNombreMiembro = cb.like(cb.lower(miembroJoin.get("nombre")), pattern);
-            Predicate pApellidoMiembro = cb.like(cb.lower(miembroJoin.get("apellidoPaterno")), pattern);
+            Predicate pAPaternoMiembro = cb.like(cb.lower(miembroJoin.get("apellidoPaterno")), pattern);
+            Predicate pAMaternoMiembro = cb.like(cb.lower(miembroJoin.get("apellidoMaterno")), pattern);
 
             // 3) JOIN con Instalación
             Join<Reserva, Instalacion> instalacionJoin = root.join("instalacion", JoinType.LEFT);
@@ -89,7 +90,8 @@ public class ReservaServiceImpl implements ReservaService {
             // 5) Unimos todos los OR de texto
             Predicate texto = cb.or(
                     pNombreMiembro,
-                    pApellidoMiembro,
+                    pAPaternoMiembro,
+                    pAMaternoMiembro,
                     pNombreInstalacion,
                     pEstado,
                     pInicio,

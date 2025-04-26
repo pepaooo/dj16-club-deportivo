@@ -6,10 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -32,13 +29,13 @@ public class Usuario {
     @Column(name = "nombre_usuario", nullable = false, unique = true, length = 50)
     private String nombre;
 
-    @NotBlank(message = "La contraseña no puede estar vacía")
+    //@NotBlank(message = "La contraseña no puede estar vacía")
     @Size(max = 255)
     @Column(name = "contrasena", nullable = false, length = 255)
     private String contrasena;
 
     @NotBlank(message = "El estatus no puede estar vacío")
-    @Pattern(regexp = "Activo|Inactivo|Bloqueado")
+    @Pattern(regexp = "Activo|Inactivo")
     @Column(name = "estatus", nullable = false, length = 20)
     private String estatus;
 
@@ -58,6 +55,8 @@ public class Usuario {
     @JoinTable(name = "usuario_rol",
             joinColumns = @JoinColumn(name = "id_usuario"),
             inverseJoinColumns = @JoinColumn(name = "id_rol"))
+    @EqualsAndHashCode.Exclude  // <-- excluir de equals/hashCode
+    @ToString.Exclude
     private Set<Rol> roles;
 
 }

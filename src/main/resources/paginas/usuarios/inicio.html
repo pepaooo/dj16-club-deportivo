@@ -4,52 +4,132 @@
 <head th:replace="~{plantillas/plantilla :: head}"></head>
 <body>
 <header th:replace="~{plantillas/plantilla :: header}"></header>
+
 <!-- Contenido principal -->
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Gestión de Usuarios</h2>
-        <a class="btn btn-custom" href="nuevo-usuario.html">
-            <i class="bi bi-plus-circle"></i> Nuevo Usuario
-        </a>
+<div class="container container-custom mt-4">
+
+    <!-- Mensaje de éxito -->
+    <div id="alertSuccess" th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+
+    <!-- Encabezado y botón Nuevo Usuario -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2>Gestión de Usuarios</h2>
+        </div>
+        <div class="col-md-6 text-end">
+            <a class="btn btn-primary" th:href="@{/usuarios/new}">
+                <i class="bi bi-plus-circle"></i> Nuevo Usuario
+            </a>
+        </div>
+    </div>
+
+    <!-- Campo de Búsqueda -->
+    <form id="searchForm" th:action="@{/usuarios}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-12 ">
+                <div class="input-group">
+                    <input type="text" id="searchInput" name="q" class="form-control"
+                           placeholder="Buscar usuario por nombre, miembro o correo" th:value="${q}" aria-label="Buscar"
+                           aria-describedby="search-addon"/>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <!-- Botón de limpiar, inicialmente oculto -->
+                    <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                        <i class="bi bi-x"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
     <!-- Tabla de Usuarios -->
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead>
+        <table class="table table-striped table-hover table-fixed-items">
+            <colgroup>
+                <col style="width: 10%">
+                <col style="width: 25%">
+                <col style="width: 20%">
+                <col style="width: 10%">
+                <col style="width: 10%">
+                <col style="width: 10%">
+                <col style="width: 15%">
+            </colgroup>
+            <thead style="background-color: #e9f5ff; color: #0d6efd">
             <tr>
-                <th>ID</th>
-                <th>Nombre de Usuario</th>
+                <th>Usuario</th>
+                <th>Miembro</th>
+                <th>Correo</th>
                 <th>Estatus</th>
+                <th>Fecha Creación</th>
                 <th>Último Acceso</th>
                 <th>Acciones</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>1</td>
-                <td>jdoe</td>
-                <td><span class="badge bg-success">Activo</span></td>
-                <td>2025-03-28 14:35</td>
+            <!-- Ejemplo de fila; se itera con th:each -->
+            <tr th:each="usuario : ${usuarios}">
+                <td th:text="${usuario.nombre}"></td>
+                <td th:text="${usuario.miembro != null ? usuario.miembro : '-'}"></td>
+                <td th:text="${usuario.correoElectronico != null ? usuario.correoElectronico : '-'}"></td>
+                <td th:text="${usuario.estatus}"></td>
+                <td th:text="${#temporals.format(usuario.fechaCreacion, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${usuario.ultimoAcceso != null ? #temporals.format(usuario.ultimoAcceso, 'yyyy-MM-dd HH:mm') : '-'}"></td>
                 <td>
-                    <a
-                            class="btn btn-custom-outline btn-sm"
-                            href="editar-usuario.html?id=1"
-                    >
-                        <i class="bi bi-pencil-square"></i> Editar
-                    </a>
-                    <a
-                            class="btn btn-custom-danger-outline btn-sm"
-                            href="eliminar-usuario.html?id=1"
-                    >
-                        <i class="bi bi-trash"></i> Eliminar
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{'/usuarios/get?id=' + ${usuario.id}}">
+                        <i class="bi bi-eye"></i> Ver Detalle
                     </a>
                 </td>
             </tr>
-            <!-- Más filas según sea necesario -->
+            <tr th:if="${#lists.isEmpty(usuarios)}">
+                <td colspan="7" class="text-center">
+                    No se encontraron registros.
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
 </div>
+
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Espera 5 segundos y oculta el alert automáticamente
+    document.addEventListener("DOMContentLoaded", function () {
+        var alertEl = document.getElementById("alertSuccess");
+        if (alertEl) {
+            setTimeout(function () {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+    // Muestra el botón de limpiar si hay texto en el campo de búsqueda
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const clearButton = document.getElementById("clearSearch");
+        const searchForm = document.getElementById("searchForm");
+
+        // Mostrar botón de limpiar si el campo tiene contenido al cargar la página
+        if (searchInput.value.trim() !== "") {
+            clearButton.style.display = "inline-block";
+        }
+
+        // Actualizar visibilidad del botón a medida que se escribe
+        searchInput.addEventListener("input", function () {
+            clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
+        });
+
+        // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            searchForm.submit();
+        });
+    });
+</script>
 </body>
 </html>

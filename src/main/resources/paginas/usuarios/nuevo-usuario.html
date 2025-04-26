@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <div th:insert="~{plantillas/plantilla :: headContent}"></div>
+    <link th:href="@{/select2/css/select2.min.css}" rel="stylesheet"/>
+    <script th:src="@{/jquery/3.7.1/jquery.min.js}"></script>
+    <script th:src="@{/select2/js/select2.full.min.js}"></script>
+</head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container container-custom mt-4">
+    <div class="row justify-content-center">
+        <!-- Encabezado del formulario -->
+        <div class="col-md-10 col-lg-8">
+            <div class="text-center">
+                <i class="bi bi-plus-circle" style="font-size: 3rem; color: #1976d2"
+                ></i>
+                <h2 class="mt-2">Registrar Nuevo Usuario</h2>
+                <p class="text-muted">
+                    Complete la información a continuación para dar de alta un nuevo usuario.
+                </p>
+            </div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form th:action="@{/usuarios/create-usuario}" th:object="${usuario}" method="post">
+
+                        <!-- Mostrar errores globales -->
+                        <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
+                            Verifique los siguientes inconvenientes
+                            <ul>
+                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+                            </ul>
+                        </div>
+
+                        <!-- Nombre del usuario -->
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre de Usuario</label>
+                            <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nombre"
+                                    th:field="*{nombre}"
+                                    name="nombre"
+                                    placeholder="Ingrese el nombre de usuario"
+                                    required
+                            />
+                            <div class="text-danger" th:if="${#fields.hasErrors('nombre')}"
+                                 th:errors="*{nombre}"></div>
+                        </div>
+                        <!-- Contraseña del usuario -->
+                        <div class="mb-3">
+                            <label for="contrasena" class="form-label"
+                            >Contraseña</label>
+                            <input
+                                    type="password"
+                                    class="form-control"
+                                    id="contrasena"
+                                    th:field="*{contrasena}"
+                                    name="contrasena"
+                                    placeholder="Ingrese la contraseña"
+                                    required
+                            />
+                            <div class="text-danger" th:if="${#fields.hasErrors('contrasena')}"
+                                 th:errors="*{contrasena}"></div>
+                        </div>
+                        <!-- Selección de Miembro -->
+                        <div class="mb-3">
+                            <label for="miembroSelect" class="form-label">Miembro</label>
+                            <select id="miembroSelect" name="idMiembro" th:field="*{idMiembro}" class="form-control"
+                                    style="width: 100%;">
+                                <!-- Las opciones se cargarán vía AJAX -->
+                            </select>
+                            <div class="text-danger" th:if="${#fields.hasErrors('idMiembro')}"
+                                 th:errors="*{idMiembro}"></div>
+                        </div>
+                        <!-- Roles -->
+                        <div class="mb-3">
+                            <label for="roles" class="form-label">Roles</label>
+                            <select id="roles"
+                                    class="form-select"
+                                    multiple
+                                    th:field="*{rolesIds}"
+                                    required>
+                                <option th:each="r : ${roles}"
+                                        th:value="${r.id}"
+                                        th:text="${r.nombre}"></option>
+                            </select>
+                            <div class="text-danger"
+                                 th:if="${#fields.hasErrors('rolesIds')}"
+                                 th:errors="*{rolesIds}"></div>
+                        </div>
+
+
+                        <div class="d-flex justify-content-end">
+                            <a th:href="@{/usuarios}" class="btn btn-secondary me-2">
+                                <i class="bi bi-arrow-left-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Guardar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+
+<script>
+
+    $(document).ready(function () {
+        let defaultFin = null;
+
+        // 1) Configuramos Select2 para buscar sólo miembros
+        $('#miembroSelect').select2({
+            placeholder: 'Buscar miembro por nombre, correo, etc.',
+            ajax: {
+                url: '/api/miembros/search',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {q: params.term};
+                },
+                processResults: function (data) {
+                    return {
+                        results: $.map(data, function (item) {
+                            return {
+                                id: item.id,
+                                text: item.nombre + ' ' + item.apellidoPaterno + ' ' + item.apellidoMaterno
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1
+        });
+    });
+
+</script>
+
+</body>
+</html>
