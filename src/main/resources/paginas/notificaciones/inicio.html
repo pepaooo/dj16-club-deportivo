@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container container-custom mt-4">
+
+    <!-- Mensaje de éxito -->
+    <div id="alertSuccess" th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i class="bi bi-bell" style="font-size: 3rem; color: #1976d2"></i>
+            <h2 class="mt-2">Notificaciones de Vencimiento de Membresías</h2>
+            <p class="text-muted">
+                Revise las notificaciones para las membresías próximas a vencer y
+                tome las acciones correspondientes.
+            </p>
+        </div>
+    </div>
+
+    <!-- Tarjetas resumen (opcional) -->
+    <div class="row row-cols-1 row-cols-md-4 mb-4">
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Total Notificaciones</h6>
+                    <p class="card-text" th:text="${totalNotificaciones}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Pendientes</h6>
+                    <p class="card-text" th:text="${notificacionesPendientes}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Enviadas</h6>
+                    <p class="card-text" th:text="${notificacionesEnviadas}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-title">Error</h6>
+                    <p class="card-text" th:text="${notificacionesError}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campo de búsqueda -->
+    <form id="searchForm" th:action="@{/notificaciones}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-8 offset-md-2">
+                <div class="input-group">
+                    <input type="text" id="searchInput" name="q" class="form-control"
+                           placeholder="Buscar notificación por miembro, fecha, etc." th:value="${q}"
+                           aria-label="Buscar"
+                           aria-describedby="search-addon"/>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <!-- Botón de limpiar, inicialmente oculto -->
+                    <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                        <i class="bi bi-x"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de Notificaciones -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-fixed-items">
+            <colgroup>
+                <col style="width: 5%">
+                <col style="width: 25%">
+                <col style="width: 15%">
+                <col style="width: 15%">
+                <col style="width: 15%">
+                <col style="width: 10%">
+                <col style="width: 15%">
+            </colgroup>
+            <thead style="background-color: #e9f5ff; color: #0d6efd">
+            <tr>
+                <th>ID</th>
+                <th>Miembro</th>
+                <th>Membresía</th>
+                <th>Vencimiento</th>
+                <th>Días restantes</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Ejemplo de fila (en producción se iteraría con th:each) -->
+            <tr th:each="n : ${notificaciones}">
+                <td th:text="${n.id}"></td>
+                <td th:text="${n.miembroNombre}"></td>
+                <td th:text="${n.membresiaNombre}"></td>
+                <td th:text="${#temporals.format(n.fechaVencimiento, 'yyyy-MM-dd')}"></td>
+                <td th:text="${n.diasRestantes}"></td>
+                <td th:text="${n.estatus}"></td>
+                <td>
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{'/notificaciones/get?id=' + ${n.id}}">
+                        <i class="bi bi-eye"></i> Ver Detalle
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(notificaciones)}">
+                <td colspan="7" class="text-center">
+                    No se encontraron registros vigentes.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Espera 5 segundos y oculta el alert automáticamente
+    document.addEventListener("DOMContentLoaded", function () {
+        var alertEl = document.getElementById("alertSuccess");
+        if (alertEl) {
+            setTimeout(function () {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+    // Muestra el botón de limpiar si hay texto en el campo de búsqueda
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const clearButton = document.getElementById("clearSearch");
+        const searchForm = document.getElementById("searchForm");
+
+        // Mostrar botón de limpiar si el campo tiene contenido al cargar la página
+        if (searchInput.value.trim() !== "") {
+            clearButton.style.display = "inline-block";
+        }
+
+        // Actualizar visibilidad del botón a medida que se escribe
+        searchInput.addEventListener("input", function () {
+            clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
+        });
+
+        // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            searchForm.submit();
+        });
+    });
+</script>
+</body>
+</html>

@@ -200,4 +200,7 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
             @Param("fechaFin") LocalDateTime fechaFin
     );
 
+    // Busca pagos cuya fecha_fin sea exactamente la fecha dada y no estén cancelados
+    List<PagoMembresia> findByFechaFinAndCanceladoFalse(LocalDate fechaFin);
+
 }
