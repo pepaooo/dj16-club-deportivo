@@ -52,7 +52,7 @@ public class MembresiasController {
         // Otros atributos, por ejemplo para los resúmenes:
         //List<Membresia> allMembresias = membresiaService.findAll();
         model.addAttribute("totalMembresias", membresias.size());
-        // Para calcular membresías activas/inactivas, podrías hacer filtrados o consultar en el servicio.
+        // Para calcular membresías activas/inactivas
         long activas = membresias.stream().filter(m -> "Activo".equalsIgnoreCase(m.getEstatus())).count();
         long inactivas = membresias.size() - activas;
         model.addAttribute("membresiasActivas", activas);

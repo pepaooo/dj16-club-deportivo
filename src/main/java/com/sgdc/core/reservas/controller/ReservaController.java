@@ -52,7 +52,7 @@ public class ReservaController {
         // Otros atributos, por ejemplo para los resúmenes:
         //List<Reserva> allReservaes = reservaService.findAll();
         model.addAttribute("totalReservas", reservas.size());
-        // Para calcular reservas activas/inactivas, podrías hacer filtrados o consultar en el servicio.
+        // Para calcular reservas activas/inactivas
         long disponibles = reservas.stream().filter(m -> EstadoReserva.PENDIENTE.getLabel().equalsIgnoreCase(m.getEstadoReserva())).count();
         model.addAttribute("reservasPendientes", disponibles);
         long mantenimiento = reservas.stream().filter(m -> EstadoReserva.CONFIRMADA.getLabel().equalsIgnoreCase(m.getEstadoReserva())).count();

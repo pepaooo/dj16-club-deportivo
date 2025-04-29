@@ -42,7 +42,7 @@ public class InstalacionController {
         // Otros atributos, por ejemplo para los resúmenes:
         //List<Instalacion> allInstalaciones = instalacionService.findAll();
         model.addAttribute("totalInstalaciones", instalaciones.size());
-        // Para calcular instalaciones activas/inactivas, podrías hacer filtrados o consultar en el servicio.
+        // Para calcular instalaciones activas/inactivas
         long disponibles = instalaciones.stream().filter(m -> EstadoInstalacion.DISPONIBLE.getLabel().equalsIgnoreCase(m.getEstado())).count();
         model.addAttribute("instalacionesDisponibles", disponibles);
         long mantenimiento = instalaciones.stream().filter(m -> EstadoInstalacion.EN_MANTENIMIENTO.getLabel().equalsIgnoreCase(m.getEstado())).count();
