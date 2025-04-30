@@ -32,19 +32,25 @@
                     </p>
                     <p>
                         <strong>Miembro:</strong>
-                        <span th:text="${notificacion.pagoMembresia.miembro.nombre}"></span>
+                        <a th:href="@{'/miembros/get?id=' + ${notificacion.pagoMembresia.miembro.id}}">
+                            <span th:text="${notificacion.pagoMembresia.miembro.nombre + ' ' + notificacion.pagoMembresia.miembro.apellidoPaterno + ' ' + notificacion.pagoMembresia.miembro.apellidoMaterno}"></span>
+                        </a>
+                    </p>
+                    <p>
+                        <strong>Correo electrónico:</strong>
+                        <span th:text="${notificacion.pagoMembresia.miembro.correoElectronico}"></span>
                     </p>
                     <p>
                         <strong>Membresía:</strong>
                         <span th:text="${notificacion.pagoMembresia.membresia.nombre}"></span>
                     </p>
+                </div>
+                <!-- Segunda columna -->
+                <div class="col-md-6">
                     <p>
                         <strong>Fecha de Vencimiento:</strong>
                         <span th:text="${#temporals.format(notificacion.fechaVencimiento, 'yyyy-MM-dd')}"></span>
                     </p>
-                </div>
-                <!-- Segunda columna -->
-                <div class="col-md-6">
                     <p>
                         <strong>Días Restantes:</strong>
                         <span th:text="${notificacion.diasRestantes}"></span>
@@ -59,10 +65,6 @@
                                 th:if="${notificacion.fechaEnvio != null}"
                                 th:text="${#temporals.format(notificacion.fechaEnvio, 'yyyy-MM-dd HH:mm')}"></span>
                         <span th:if="${notificacion.fechaEnvio == null}">-</span>
-                    </p>
-                    <p>
-                        <strong>Mensaje:</strong>
-                        <span th:text="${notificacion.mensaje}"></span>
                     </p>
                 </div>
             </div>

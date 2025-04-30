@@ -109,7 +109,11 @@
                 </thead>
                 <tbody>
                 <tr th:each="pago : ${pagosMembresiaDTO}">
-                    <td th:text="${pago.membresiaActual}"></td>
+                    <td>
+                        <a th:href="@{'/membresias/get?id=' + ${pago.idMembresiaActual}}">
+                            <span th:text="${pago.membresiaActual}"></span>
+                        </a>
+                    </td>
                     <td th:text="${pago.fechaInicio}"></td>
                     <td th:text="${pago.fechaFin}"></td>
                     <td th:text="${pago.estatusMembresia}"></td>
@@ -151,8 +155,8 @@
             </table>
         </div>
 
-</div>
+    </div>
 
-<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+    <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
 </body>
 </html>
