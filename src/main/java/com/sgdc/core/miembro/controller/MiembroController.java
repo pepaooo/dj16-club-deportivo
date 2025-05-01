@@ -144,7 +144,7 @@ public class MiembroController {
 
         try {
             log.info("Membresía a guardar: {}", miembro);
-            miembroService.save(miembro);
+            miembroService.update(miembro);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();
             log.error("Error de integridad de datos: {}", errorMessage);

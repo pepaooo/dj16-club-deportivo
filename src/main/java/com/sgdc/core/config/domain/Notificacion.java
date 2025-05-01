@@ -1,6 +1,5 @@
 package com.sgdc.core.config.domain;
 
-import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;

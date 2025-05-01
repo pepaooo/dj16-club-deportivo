@@ -11,7 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, JpaSpecificationExecutor<Usuario> {
+
     List<Usuario> findAllByOrderByIdDesc();
+
+    Usuario findByNombre(String nombre);
 
     // Obtenemos el UsuarioDetalleDTO por id de la cuenta, con datos del miembro
     @Query("""

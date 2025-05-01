@@ -19,6 +19,8 @@ public interface MiembroService {
 
     void save(Miembro miembro);
 
+    void update(Miembro miembro);
+
     List<Miembro> searchMiembros(Integer idMembresia, LocalDateTime fechaInicio, LocalDateTime fechaFin);
 
     byte[] generatePdfReport(Integer idMembresia, LocalDate fechaInicio, LocalDate fechaFin);

@@ -1,10 +1,14 @@
 package com.sgdc.core.miembro.service;
 
+import com.sgdc.core.audit.aop.Auditable;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.domain.dto.MiembroSearchDTO;
 import com.sgdc.core.miembro.repository.MiembroRepository;
 import com.sgdc.core.reportes.utils.PdfGenerator;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,8 @@ import java.util.List;
 
 @Service
 public class MiembroServiceImpl implements MiembroService {
+
+    private static final Logger log = LoggerFactory.getLogger(MiembroServiceImpl.class);
 
     private final MiembroRepository repository;
 
@@ -64,6 +70,26 @@ public class MiembroServiceImpl implements MiembroService {
 
     @Override
     public void save(Miembro miembro) {
+        log.info("Agregando nuevo miembro: {} {} {}", miembro.getNombre(), miembro.getApellidoPaterno(), miembro.getApellidoMaterno());
+        repository.save(miembro);
+    }
+
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "miembro",
+            entidadId = "#miembro.id",
+            descripcion = "'Actualización del miembro '+#miembro.nombre"
+    )
+    @Override
+    public void update(Miembro miembro) {
+        log.info("Actualizando miembro {}: {} {} {}", miembro.getId(), miembro.getNombre(), miembro.getApellidoPaterno(), miembro.getApellidoMaterno());
+
+        // Aquí puedes agregar lógica adicional antes de guardar el miembro.
+        // Por ejemplo, validar datos o realizar transformaciones.
+        // Si es necesario, puedes buscar el miembro existente antes de actualizarlo.
+        Miembro existingMiembro = repository.findById(miembro.getId()).orElseThrow(() -> new EntityNotFoundException("No se encontró el miembro con ID: " + miembro.getId()));
+        // Aquí puedes realizar la lógica de actualización.
+        // Por ejemplo, actualizar solo ciertos campos:
         repository.save(miembro);
     }
 

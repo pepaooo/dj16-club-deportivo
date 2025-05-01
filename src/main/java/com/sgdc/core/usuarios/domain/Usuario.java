@@ -32,6 +32,7 @@ public class Usuario {
     //@NotBlank(message = "La contraseña no puede estar vacía")
     @Size(max = 255)
     @Column(name = "contrasena", nullable = false, length = 255)
+    @ToString.Exclude
     private String contrasena;
 
     @NotBlank(message = "El estatus no puede estar vacío")
@@ -51,7 +52,7 @@ public class Usuario {
     private Miembro miembro;
 
     // Relación ManyToMany con Rol
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "usuario_rol",
             joinColumns = @JoinColumn(name = "id_usuario"),
             inverseJoinColumns = @JoinColumn(name = "id_rol"))
