@@ -17,9 +17,9 @@ public interface MiembroService {
 
     List<MiembroSearchDTO> searchActive(String keyword);
 
-    void save(Miembro miembro);
+    Miembro save(Miembro miembro);
 
-    void update(Miembro miembro);
+    Miembro update(Miembro miembro);
 
     List<Miembro> searchMiembros(Integer idMembresia, LocalDateTime fechaInicio, LocalDateTime fechaFin);
 

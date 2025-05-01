@@ -68,10 +68,16 @@ public class MiembroServiceImpl implements MiembroService {
         return repository.searchActiveMembers(keyword);
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "miembro",
+            entidadId = "#result.id",
+            descripcion = "'Creación del miembro '+#result.nombre"
+    )
     @Override
-    public void save(Miembro miembro) {
+    public Miembro save(Miembro miembro) {
         log.info("Agregando nuevo miembro: {} {} {}", miembro.getNombre(), miembro.getApellidoPaterno(), miembro.getApellidoMaterno());
-        repository.save(miembro);
+        return repository.save(miembro);
     }
 
     @Auditable(
@@ -81,16 +87,10 @@ public class MiembroServiceImpl implements MiembroService {
             descripcion = "'Actualización del miembro '+#miembro.nombre"
     )
     @Override
-    public void update(Miembro miembro) {
+    public Miembro update(Miembro miembro) {
         log.info("Actualizando miembro {}: {} {} {}", miembro.getId(), miembro.getNombre(), miembro.getApellidoPaterno(), miembro.getApellidoMaterno());
-
-        // Aquí puedes agregar lógica adicional antes de guardar el miembro.
-        // Por ejemplo, validar datos o realizar transformaciones.
-        // Si es necesario, puedes buscar el miembro existente antes de actualizarlo.
         Miembro existingMiembro = repository.findById(miembro.getId()).orElseThrow(() -> new EntityNotFoundException("No se encontró el miembro con ID: " + miembro.getId()));
-        // Aquí puedes realizar la lógica de actualización.
-        // Por ejemplo, actualizar solo ciertos campos:
-        repository.save(miembro);
+        return repository.save(miembro);
     }
 
     @Override
