@@ -72,7 +72,7 @@ public class MiembroServiceImpl implements MiembroService {
             tipoAccion = "CREATE",
             tabla = "miembro",
             entidadId = "#result.id",
-            descripcion = "'Creación del miembro '+#result.nombre"
+            descripcion = "'Creación del miembro '+#result.nombre + ' '+#result.apellidoPaterno + ' '+#result.apellidoMaterno"
     )
     @Override
     public Miembro save(Miembro miembro) {
@@ -84,7 +84,7 @@ public class MiembroServiceImpl implements MiembroService {
             tipoAccion = "UPDATE",
             tabla = "miembro",
             entidadId = "#miembro.id",
-            descripcion = "'Actualización del miembro '+#miembro.nombre"
+            descripcion = "'Actualización del miembro '+#miembro.nombre + ' '+#miembro.apellidoPaterno + ' '+#miembro.apellidoMaterno"
     )
     @Override
     public Miembro update(Miembro miembro) {
