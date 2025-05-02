@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -32,9 +31,10 @@ public class LoginFailureListener
     public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
         Object principal = event.getAuthentication().getPrincipal();
         if (principal instanceof UserPrincipal up) {
+            // Este código no es funcional
             Actividad act = new Actividad();
             act.setUsuario(up.getUsuario());
-            act.setTipoAccion("LOGIN_FAIL");
+            act.setTipoAccion("LOGIN_FAILURE");
             act.setTablaAfectada("usuario");
             act.setEntidadId(up.getUsuario().getId());
             act.setDescripcion("Falló login para usuario " + up.getUsername());

@@ -47,7 +47,20 @@
                 <i class="bi bi-speedometer2"></i> SGCD
             </h3>
             <h3 class="mb-4">Iniciar Sesión</h3>
-            <div th:if="${param.error}" class="alert alert-danger">Usuario o contraseña incorrectos.</div>
+            <!-- Credenciales incorrectas -->
+            <div th:if="${param.error}" class="alert alert-danger">
+                Usuario o contraseña incorrectos.
+            </div>
+
+            <!-- Cuenta inhabilitada -->
+            <div th:if="${param.disabled}" class="alert alert-warning">
+                Su cuenta está inhabilitada. Por favor contacte al administrador.
+            </div>
+
+            <!-- Cuenta bloqueada -->
+            <div th:if="${param.locked}" class="alert alert-warning">
+                Su cuenta está bloqueada. Por favor contacte al administrador.
+            </div>
 
             <form th:action="@{/login}" method="post">
                 <div class="form-floating mb-3">

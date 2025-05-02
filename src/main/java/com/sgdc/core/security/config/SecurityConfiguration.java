@@ -1,5 +1,6 @@
 package com.sgdc.core.security.config;
 
+import com.sgdc.core.security.handler.CustomAuthenticationFailureHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +29,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationFailureHandler failureHandler) throws Exception {
         http
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/bootstrap/**", "/iconos/**", "/themes/**", "/images/**",
@@ -41,6 +42,7 @@ public class SecurityConfiguration {
                 )
                 .formLogin(login -> login
                         .loginPage("/login") //new
+                        .failureHandler(failureHandler)
                         //.usernameParameter("email")
                         //.passwordParameter("pass")
                         //.loginProcessingUrl("/doLogin")
