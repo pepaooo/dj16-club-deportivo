@@ -1,4 +1,4 @@
-package com.sgdc.core.security;
+package com.sgdc.core.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

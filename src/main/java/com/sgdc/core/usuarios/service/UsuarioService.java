@@ -14,13 +14,13 @@ public interface UsuarioService {
     UsuarioDetalleDTO findUsuarioDetalleDTOById(Integer id);
 
     List<UsuarioDetalleDTO> search(String keyword);
-    
-    void save(UsuarioDetalleDTO dto);
 
-    void update(UsuarioDetalleDTO dto);
+    UsuarioDetalleDTO save(UsuarioDetalleDTO dto);
 
-    void activate(Integer id);
+    UsuarioDetalleDTO update(UsuarioDetalleDTO dto);
 
-    void deactivate(Integer id);
+    UsuarioDetalleDTO activate(Integer id);
+
+    UsuarioDetalleDTO deactivate(Integer id);
 
 }

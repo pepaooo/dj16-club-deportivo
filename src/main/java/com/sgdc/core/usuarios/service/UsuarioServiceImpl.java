@@ -1,6 +1,6 @@
 package com.sgdc.core.usuarios.service;
 
-import com.sgdc.core.membresia.domain.Beneficio;
+import com.sgdc.core.audit.aop.Auditable;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.repository.MiembroRepository;
 import com.sgdc.core.usuarios.domain.Rol;
@@ -10,14 +10,9 @@ import com.sgdc.core.usuarios.domain.dto.UsuarioDetalleDTO;
 import com.sgdc.core.usuarios.repository.RolRepository;
 import com.sgdc.core.usuarios.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -35,10 +30,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private final MiembroRepository miembroRepository;
 
-    public UsuarioServiceImpl(UsuarioRepository repository, RolRepository rolRepository, MiembroRepository miembroRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UsuarioServiceImpl(UsuarioRepository repository, RolRepository rolRepository, MiembroRepository miembroRepository, PasswordEncoder passwordEncoder) {
         this.repository = repository;
         this.rolRepository = rolRepository;
         this.miembroRepository = miembroRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -75,23 +73,36 @@ public class UsuarioServiceImpl implements UsuarioService {
         return repository.searchUsuarios(keyword);
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "usuario",
+            entidadId = "#result.id",
+            descripcion = "'Creación del usuario '+#result.nombre"
+    )
     @Override
-    public void save(UsuarioDetalleDTO dto) {
+    public UsuarioDetalleDTO save(UsuarioDetalleDTO dto) {
+        dto.setContrasena(passwordEncoder.encode(dto.getContrasena()));
         Usuario usuario = toEntity(dto);
         log.info("Usuario encontrado: " + usuario);
         // Si no se especifica el estatus se asigna "Activo"
         if (dto.getEstatus() == null || dto.getEstatus().isBlank()) {
             usuario.setEstatus("Activo");
         }
-        repository.save(usuario);
+        return toDTO(repository.save(usuario));
     }
 
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "usuario",
+            entidadId = "#result.id",
+            descripcion = "'Actualización del usuario '+#result.nombre"
+    )
     @Override
-    public void update(UsuarioDetalleDTO dto) {
+    public UsuarioDetalleDTO update(UsuarioDetalleDTO dto) {
         Usuario usuario = findById(dto.getId());
         // Actualizar los campos del usuario
         if (dto.getContrasena() != null) {
-            usuario.setContrasena(dto.getContrasena());
+            usuario.setContrasena(passwordEncoder.encode(dto.getContrasena()));
         }
         // Actualizar el miembro
         if (dto.getIdMiembro() != null) {
@@ -105,21 +116,33 @@ public class UsuarioServiceImpl implements UsuarioService {
         List<Rol> roles = rolRepository.findAllById(dto.getRolesIds());
         usuario.setRoles(new HashSet<>(roles));
         // Guardar el usuario actualizado
-        repository.save(usuario);
+        return toDTO(repository.save(usuario));
     }
 
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "usuario",
+            entidadId = "#result.id",
+            descripcion = "'Activación del usuario '+#result.nombre"
+    )
     @Override
-    public void activate(Integer id) {
+    public UsuarioDetalleDTO activate(Integer id) {
         Usuario usuario = findById(id);
         usuario.setEstatus("Activo");
-        repository.save(usuario);
+        return toDTO(repository.save(usuario));
     }
 
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "usuario",
+            entidadId = "#result.id",
+            descripcion = "'Inactivación del usuario '+#result.nombre"
+    )
     @Override
-    public void deactivate(Integer id) {
+    public UsuarioDetalleDTO deactivate(Integer id) {
         Usuario usuario = findById(id);
         usuario.setEstatus("Inactivo");
-        repository.save(usuario);
+        return toDTO(repository.save(usuario));
     }
 
     private Usuario toEntity(UsuarioDetalleDTO dto) {
@@ -136,5 +159,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         List<Rol> roles = rolRepository.findAllById(dto.getRolesIds());
         usuario.setRoles(new HashSet<>(roles));
         return usuario;
+    }
+
+    private UsuarioDetalleDTO toDTO(Usuario usuario) {
+        UsuarioDetalleDTO dto = new UsuarioDetalleDTO();
+        dto.setId(usuario.getId());
+        dto.setNombre(usuario.getNombre());
+        dto.setContrasena(usuario.getContrasena());
+        dto.setEstatus(usuario.getEstatus());
+        dto.setFechaCreacion(usuario.getFechaCreacion());
+        dto.setUltimoAcceso(usuario.getUltimoAcceso());
+        dto.setIdMiembro(usuario.getMiembro() != null ? usuario.getMiembro().getId() : null);
+        return dto;
     }
 }

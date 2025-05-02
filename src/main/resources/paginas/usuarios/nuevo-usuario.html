@@ -44,6 +44,7 @@
                                     th:field="*{nombre}"
                                     name="nombre"
                                     placeholder="Ingrese el nombre de usuario"
+                                    autocomplete="off"
                                     required
                             />
                             <div class="text-danger" th:if="${#fields.hasErrors('nombre')}"
@@ -60,6 +61,7 @@
                                     th:field="*{contrasena}"
                                     name="contrasena"
                                     placeholder="Ingrese la contraseña"
+                                    autocomplete="new-password"
                                     required
                             />
                             <div class="text-danger" th:if="${#fields.hasErrors('contrasena')}"

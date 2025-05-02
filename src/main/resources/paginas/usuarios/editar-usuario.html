@@ -60,6 +60,7 @@
                                     id="contrasena"
                                     th:field="*{contrasena}"
                                     name="contrasena"
+                                    autocomplete="new-password"
                                     placeholder="Ingrese la contraseña"
                             />
                             <div class="text-danger" th:if="${#fields.hasErrors('contrasena')}"
