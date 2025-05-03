@@ -30,44 +30,70 @@ public class SecurityConfiguration {
     private final CaptchaService captchaService;
     private final CustomAuthenticationFailureHandler failureHandler;
     private final CustomUserDetailsService uds;
-    private final CaptchaAuthenticationFilter captchaFilter;
+    //private final CaptchaValidationFilter captchaValidationFilter;
 
     public SecurityConfiguration(LoginAttemptService loginAttemptService, CaptchaService captchaService, CustomAuthenticationFailureHandler failureHandler, CustomUserDetailsService uds) {
         this.loginAttemptService = loginAttemptService;
         this.captchaService = captchaService;
         this.failureHandler = failureHandler;
         this.uds = uds;
-        this.captchaFilter = new CaptchaAuthenticationFilter(loginAttemptService, captchaService);
+        //this.captchaValidationFilter = captchaValidationFilter;
     }
+
+//    @Bean
+//    public CaptchaAuthenticationFilter captchaFilter(AuthenticationManager authMgr) {
+//        CaptchaAuthenticationFilter f =
+//                new CaptchaAuthenticationFilter(loginAttemptService, captchaService);
+//        f.setAuthenticationManager(authMgr);
+//        f.setAuthenticationFailureHandler(failureHandler);
+//        f.setUsernameParameter("username");
+//        f.setPasswordParameter("password");
+//        f.setFilterProcessesUrl("/login");
+//        return f;
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
 
-        // 1) Configuro el filtro custom con authMgr y failureHandler
-        captchaFilter.setAuthenticationManager(authMgr);
-        captchaFilter.setAuthenticationFailureHandler(failureHandler);
+        // 1) Crea e inyecta tu filtro custom en lugar del default
+        CaptchaAuthenticationFilter caf =
+                new CaptchaAuthenticationFilter(loginAttemptService, captchaService);
+        caf.setAuthenticationManager(authMgr);
+        caf.setAuthenticationFailureHandler(failureHandler);
+        caf.setAuthenticationSuccessHandler((req, res, auth) -> {
+            // reset de intentos al logueo exitoso
+            loginAttemptService.loginSucceeded(auth.getName());
+            res.sendRedirect("/");
+        });
 
         http
                 // Inyectamos el filtro de CAPTCHA antes de autenticar
-                .addFilterAt(captchaFilter,
+                .addFilterAt(caf,
                         UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(captchaValidationFilter,
+//                        UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/bootstrap/**", "/iconos/**", "/themes/**", "/images/**",
-                                "/", "/index", "/login",
+                                "/", "/index", "/login", "doLogin",
                                 "/error", "/error/**")
                         .permitAll()
                         .requestMatchers("/user").hasAnyAuthority("USER")
                         .requestMatchers("/admin").hasAnyAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
+
+//                .addFilterAt(caf,
+//                        UsernamePasswordAuthenticationFilter.class)
+
                 .formLogin(login -> login
                         .loginPage("/login") //new
-                        .successHandler((req, res, auth) -> {
-                            // opcional: redirige a "/" y reset failed attempts
-                            String user = auth.getName();
-                            loginAttemptService.loginSucceeded(user);
-                            res.sendRedirect("/");
-                        })
+                        .loginProcessingUrl("/doLogin")// POST /doLogin -> tu filter
+//                        .successHandler((req, res, auth) -> {
+//                            // opcional: redirige a "/" y reset failed attempts
+//                            String user = auth.getName();
+//                            loginAttemptService.loginSucceeded(user);
+//                            res.sendRedirect("/");
+//                        })
                         //   .failureHandler(failureHandler) // ya no uso failureHandler aquí, porque lo inyecto en el filtro
                         //.usernameParameter("email")
                         //.passwordParameter("pass")
@@ -93,11 +119,12 @@ public class SecurityConfiguration {
                         .permitAll())
                 .logout(logout -> logout
                         //.logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
+                        .logoutSuccessUrl("/login?logout")
                         .deleteCookies("JSESSIONID") //NEW Cookies to clear
-                        .invalidateHttpSession(true))
-                .csrf(Customizer.withDefaults())
-                .cors(Customizer.withDefaults()); //new
+                        .invalidateHttpSession(true));
+//                .csrf(Customizer.withDefaults())
+//                .cors(Customizer.withDefaults()); //new
+                //.userDetailsService(uds);
         return http.build();
     }
 

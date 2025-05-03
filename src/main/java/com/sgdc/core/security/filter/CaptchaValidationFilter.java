@@ -35,14 +35,24 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        if ("/login".equals(req.getRequestURI())
+        if ("/login".equals(req.getServletPath())
                 && "POST".equalsIgnoreCase(req.getMethod())) {
 
             String username = req.getParameter("username");
             if (loginAttemptService.isCaptchaRequired(username)) {
                 String token = req.getParameter("g-recaptcha-response");
-                if (token == null || !captchaService.verify(token)) {
-                    throw new CaptchaException("Captcha inválido");
+//                if (token == null || !captchaService.verify(token)) {
+//                    throw new CaptchaException("Captcha inválido");
+//                }
+                // Falta token ▶️ voy a login?captcha
+                if (token == null || token.isBlank()) {
+                    res.sendRedirect("/login?captcha");
+                    return;
+                }
+                // Token inválido ▶️ voy a login?captchaError
+                if (!captchaService.verify(token)) {
+                    res.sendRedirect("/login?captchaError");
+                    return;
                 }
             }
         }

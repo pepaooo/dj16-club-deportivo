@@ -23,10 +23,10 @@ public class CaptchaAuthenticationFilter extends UsernamePasswordAuthenticationF
                                        CaptchaService captchaService) {
         this.loginAttemptService = loginAttemptService;
         this.captchaService      = captchaService;
+        // la URL debe coincidir con tu loginProcessingUrl (por defecto "/login")
+        setFilterProcessesUrl("/doLogin");
         setUsernameParameter("username");
         setPasswordParameter("password");
-        // la URL debe coincidir con tu loginProcessingUrl (por defecto "/login")
-        setFilterProcessesUrl("/login");
     }
 
     @Override
@@ -34,8 +34,14 @@ public class CaptchaAuthenticationFilter extends UsernamePasswordAuthenticationF
                                                 HttpServletResponse response)
             throws AuthenticationException {
 
-        String username = obtainUsername(request).trim();
+//        String username = obtainUsername(request).trim();
+//        log.info("Intentando autenticar usuario: {}", username);
+
+        String username = obtainUsername(request);
+        if (username == null) username = "";
+        username = username.trim();
         log.info("Intentando autenticar usuario: {}", username);
+
         // 1) Si ya pasé el umbral, obligo captcha
         if (loginAttemptService.isCaptchaRequired(username)) {
             String token = request.getParameter("g-recaptcha-response");

@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginAttemptService {
 
     // TODO : Cambiar a propiedades
-    static final int MAX_FAILED_ATTEMPTS = 2; // 5 intentos
-    static final int CAPTCHA_THRESHOLD   = 1; // 3 intentos
+    static final int MAX_FAILED_ATTEMPTS = 3; // 5 intentos
+    static final int CAPTCHA_THRESHOLD   = 2; // 3 intentos
     static final long LOCK_DURATION_MIN = 2; // 5 minutos
 
     private final UsuarioRepository usuarioRepo;
