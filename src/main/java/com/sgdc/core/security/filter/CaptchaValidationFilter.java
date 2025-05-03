@@ -1,6 +1,5 @@
 package com.sgdc.core.security.filter;
 
-import com.sgdc.core.security.exception.CaptchaException;
 import com.sgdc.core.security.service.CaptchaService;
 import com.sgdc.core.security.service.LoginAttemptService;
 import jakarta.servlet.FilterChain;
@@ -35,21 +34,21 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
-        if ("/login".equals(req.getServletPath())
+        if ("/doLogin".equals(req.getServletPath())
                 && "POST".equalsIgnoreCase(req.getMethod())) {
 
             String username = req.getParameter("username");
             if (loginAttemptService.isCaptchaRequired(username)) {
+                log.info("Captcha requerido para el usuario: {}", username);
+
                 String token = req.getParameter("g-recaptcha-response");
-//                if (token == null || !captchaService.verify(token)) {
-//                    throw new CaptchaException("Captcha inválido");
-//                }
-                // Falta token ▶️ voy a login?captcha
+
+                // Falta token voy a login?captcha
                 if (token == null || token.isBlank()) {
                     res.sendRedirect("/login?captcha");
                     return;
                 }
-                // Token inválido ▶️ voy a login?captchaError
+                // Token inválido voy a login?captchaError
                 if (!captchaService.verify(token)) {
                     res.sendRedirect("/login?captchaError");
                     return;

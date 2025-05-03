@@ -1,16 +1,20 @@
 package com.sgdc.core.security.service;
 
 import com.sgdc.core.usuarios.repository.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LoginAttemptService {
 
-    // TODO : Cambiar a propiedades
-    static final int MAX_FAILED_ATTEMPTS = 3; // 5 intentos
-    static final int CAPTCHA_THRESHOLD   = 2; // 3 intentos
-    static final long LOCK_DURATION_MIN = 2; // 5 minutos
+    private static final Logger log = LoggerFactory.getLogger(LoginAttemptService.class);
+
+    // TODO : Cambiar a propiedades (application.properties)
+    static final int MAX_FAILED_ATTEMPTS = 5; // 5 intentos
+    static final int CAPTCHA_THRESHOLD   = 3; // 3 intentos
+    public static final long LOCK_DURATION_MIN = 5; // 5 minutos
 
     private final UsuarioRepository usuarioRepo;
 
@@ -61,6 +65,7 @@ public class LoginAttemptService {
                 u.resetFailedAttempts();
                 u.setLockTime(null);
                 usuarioRepo.save(u);
+                log.info("El usuario {} ha sido desbloqueado.", username);
             }
         });
     }

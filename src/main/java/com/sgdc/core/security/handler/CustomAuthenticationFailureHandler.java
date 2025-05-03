@@ -1,6 +1,5 @@
 package com.sgdc.core.security.handler;
 
-import com.sgdc.core.security.exception.CaptchaException;
 import com.sgdc.core.security.service.LoginAttemptService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,23 +34,15 @@ public class CustomAuthenticationFailureHandler
 
         String user = request.getParameter("username");
         loginAttemptService.loginFailed(user);
+        log.error("Login failure for user {}: {}", user, exception.getClass().getSimpleName());
 
-        String redirectUrl = "/login?error";  // credenciales inválidas
-
-        if (exception instanceof CaptchaException) {
-            boolean alreadyFailed = loginAttemptService.isCaptchaRequired(user);
-            // si falló por captcha requerido (no pusieron token)
-            // o por captcha inválido
-            redirectUrl = alreadyFailed
-                    ? "/login?captcha"     // mostrar el widget
-                    : "/login?captchaError";
-        } else if (exception instanceof DisabledException) {
+        String redirectUrl = "/login?error"; // default
+        if (exception instanceof DisabledException) {
             redirectUrl = "/login?disabled";
         } else if (exception instanceof LockedException) {
             redirectUrl = "/login?locked";
         }
-
-        // Redirige al login con el parámetro adecuado
+        // Redirigir una sola vez
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }

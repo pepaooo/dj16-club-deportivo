@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS usuario
     nombre_usuario VARCHAR(50)  NOT NULL UNIQUE,
     contrasena     VARCHAR(255) NOT NULL,
     estatus        VARCHAR(20)  NOT NULL DEFAULT 'Activo'
-        CHECK (estatus IN ('Activo', 'Inactivo', 'Bloqueado')),
+        CHECK (estatus IN ('Activo', 'Inactivo')),
     fecha_creacion DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ultimo_acceso  DATETIME, -- NULL = el usuario no ha ingresado aún
     id_miembro     INT,      -- NULL = cuenta no ligada a un miembro

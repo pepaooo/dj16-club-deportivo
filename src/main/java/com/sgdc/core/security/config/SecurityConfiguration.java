@@ -1,80 +1,71 @@
 package com.sgdc.core.security.config;
 
-import com.sgdc.core.security.filter.CaptchaAuthenticationFilter;
+import com.sgdc.core.security.filter.CaptchaValidationFilter;
 import com.sgdc.core.security.handler.CustomAuthenticationFailureHandler;
-import com.sgdc.core.security.service.CaptchaService;
 import com.sgdc.core.security.service.CustomUserDetailsService;
 import com.sgdc.core.security.service.LoginAttemptService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.security.SecureRandom;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final LoginAttemptService loginAttemptService;
-    private final CaptchaService captchaService;
-    private final CustomAuthenticationFailureHandler failureHandler;
     private final CustomUserDetailsService uds;
-    //private final CaptchaValidationFilter captchaValidationFilter;
+    private final LoginAttemptService loginAttemptService;
+    private final CaptchaValidationFilter captchaFilter;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
-    public SecurityConfiguration(LoginAttemptService loginAttemptService, CaptchaService captchaService, CustomAuthenticationFailureHandler failureHandler, CustomUserDetailsService uds) {
-        this.loginAttemptService = loginAttemptService;
-        this.captchaService = captchaService;
-        this.failureHandler = failureHandler;
+    public SecurityConfiguration(CustomUserDetailsService uds, LoginAttemptService loginAttemptService, CaptchaValidationFilter captchaFilter, CustomAuthenticationFailureHandler customAuthenticationFailureHandler) {
         this.uds = uds;
-        //this.captchaValidationFilter = captchaValidationFilter;
+        this.loginAttemptService = loginAttemptService;
+        this.captchaFilter = captchaFilter;
+        this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
     }
 
-//    @Bean
-//    public CaptchaAuthenticationFilter captchaFilter(AuthenticationManager authMgr) {
-//        CaptchaAuthenticationFilter f =
-//                new CaptchaAuthenticationFilter(loginAttemptService, captchaService);
-//        f.setAuthenticationManager(authMgr);
-//        f.setAuthenticationFailureHandler(failureHandler);
-//        f.setUsernameParameter("username");
-//        f.setPasswordParameter("password");
-//        f.setFilterProcessesUrl("/login");
-//        return f;
-//    }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider p = new DaoAuthenticationProvider();
+        p.setUserDetailsService(uds);
+        p.setPasswordEncoder(passwordEncoder());
+        return p;
+    }
 
-        // 1) Crea e inyecta tu filtro custom en lugar del default
-        CaptchaAuthenticationFilter caf =
-                new CaptchaAuthenticationFilter(loginAttemptService, captchaService);
-        caf.setAuthenticationManager(authMgr);
-        caf.setAuthenticationFailureHandler(failureHandler);
-        caf.setAuthenticationSuccessHandler((req, res, auth) -> {
-            // reset de intentos al logueo exitoso
-            loginAttemptService.loginSucceeded(auth.getName());
-            res.sendRedirect("/");
-        });
-
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Inyectamos el filtro de CAPTCHA antes de autenticar
-                .addFilterAt(caf,
+                .addFilterBefore(captchaFilter,
                         UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(captchaValidationFilter,
-//                        UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests((authz) -> authz
+
+                // 1) Provider
+                .authenticationProvider(authenticationProvider())
+
+                // 2) CSRF activo
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
+
+                // 3) Autorizar rutas
+                .authorizeHttpRequests(auth -> auth
+                        // recursos estáticos
+                        //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/bootstrap/**", "/iconos/**", "/themes/**", "/images/**",
-                                "/", "/index", "/login", "doLogin",
+                                "/", "/index", "/login",
                                 "/error", "/error/**")
                         .permitAll()
                         .requestMatchers("/user").hasAnyAuthority("USER")
@@ -82,77 +73,29 @@ public class SecurityConfiguration {
                         .anyRequest().authenticated()
                 )
 
-//                .addFilterAt(caf,
-//                        UsernamePasswordAuthenticationFilter.class)
-
-                .formLogin(login -> login
-                        .loginPage("/login") //new
-                        .loginProcessingUrl("/doLogin")// POST /doLogin -> tu filter
-//                        .successHandler((req, res, auth) -> {
-//                            // opcional: redirige a "/" y reset failed attempts
-//                            String user = auth.getName();
-//                            loginAttemptService.loginSucceeded(user);
-//                            res.sendRedirect("/");
-//                        })
-                        //   .failureHandler(failureHandler) // ya no uso failureHandler aquí, porque lo inyecto en el filtro
-                        //.usernameParameter("email")
-                        //.passwordParameter("pass")
-                        //.loginProcessingUrl("/doLogin")
-                        //    .defaultSuccessUrl("/")
-                        //.successForwardUrl("/login_success_handler")
-                        //.failureForwardUrl("/login_failure_handler")
-                        /*.successHandler(new AuthenticationSuccessHandler() {
-                            @Override
-                            public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                                System.out.println("Logged user: " + authentication.getName());
-                                response.sendRedirect("/");
-                            }
+                // 4) Configuración de form login
+                .formLogin(form -> form
+                        .loginPage("/login")                  // GET /login → plantilla
+                        .loginProcessingUrl("/doLogin")       // POST /doLogin → procesa credenciales
+                        .defaultSuccessUrl("/", true)         // a dónde vas si ok
+                        //.failureUrl("/login?error")           // a dónde vas si bad creds
+                        .successHandler((req, res, auth) -> {
+                            loginAttemptService.loginSucceeded(auth.getName());
+                            res.sendRedirect("/");
                         })
-                        .failureHandler(new AuthenticationFailureHandler() {
-                            @Override
-                            public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                                System.out.println("Login failed");
-                                System.out.println(exception);
-                                response.sendRedirect("/login");
-                            }
-                        })*/
-                        .permitAll())
+                        .failureHandler(customAuthenticationFailureHandler)
+                        .permitAll()
+                )
+
+                // 5) logout
                 .logout(logout -> logout
-                        //.logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .deleteCookies("JSESSIONID") //NEW Cookies to clear
-                        .invalidateHttpSession(true));
-//                .csrf(Customizer.withDefaults())
-//                .cors(Customizer.withDefaults()); //new
-                //.userDetailsService(uds);
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                )
+                .cors(Customizer.withDefaults());
+
         return http.build();
     }
-
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        //return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        return new BCryptPasswordEncoder(10, new SecureRandom());
-        //return new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2Y, 12);
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(uds);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return new ProviderManager(authenticationProvider());
-    }
-
-//    @Bean
-//    UserDetailsManager inMemoryUserDetailsManager() {
-//        var user1 = User.withUsername("user").password("{noop}Mexico123.").roles("USER").build();
-//        var user2 = User.withUsername("admin").password("{noop}Mexico123.").roles("USER", "ADMIN").build();
-//        return new InMemoryUserDetailsManager(user1, user2);
-//    }
 }

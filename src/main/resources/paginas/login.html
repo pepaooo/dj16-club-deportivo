@@ -48,33 +48,33 @@
             </h3>
             <h3 class="mb-4">Iniciar Sesión</h3>
 
+            <!-- Credenciales incorrectas -->
+            <div th:if="${param.error}" class="alert alert-danger">
+                Usuario o contraseña incorrectos.
+            </div>
+
+            <!-- CAPTCHA -->
+            <div th:if="${param.captcha}" class="alert alert-warning">
+                Por favor resuelva el CAPTCHA.
+            </div>
+            <div th:if="${param.captchaError}" class="alert alert-danger">
+                CAPTCHA inválido.
+            </div>
+
+            <!-- Cuenta inhabilitada -->
+            <div th:if="${param.disabled}" class="alert alert-warning">
+                Su cuenta está inhabilitada. Por favor contacte al administrador.
+            </div>
+
+            <!-- Cuenta bloqueada -->
+            <div th:if="${param.locked}" class="alert alert-warning">
+                Su cuenta está bloqueada. Por favor contacte al administrador.
+            </div>
+
             <form th:action="@{/doLogin}" method="post">
                 <input type="hidden"
                        th:name="${_csrf.parameterName}"
                        th:value="${_csrf.token}"/>
-
-                <!-- Credenciales incorrectas -->
-                <div th:if="${param.error}" class="alert alert-danger">
-                    Usuario o contraseña incorrectos.
-                </div>
-
-                <!-- CAPTCHA -->
-                <div th:if="${param.captcha}" class="alert alert-warning">
-                    Por favor resuelva el CAPTCHA.
-                </div>
-                <div th:if="${param.captchaError}" class="alert alert-danger">
-                    CAPTCHA inválido.
-                </div>
-
-                <!-- Cuenta inhabilitada -->
-                <div th:if="${param.disabled}" class="alert alert-warning">
-                    Su cuenta está inhabilitada. Por favor contacte al administrador.
-                </div>
-
-                <!-- Cuenta bloqueada -->
-                <div th:if="${param.locked}" class="alert alert-warning">
-                    Su cuenta está bloqueada. Por favor contacte al administrador.
-                </div>
 
                 <div class="form-floating mb-3">
                     <input type="text" id="username" name="username" class="form-control"
@@ -98,7 +98,7 @@
                 <!-- Solo mostrar CAPTCHA tras X fallos -->
                 <div th:if="${param.captcha}">
                     <div class="g-recaptcha"
-                         data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI">
+                         th:data-sitekey="${@environment.getProperty('recaptcha.siteKey')}">
                     </div>
                     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
                 </div>

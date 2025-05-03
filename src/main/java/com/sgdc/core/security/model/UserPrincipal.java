@@ -1,5 +1,6 @@
 package com.sgdc.core.security.model;
 
+import com.sgdc.core.security.service.LoginAttemptService;
 import com.sgdc.core.usuarios.domain.Usuario;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -98,7 +99,14 @@ public class UserPrincipal implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        // si no hay lockTime → está desbloqueado
+        if (usuario.getLockTime() == null) return true;
+        // si ya expiró el lock → también
+        if (usuario.isLockTimeExpired(LoginAttemptService.LOCK_DURATION_MIN)) {
+            return true;
+        }
+        // caso contrario → bloqueado
+        return false;
     }
 
     /**

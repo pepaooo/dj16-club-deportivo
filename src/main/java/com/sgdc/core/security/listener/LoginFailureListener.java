@@ -24,12 +24,20 @@ public class LoginFailureListener
     public LoginFailureListener(ActividadRepository actividadRepo,
                                 HttpServletRequest request) {
         this.actividadRepo = actividadRepo;
-        this.request       = request;
+        this.request = request;
     }
 
     @Override
     public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
         Object principal = event.getAuthentication().getPrincipal();
+
+        // TODO Pseudocódigo
+//        if (yaGrabéUnFallo(username, last30Min)) {
+//            return; // omito duplicados
+//        }
+//        grabarActividad();
+
+
         if (principal instanceof UserPrincipal up) {
             // TODO Este código no es funcional
             Actividad act = new Actividad();
@@ -44,7 +52,7 @@ public class LoginFailureListener
             // si tienes el UserPrincipal cargado, podrías buscar la entidad Usuario y setUsuarioId
             actividadRepo.save(act);
         } else {
-            log.info("Login failure. {}", principal);
+            log.error("Login failure. {}", principal);
         }
     }
 

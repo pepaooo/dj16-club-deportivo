@@ -5,7 +5,6 @@ import com.sgdc.core.usuarios.domain.Usuario;
 import com.sgdc.core.usuarios.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,11 +32,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         loginAttemptService.unlockIfNeeded(username);
 
         // Releer tras posible desbloqueo
-        if (u.getFailedAttempt() >= LoginAttemptService.MAX_FAILED_ATTEMPTS
-                && u.getLockTime() != null
-                && !u.isLockTimeExpired(LoginAttemptService.LOCK_DURATION_MIN)) {
-            throw new LockedException("Cuenta bloqueada temporalmente");
-        }
+//        if (loginAttemptService.isLocked(username)) {
+//            throw new LockedException("Cuenta bloqueada temporalmente");
+//        }
 
         return UserPrincipal.build(u);
     }

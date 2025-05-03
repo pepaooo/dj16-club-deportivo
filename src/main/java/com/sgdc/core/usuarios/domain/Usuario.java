@@ -36,7 +36,7 @@ public class Usuario {
     private String contrasena;
 
     @NotBlank(message = "El estatus no puede estar vacío")
-    @Pattern(regexp = "Activo|Inactivo|Bloqueado")
+    @Pattern(regexp = "Activo|Inactivo")
     @Column(name = "estatus", nullable = false, length = 20)
     private String estatus;
 
