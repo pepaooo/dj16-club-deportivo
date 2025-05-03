@@ -1,6 +1,10 @@
 package com.sgdc.core.security.config;
 
+import com.sgdc.core.security.filter.CaptchaAuthenticationFilter;
 import com.sgdc.core.security.handler.CustomAuthenticationFailureHandler;
+import com.sgdc.core.security.service.CaptchaService;
+import com.sgdc.core.security.service.CustomUserDetailsService;
+import com.sgdc.core.security.service.LoginAttemptService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,10 +15,10 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.security.SecureRandom;
 
@@ -22,15 +26,31 @@ import java.security.SecureRandom;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final UserDetailsService uds;
+    private final LoginAttemptService loginAttemptService;
+    private final CaptchaService captchaService;
+    private final CustomAuthenticationFailureHandler failureHandler;
+    private final CustomUserDetailsService uds;
+    private final CaptchaAuthenticationFilter captchaFilter;
 
-    public SecurityConfiguration(UserDetailsService uds) {
+    public SecurityConfiguration(LoginAttemptService loginAttemptService, CaptchaService captchaService, CustomAuthenticationFailureHandler failureHandler, CustomUserDetailsService uds) {
+        this.loginAttemptService = loginAttemptService;
+        this.captchaService = captchaService;
+        this.failureHandler = failureHandler;
         this.uds = uds;
+        this.captchaFilter = new CaptchaAuthenticationFilter(loginAttemptService, captchaService);
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomAuthenticationFailureHandler failureHandler) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
+
+        // 1) Configuro el filtro custom con authMgr y failureHandler
+        captchaFilter.setAuthenticationManager(authMgr);
+        captchaFilter.setAuthenticationFailureHandler(failureHandler);
+
         http
+                // Inyectamos el filtro de CAPTCHA antes de autenticar
+                .addFilterAt(captchaFilter,
+                        UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/bootstrap/**", "/iconos/**", "/themes/**", "/images/**",
                                 "/", "/index", "/login",
@@ -42,11 +62,17 @@ public class SecurityConfiguration {
                 )
                 .formLogin(login -> login
                         .loginPage("/login") //new
-                        .failureHandler(failureHandler)
+                        .successHandler((req, res, auth) -> {
+                            // opcional: redirige a "/" y reset failed attempts
+                            String user = auth.getName();
+                            loginAttemptService.loginSucceeded(user);
+                            res.sendRedirect("/");
+                        })
+                        //   .failureHandler(failureHandler) // ya no uso failureHandler aquí, porque lo inyecto en el filtro
                         //.usernameParameter("email")
                         //.passwordParameter("pass")
                         //.loginProcessingUrl("/doLogin")
-                        .defaultSuccessUrl("/")
+                        //    .defaultSuccessUrl("/")
                         //.successForwardUrl("/login_success_handler")
                         //.failureForwardUrl("/login_failure_handler")
                         /*.successHandler(new AuthenticationSuccessHandler() {

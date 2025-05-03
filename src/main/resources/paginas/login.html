@@ -47,9 +47,18 @@
                 <i class="bi bi-speedometer2"></i> SGCD
             </h3>
             <h3 class="mb-4">Iniciar Sesión</h3>
+
             <!-- Credenciales incorrectas -->
             <div th:if="${param.error}" class="alert alert-danger">
                 Usuario o contraseña incorrectos.
+            </div>
+
+            <!-- CAPTCHA -->
+            <div th:if="${param.captcha}" class="alert alert-warning">
+                Por favor resuelva el CAPTCHA.
+            </div>
+            <div th:if="${param.captchaError}" class="alert alert-danger">
+                CAPTCHA inválido.
             </div>
 
             <!-- Cuenta inhabilitada -->
@@ -81,6 +90,15 @@
 <!--                    </div>-->
 <!--                    <a class="small" th:href="@{/forgot-password}">Olvidé mi contraseña</a>-->
 <!--                </div>-->
+
+                <!-- Solo mostrar CAPTCHA tras X fallos -->
+                <div th:if="${param.captcha}">
+                    <div class="g-recaptcha"
+                         data-sitekey="${@environment.getProperty('recaptcha.siteKey')}">
+                    </div>
+                    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                </div>
+
                 <!-- botón -->
                 <div class="d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary px-5">

@@ -31,7 +31,7 @@ public class LoginFailureListener
     public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
         Object principal = event.getAuthentication().getPrincipal();
         if (principal instanceof UserPrincipal up) {
-            // Este código no es funcional
+            // TODO Este código no es funcional
             Actividad act = new Actividad();
             act.setUsuario(up.getUsuario());
             act.setTipoAccion("LOGIN_FAILURE");

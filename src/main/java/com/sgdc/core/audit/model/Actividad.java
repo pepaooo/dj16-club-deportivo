@@ -26,10 +26,10 @@ public class Actividad {
     @Column(name = "tipo_accion", length = 50, nullable = false)
     private String tipoAccion;
 
-    @Column(name = "tabla_afectada", length = 50, nullable = false)
+    @Column(name = "tabla_afectada", length = 50)
     private String tablaAfectada;
 
-    @Column(name = "id_entidad_afectada", nullable = false)
+    @Column(name = "id_entidad_afectada")
     private Integer entidadId;
 
     @Column(name = "fecha_hora", nullable = false, updatable = false,

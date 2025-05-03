@@ -14,7 +14,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, JpaS
 
     List<Usuario> findAllByOrderByIdDesc();
 
-    Usuario findByNombre(String nombre);
+    Optional<Usuario> findByNombre(String nombre);
 
     // Obtenemos el UsuarioDetalleDTO por id de la cuenta, con datos del miembro
     @Query("""

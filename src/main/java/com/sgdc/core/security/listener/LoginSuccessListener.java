@@ -34,8 +34,6 @@ public class LoginSuccessListener
             Actividad act = new Actividad();
             act.setUsuario(up.getUsuario());
             act.setTipoAccion("LOGIN_SUCCESS");
-            act.setTablaAfectada("usuario");
-            act.setEntidadId(up.getUsuario().getId());
             act.setDescripcion("Inicio de sesión exitoso");
             act.setIpOrigen(extractClientIp());
             act.setUserAgent(request.getHeader("User-Agent"));

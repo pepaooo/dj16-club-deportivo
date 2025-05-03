@@ -36,7 +36,7 @@ public class Usuario {
     private String contrasena;
 
     @NotBlank(message = "El estatus no puede estar vacío")
-    @Pattern(regexp = "Activo|Inactivo")
+    @Pattern(regexp = "Activo|Inactivo|Bloqueado")
     @Column(name = "estatus", nullable = false, length = 20)
     private String estatus;
 
@@ -46,6 +46,12 @@ public class Usuario {
 
     @Column(name = "ultimo_acceso")
     private LocalDateTime ultimoAcceso;
+
+    @Column(name = "intentos_fallidos", nullable = false)
+    private Integer failedAttempt;
+
+    @Column(name = "fecha_bloqueo")
+    private LocalDateTime lockTime;
 
     @ManyToOne
     @JoinColumn(name = "id_miembro")
@@ -59,5 +65,22 @@ public class Usuario {
     @EqualsAndHashCode.Exclude  // <-- excluir de equals/hashCode
     @ToString.Exclude
     private Set<Rol> roles;
+
+    public void incrementFailedAttempt() {
+        this.failedAttempt++;
+    }
+
+    public void resetFailedAttempts() {
+        this.failedAttempt = 0;
+    }
+
+    public void lock() {
+        this.lockTime = LocalDateTime.now();
+    }
+
+    public boolean isLockTimeExpired(long lockDurationMinutes) {
+        return lockTime != null
+                && lockTime.plusMinutes(lockDurationMinutes).isBefore(LocalDateTime.now());
+    }
 
 }
