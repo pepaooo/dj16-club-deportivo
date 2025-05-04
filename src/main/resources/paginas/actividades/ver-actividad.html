@@ -35,14 +35,20 @@
                     </a>
                 </dd>
 
+                <dt class="col-sm-3">Miembro:</dt>
+                <dd class="col-sm-9"
+                    th:text="${actividad.usuario.miembro?.nombre ?: 'Sin miembro asignado'}">
+                    <!-- Mostrará el nombre o quedará vacío -->
+                </dd>
+
                 <dt class="col-sm-3">Tipo de Acción:</dt>
                 <dd class="col-sm-9" th:text="${actividad.tipoAccion}"></dd>
 
-                <dt class="col-sm-3">Tabla Afectada:</dt>
-                <dd class="col-sm-9" th:text="${actividad.tablaAfectada}"></dd>
+                <dt class="col-sm-3" th:if="${actividad.tablaAfectada != null}">Tabla Afectada:</dt>
+                <dd class="col-sm-9" th:if="${actividad.tablaAfectada != null}" th:text="${actividad.tablaAfectada}"></dd>
 
-                <dt class="col-sm-3">ID Entidad Afectada:</dt>
-                <dd class="col-sm-9" th:text="${actividad.entidadId}"></dd>
+                <dt class="col-sm-3" th:if="${actividad.entidadId != null}">ID Entidad Afectada:</dt>
+                <dd class="col-sm-9" th:if="${actividad.entidadId != null}" th:text="${actividad.entidadId}"></dd>
 
                 <dt class="col-sm-3">Fecha / Hora:</dt>
                 <dd class="col-sm-9"
