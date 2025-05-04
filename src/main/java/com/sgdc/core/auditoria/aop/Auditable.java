@@ -1,4 +1,4 @@
-package com.sgdc.core.audit.aop;
+package com.sgdc.core.auditoria.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

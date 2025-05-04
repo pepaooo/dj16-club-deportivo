@@ -4,8 +4,6 @@ import com.sgdc.core.membresia.domain.Membresia;
 import com.sgdc.core.membresia.domain.dto.MembresiaDTO;
 import com.sgdc.core.membresia.service.BeneficioService;
 import com.sgdc.core.membresia.service.MembresiaService;
-import com.sgdc.core.miembro.domain.Miembro;
-import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.reservas.service.InstalacionService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -18,17 +16,14 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Controller
 @RequestMapping("membresias")
-public class MembresiasController {
+public class MembresiaController {
 
-    private static final Logger log = LoggerFactory.getLogger(MembresiasController.class);
+    private static final Logger log = LoggerFactory.getLogger(MembresiaController.class);
 
     private final MembresiaService membresiaService;
 
@@ -36,7 +31,7 @@ public class MembresiasController {
 
     private final InstalacionService instalacionService;
 
-    public MembresiasController(MembresiaService membresiaService, BeneficioService beneficioService, InstalacionService instalacionService) {
+    public MembresiaController(MembresiaService membresiaService, BeneficioService beneficioService, InstalacionService instalacionService) {
         this.membresiaService = membresiaService;
         this.beneficioService = beneficioService;
         this.instalacionService = instalacionService;

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container container-custom mt-4">
+
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i
+                    class="bi bi-clock-history"
+                    style="font-size: 3rem; color: #1976d2"
+            ></i>
+            <h2 class="mt-2">Auditoría y Actividades</h2>
+            <p class="text-muted">
+                Revise el historial de actividades del sistema.
+            </p>
+        </div>
+    </div>
+
+    <!-- Campo de Búsqueda -->
+    <form id="searchForm" th:action="@{/auditoria/actividades}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-12 ">
+                <div class="input-group">
+                    <input type="text" id="searchInput" name="q" class="form-control"
+                           placeholder="Buscar usuario, acción, fecha, etc." th:value="${q}" aria-label="Buscar"
+                           aria-describedby="search-addon"/>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <!-- Botón de limpiar, inicialmente oculto -->
+                    <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                        <i class="bi bi-x"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de Actividades -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-fixed-items">
+            <colgroup>
+                <col style="width: 10%">
+                <col style="width: 15%">
+                <col style="width: 15%">
+                <col style="width: 30%">
+                <col style="width: 15%">
+                <col style="width: 15%">
+            </colgroup>
+            <thead style="background-color: #e9f5ff; color: #0d6efd">
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Descripción</th>
+                <th>Fecha/Hora</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="actividad : ${actividades}">
+                <td th:text="${actividad.id}"></td>
+                <td th:text="${actividad.usuario.nombre}"></td>
+                <td th:text="${actividad.tipoAccion}"></td>
+                <td th:text="${actividad.descripcion}"></td>
+                <td th:text="${#temporals.format(actividad.fechaHora, 'dd/MM/yyyy HH:mm')}"></td>
+                <td>
+                    <a class="btn btn-outline-primary btn-sm"
+                       th:href="@{'/auditoria/actividades/get?id=' + ${actividad.id}}">
+                        <i class="bi bi-eye"></i> Ver Detalle
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(actividades)}">
+                <td colspan="6" class="text-center">
+                    No se encontraron registros.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Espera 5 segundos y oculta el alert automáticamente
+    document.addEventListener("DOMContentLoaded", function () {
+        var alertEl = document.getElementById("alertSuccess");
+        if (alertEl) {
+            setTimeout(function () {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+    // Muestra el botón de limpiar si hay texto en el campo de búsqueda
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const clearButton = document.getElementById("clearSearch");
+        const searchForm = document.getElementById("searchForm");
+
+        // Mostrar botón de limpiar si el campo tiene contenido al cargar la página
+        if (searchInput.value.trim() !== "") {
+            clearButton.style.display = "inline-block";
+        }
+
+        // Actualizar visibilidad del botón a medida que se escribe
+        searchInput.addEventListener("input", function () {
+            clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
+        });
+
+        // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            searchForm.submit();
+        });
+    });
+</script>
+</body>
+</html>

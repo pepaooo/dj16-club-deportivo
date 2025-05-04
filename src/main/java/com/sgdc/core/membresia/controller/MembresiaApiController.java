@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/membresias")
-public class MembresiasApiController {
+public class MembresiaApiController {
 
     private final MembresiaService membresiaService;
 
@@ -24,7 +24,7 @@ public class MembresiasApiController {
 
     private final ModelMapper modelMapper;
 
-    public MembresiasApiController(MembresiaService membresiaService, InstalacionService instalacionService, ModelMapper modelMapper) {
+    public MembresiaApiController(MembresiaService membresiaService, InstalacionService instalacionService, ModelMapper modelMapper) {
         this.membresiaService = membresiaService;
         this.instalacionService = instalacionService;
         this.modelMapper = modelMapper;

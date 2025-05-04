@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido Principal -->
+<div class="container container-custom-details mt-4">
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i
+                    class="bi bi-clock-history  "
+                    style="font-size: 3rem; color: #1976d2"
+            ></i>
+            <h2 class="mt-2">Detalle de Actividad</h2>
+            <p class="text-muted">
+                Visualice la información del registro de la actividad.
+            </p>
+        </div>
+    </div>
+
+    <!-- Información en dos columnas -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <!-- Lista de descripción horizontal -->
+            <dl class="row">
+                <dt class="col-sm-3 text-truncate">ID Actividad:</dt>
+                <dd class="col-sm-9" th:text="${actividad.id}"></dd>
+
+                <dt class="col-sm-3">Usuario:</dt>
+                <dd class="col-sm-9">
+                    <a th:href="@{'/usuarios/get?id=' + ${actividad.usuario.id}}">
+                        <span th:text="${actividad.usuario.nombre}"></span>
+                    </a>
+                </dd>
+
+                <dt class="col-sm-3">Tipo de Acción:</dt>
+                <dd class="col-sm-9" th:text="${actividad.tipoAccion}"></dd>
+
+                <dt class="col-sm-3">Tabla Afectada:</dt>
+                <dd class="col-sm-9" th:text="${actividad.tablaAfectada}"></dd>
+
+                <dt class="col-sm-3">ID Entidad Afectada:</dt>
+                <dd class="col-sm-9" th:text="${actividad.entidadId}"></dd>
+
+                <dt class="col-sm-3">Fecha / Hora:</dt>
+                <dd class="col-sm-9"
+                    th:text="${#temporals.format(actividad.fechaHora, 'dd/MM/yyyy HH:mm')}">
+                </dd>
+
+                <dt class="col-sm-3">Descripción:</dt>
+                <dd class="col-sm-9" th:text="${actividad.descripcion}">
+                </dd>
+
+                <dt class="col-sm-3">IP Origen:</dt>
+                <dd class="col-sm-9" th:text="${actividad.ipOrigen}"></dd>
+
+                <dt class="col-sm-3">User-Agent:</dt>
+                <dd class="col-sm-9" th:text="${actividad.userAgent}">
+                </dd>
+            </dl>
+        </div>
+        <!-- Botones de Acción -->
+        <div class="card-footer text-end">
+            <a class="btn btn-secondary me-2" th:href="@{/auditoria/actividades}">
+                <i class="bi bi-arrow-left-circle"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    </div>
+
+    <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+</body>
+</html>

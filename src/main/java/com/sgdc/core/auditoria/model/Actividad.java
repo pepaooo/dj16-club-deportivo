@@ -1,4 +1,4 @@
-package com.sgdc.core.audit.model;
+package com.sgdc.core.auditoria.model;
 
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;

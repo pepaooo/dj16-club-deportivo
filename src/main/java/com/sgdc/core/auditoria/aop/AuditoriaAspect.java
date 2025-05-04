@@ -1,7 +1,7 @@
-package com.sgdc.core.audit.aop;
+package com.sgdc.core.auditoria.aop;
 
-import com.sgdc.core.audit.model.Actividad;
-import com.sgdc.core.audit.repository.ActividadRepository;
+import com.sgdc.core.auditoria.model.Actividad;
+import com.sgdc.core.auditoria.repository.ActividadRepository;
 import com.sgdc.core.security.model.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;

@@ -1,6 +1,6 @@
 package com.sgdc.core.usuarios.service;
 
-import com.sgdc.core.audit.aop.Auditable;
+import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.repository.MiembroRepository;
 import com.sgdc.core.usuarios.domain.Rol;
