@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
-//@RequestMapping("actividades")
 @RequestMapping("auditoria/actividades")
 public class ActividadController {
 
@@ -36,7 +35,7 @@ public class ActividadController {
     }
 
     @GetMapping("get")
-    public String getMembresia(@RequestParam(value = "id") Integer idActividad, Model model) {
+    public String getActividad(@RequestParam(value = "id") Integer idActividad, Model model) {
         Actividad actividad = actividadService.findById(idActividad);
         model.addAttribute("actividad", actividad);
         return "actividades/ver-actividad";
