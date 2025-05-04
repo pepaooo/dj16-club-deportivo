@@ -1,7 +1,7 @@
 package com.sgdc.core.security.listener;
 
-import com.sgdc.core.audit.model.Actividad;
-import com.sgdc.core.audit.repository.ActividadRepository;
+import com.sgdc.core.auditoria.model.Actividad;
+import com.sgdc.core.auditoria.repository.ActividadRepository;
 import com.sgdc.core.security.model.UserPrincipal;
 import com.sgdc.core.usuarios.domain.Usuario;
 import com.sgdc.core.usuarios.repository.UsuarioRepository;

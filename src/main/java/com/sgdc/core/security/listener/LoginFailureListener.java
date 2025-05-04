@@ -1,7 +1,7 @@
 package com.sgdc.core.security.listener;
 
-import com.sgdc.core.audit.model.Actividad;
-import com.sgdc.core.audit.repository.ActividadRepository;
+import com.sgdc.core.auditoria.model.Actividad;
+import com.sgdc.core.auditoria.repository.ActividadRepository;
 import com.sgdc.core.security.model.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;

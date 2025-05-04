@@ -3,8 +3,8 @@ package com.sgdc.core.security.config;
 import com.sgdc.core.security.filter.CaptchaValidationFilter;
 import com.sgdc.core.security.filter.IpRateLimitingFilter;
 import com.sgdc.core.security.handler.CustomAuthFailureHandler;
+import com.sgdc.core.security.handler.CustomAuthSuccessHandler;
 import com.sgdc.core.security.service.CustomUserDetailsService;
-import com.sgdc.core.security.service.LoginAttemptService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -26,15 +26,15 @@ public class SecurityConfiguration {
     private final IpRateLimitingFilter ipRateLimitingFilter;
     private final CaptchaValidationFilter captchaValidationFilter;
     private final CustomAuthFailureHandler customAuthFailureHandler;
-    private final LoginAttemptService loginAttemptService;
+    private final CustomAuthSuccessHandler customAuthSuccessHandler;
 
 
-    public SecurityConfiguration(CustomUserDetailsService uds, IpRateLimitingFilter ipRateLimitingFilter, CaptchaValidationFilter captchaValidationFilter, CustomAuthFailureHandler customAuthFailureHandler, LoginAttemptService loginAttemptService) {
+    public SecurityConfiguration(CustomUserDetailsService uds, IpRateLimitingFilter ipRateLimitingFilter, CaptchaValidationFilter captchaValidationFilter, CustomAuthFailureHandler customAuthFailureHandler, CustomAuthSuccessHandler customAuthSuccessHandler) {
         this.uds = uds;
         this.ipRateLimitingFilter = ipRateLimitingFilter;
         this.captchaValidationFilter = captchaValidationFilter;
         this.customAuthFailureHandler = customAuthFailureHandler;
-        this.loginAttemptService = loginAttemptService;
+        this.customAuthSuccessHandler = customAuthSuccessHandler;
     }
 
     @Bean
@@ -53,16 +53,30 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+
+                // Configurar formLogin primero, con los handlers
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/doLogin")
+                        .successHandler(customAuthSuccessHandler)
+                        .failureHandler(customAuthFailureHandler)
+                        .permitAll()
+                )
+
                 // Primero: limitamos el número de POST /doLogin por IP
                 .addFilterBefore(ipRateLimitingFilter,
                         UsernamePasswordAuthenticationFilter.class)
-
                 // Segundo: validamos el CAPTCHA si toca
                 .addFilterBefore(captchaValidationFilter,
                         UsernamePasswordAuthenticationFilter.class)
 
                 // Provider
                 .authenticationProvider(authenticationProvider())
+
+                // Configuración de CSRF/CORS
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .cors(Customizer.withDefaults())
 
                 // Autorizar rutas
                 .authorizeHttpRequests(auth -> auth
@@ -77,31 +91,13 @@ public class SecurityConfiguration {
                                 .anyRequest().authenticated()
                 )
 
-                // Configuración de form login
-                .formLogin(form -> form
-                        .loginPage("/login")                  // GET /login → plantilla
-                        .loginProcessingUrl("/doLogin")       // POST /doLogin → procesa credenciales
-                        .defaultSuccessUrl("/", true)         // a dónde vas si ok
-                        .successHandler((req, res, auth) -> {
-                            loginAttemptService.loginSucceeded(auth.getName());
-                            res.sendRedirect("/");
-                        })
-                        .failureHandler(customAuthFailureHandler)
-                        .permitAll()
-                )
-
-                // logout
+                // Logout
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                )
-
-                // Configuración de CSRF/CORS
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .cors(Customizer.withDefaults());
+                );
 
         return http.build();
     }
