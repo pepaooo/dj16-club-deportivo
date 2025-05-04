@@ -6,6 +6,8 @@ import com.sgdc.core.security.model.UserPrincipal;
 import com.sgdc.core.usuarios.domain.Usuario;
 import com.sgdc.core.usuarios.repository.UsuarioRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,8 @@ import java.time.LocalDateTime;
 @Component
 public class LoginSuccessListener
         implements ApplicationListener<AuthenticationSuccessEvent> {
+
+    private static final Logger log = LoggerFactory.getLogger(LoginSuccessListener.class);
 
     private final ActividadRepository actividadRepo;
     private final UsuarioRepository usuarioRepo;
@@ -43,7 +47,9 @@ public class LoginSuccessListener
             Usuario usuario = up.getUsuario();
             usuario.setUltimoAcceso(LocalDateTime.now());
             usuarioRepo.save(usuario);
+            log.info("Login success. {}", up.getUsuario());
         }
+
 
     }
 

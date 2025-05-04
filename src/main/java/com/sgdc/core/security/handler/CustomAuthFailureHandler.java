@@ -15,14 +15,14 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class CustomAuthenticationFailureHandler
+public class CustomAuthFailureHandler
         extends SimpleUrlAuthenticationFailureHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(CustomAuthenticationFailureHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(CustomAuthFailureHandler.class);
 
     private final LoginAttemptService loginAttemptService;
 
-    public CustomAuthenticationFailureHandler(LoginAttemptService loginAttemptService) {
+    public CustomAuthFailureHandler(LoginAttemptService loginAttemptService) {
         this.loginAttemptService = loginAttemptService;
     }
 

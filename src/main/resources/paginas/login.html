@@ -53,6 +53,11 @@
                 Usuario o contraseña incorrectos.
             </div>
 
+            <!-- Alerta de rate‐limit -->
+            <div th:if="${param.rateLimit}" class="alert alert-warning">
+                Demasiados intentos de login. Intenta de nuevo más tarde.
+            </div>
+
             <!-- CAPTCHA -->
             <div th:if="${param.captcha}" class="alert alert-warning">
                 Por favor resuelva el CAPTCHA.
