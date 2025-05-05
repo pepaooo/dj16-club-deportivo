@@ -1,5 +1,6 @@
 package com.sgdc.core.reservas.service;
 
+import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.reportes.utils.PdfGenerator;
 import com.sgdc.core.reservas.domain.EstadoReserva;
@@ -9,7 +10,7 @@ import com.sgdc.core.reservas.domain.dto.ReservaDTO;
 import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.repository.ReservaRepository;
-import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReservaServiceImpl implements ReservaService {
@@ -105,8 +105,14 @@ public class ReservaServiceImpl implements ReservaService {
         return repository.findAll(spec, Sort.by(Sort.Direction.ASC, "fechaHoraInicio"));
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "reserva",
+            entidadId = "#result.id",
+            descripcion = "'Creación de la reserva '+#result.id "
+    )
     @Override
-    public void save(ReservaDTO dto) {
+    public ReservaDTO save(ReservaDTO dto) {
         // 1. Convertir DTO a entidad
         Reserva reserva = modelMapper.map(dto, Reserva.class);
 
@@ -132,48 +138,66 @@ public class ReservaServiceImpl implements ReservaService {
         if (solapadas != null && solapadas > 0) {
             throw new ReservaSolapadaException("Ya existe una reserva confirmada en esta franja horaria para la instalación.");
         }
-        repository.save(reserva);
+        // 3. Guardar la reserva
+        Reserva newReserva = repository.save(reserva);
+        return toDTO(newReserva);
     }
 
+    private ReservaDTO toDTO(Reserva newReserva) {
+        return ReservaDTO.builder()
+                .id(newReserva.getId())
+                .idInstalacion(newReserva.getInstalacion().getId())
+                .fechaHoraInicio(newReserva.getFechaHoraInicio())
+                .fechaHoraFin(newReserva.getFechaHoraFin())
+                .estadoReserva(newReserva.getEstadoReserva())
+                .build();
+    }
+
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "reserva",
+            entidadId = "#id",
+            descripcion = "'Confirmación de reserva'"
+    )
     @Transactional
     @Override
-    public Optional<Reserva> confirmarReserva(Integer id) {
-        Optional<Reserva> reserva = repository.findById(id);
-        if (reserva.isPresent()) {
-            Reserva seleccionada = reserva.get();
-            seleccionada.setEstadoReserva(EstadoReserva.CONFIRMADA.getLabel());
-            repository.save(seleccionada);
+    public void confirmarReserva(Integer id) {
+        Reserva seleccionada = repository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("No se encontró la reserva con ID: " + id)
+        );
+        seleccionada.setEstadoReserva(EstadoReserva.CONFIRMADA.getLabel());
+        repository.save(seleccionada);
 
-            // 2. Buscar y cancelar todas las “Pendiente” que solapen
-            List<Reserva> solapadas = repository.findPendientesSolapadas(
-                    seleccionada.getInstalacion().getId(),
-                    seleccionada.getFechaHoraInicio(),
-                    seleccionada.getFechaHoraFin(),
-                    seleccionada.getId()
-            );
-            for (Reserva r : solapadas) {
-                r.setEstadoReserva(EstadoReserva.CANCELADA.getLabel());
-            }
-            repository.saveAll(solapadas);
-
-            // 3. (En un futuro se podría implementar) Enviar notificaciones a los usuarios de las reservas canceladas
-            // notificationService.notifyCancellations(solapadas);
-
-            return Optional.of(seleccionada);
+        // 2. Buscar y cancelar todas las “Pendiente” que solapen
+        List<Reserva> solapadas = repository.findPendientesSolapadas(
+                seleccionada.getInstalacion().getId(),
+                seleccionada.getFechaHoraInicio(),
+                seleccionada.getFechaHoraFin(),
+                seleccionada.getId()
+        );
+        for (Reserva r : solapadas) {
+            r.setEstadoReserva(EstadoReserva.CANCELADA.getLabel());
         }
-        return Optional.empty();
+        repository.saveAll(solapadas);
+
+        // 3. (En un futuro se podría implementar) Enviar notificaciones a los usuarios de las reservas canceladas
+        // notificationService.notifyCancellations(solapadas);
+
     }
 
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "reserva",
+            entidadId = "#id",
+            descripcion = "'Cancelación de reserva'"
+    )
     @Override
-    public Optional<Reserva> cancelarReserva(Integer id) {
-        Optional<Reserva> reserva = repository.findById(id);
-        if (reserva.isPresent()) {
-            Reserva r = reserva.get();
-            r.setEstadoReserva("Cancelada");
-            repository.save(r);
-            return Optional.of(r);
-        }
-        return Optional.empty();
+    public void cancelarReserva(Integer id) {
+        Reserva r = repository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("No se encontró la reserva con ID: " + id)
+        );
+        r.setEstadoReserva("Cancelada");
+        repository.save(r);
     }
 
     @Override

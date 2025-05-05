@@ -5,7 +5,6 @@ import com.sgdc.core.reservas.domain.dto.ReservaDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface ReservaService {
 
@@ -15,11 +14,11 @@ public interface ReservaService {
 
     List<Reserva> search(String keyword);
 
-    void save(ReservaDTO reserva);
+    ReservaDTO save(ReservaDTO reserva);
 
-    Optional<Reserva> confirmarReserva(Integer id);
+    void confirmarReserva(Integer id);
 
-    Optional<Reserva> cancelarReserva(Integer id);
+    void cancelarReserva(Integer id);
 
     public List<Reserva> buscarPendientesSolapadas(Integer instalacionId,
                                                    LocalDateTime inicio,
