@@ -2,20 +2,19 @@ package com.sgdc.core.config.controller;
 
 import com.sgdc.core.config.domain.Notificacion;
 import com.sgdc.core.config.domain.dto.NotificacionSearchDTO;
-import com.sgdc.core.config.repository.NotificacionRepository;
 import com.sgdc.core.config.service.NotificacionEnvioService;
 import com.sgdc.core.config.service.NotificacionService;
-import com.sgdc.core.membresia.domain.Membresia;
-import com.sgdc.core.membresia.domain.dto.MembresiaDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("notificaciones")
@@ -25,12 +24,10 @@ public class NotificacionController {
 
     private final NotificacionService notificacionService;
 
-    private final NotificacionRepository notificacionRepository;
     private final NotificacionEnvioService notificacionEnvioService;
 
-    public NotificacionController(NotificacionService notificacionService, NotificacionRepository notificacionRepository, NotificacionEnvioService notificacionEnvioService) {
+    public NotificacionController(NotificacionService notificacionService,NotificacionEnvioService notificacionEnvioService) {
         this.notificacionService = notificacionService;
-        this.notificacionRepository = notificacionRepository;
         this.notificacionEnvioService = notificacionEnvioService;
     }
 

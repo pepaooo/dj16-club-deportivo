@@ -10,7 +10,4 @@ import java.util.List;
 public interface ActividadRepository extends JpaRepository<Actividad, Integer>, JpaSpecificationExecutor<Actividad> {
     // Listas de todas las actividades ordenadas de forma descendente por ID
     List<Actividad> findAllByOrderByIdDesc();
-
-    // Listar actividades por usuario
-    List<Actividad> findByUsuario(Usuario usuario);
 }
