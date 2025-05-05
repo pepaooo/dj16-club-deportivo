@@ -1,5 +1,6 @@
 package com.sgdc.core.pagos.service;
 
+import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.membresia.domain.HistorialMembresia;
 import com.sgdc.core.membresia.domain.Membresia;
 import com.sgdc.core.membresia.domain.dto.MembresiaDTO;
@@ -152,9 +153,15 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         return pagoMembresiaRepository.findAllResumenPagosByMiembro(idMiembro, limite != -1 ? PageRequest.of(0, limite) : Pageable.unpaged());
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "pago_membresia",
+            entidadId = "#result.id",
+            descripcion = "'Creación de pago de membresía '+#result.membresiaId + ' con monto de '+#result.monto + ' del miembro '+#result.idMiembro"
+    )
     @Transactional
     @Override
-    public void save(PagoMembresiaDTO dto) {
+    public PagoMembresiaDTO save(PagoMembresiaDTO dto) {
         // 0) guardamos el pago nuevo y calculamos iniN, finN
         PagoMembresia nuevo = buildAndSaveNuevo(dto);
         LocalDate iniN = nuevo.getFechaInicio();
@@ -232,8 +239,26 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
             pagoMembresiaRepository.save(ex);
             prevEnd = ex.getFechaFin();
         }
+
+        return toDTO(nuevo);
     }
 
+    private PagoMembresiaDTO toDTO(PagoMembresia nuevo) {
+        return PagoMembresiaDTO.builder()
+                .id(nuevo.getId())
+                .idMiembro(nuevo.getMiembro().getId())
+                .membresiaId(nuevo.getMembresia().getId())
+                .monto(nuevo.getMonto())
+                .fechaInicio(nuevo.getFechaInicio())
+                .build();
+    }
+
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "pago_membresia",
+            entidadId = "#idPago",
+            descripcion = "'Cancelación de pago. Razón:  '+#motivo"
+    )
     @Override
     @Transactional
     public void cancelarPago(Integer idPago, String motivo) {

@@ -30,7 +30,7 @@ public interface PagoMembresiaService {
 
     BigDecimal calcularMontoFinal(PagoMembresia pago, List<PagoAjuste> ajustes);
 
-    void save(PagoMembresiaDTO pagoMembresiaDTO);
+    PagoMembresiaDTO save(PagoMembresiaDTO pagoMembresiaDTO);
 
     void cancelarPago(Integer idPago, String motivo);
 

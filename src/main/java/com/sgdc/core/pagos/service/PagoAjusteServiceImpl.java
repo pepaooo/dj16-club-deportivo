@@ -1,5 +1,6 @@
 package com.sgdc.core.pagos.service;
 
+import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.pagos.domain.PagoAjuste;
 import com.sgdc.core.pagos.exception.PagoInactivoException;
 import com.sgdc.core.pagos.repository.PagoAjusteRepository;
@@ -31,15 +32,21 @@ public class PagoAjusteServiceImpl implements PagoAjusteService {
         return repository.findById(id);
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "pago_ajuste",
+            entidadId = "#result.id",
+            descripcion = "'Creación de ajuste al pago de membresía '+#result.pagoMembresia.id + ' con monto de '+#result.montoAjuste + '. Razón: '+#result.descripcion"
+    )
     @Override
-    public void save(PagoAjuste pagoAjuste) {
+    public PagoAjuste save(PagoAjuste pagoAjuste) {
         // Validamos que el estatus del pago sea "Activo" o "Pendiente"
         log.debug("save {}", pagoAjuste);
         if (!pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Activo")
                 && !pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Pendiente")) {
             throw new PagoInactivoException("El pago no está activo y no se puede ajustar.");
         }
-        repository.save(pagoAjuste);
+        return repository.save(pagoAjuste);
     }
 
     @Override

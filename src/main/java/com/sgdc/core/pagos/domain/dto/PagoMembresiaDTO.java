@@ -2,12 +2,18 @@ package com.sgdc.core.pagos.domain.dto;
 
 import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PagoMembresiaDTO {
 
     private Integer id;

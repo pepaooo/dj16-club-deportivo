@@ -13,6 +13,6 @@ public interface PagoAjusteService {
 
     List<PagoAjuste> findByPagoMembresiaId(Integer idPagoMembresia);
 
-    void save(PagoAjuste pagoAjuste);
+    PagoAjuste save(PagoAjuste pagoAjuste);
 
 }
