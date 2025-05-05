@@ -14,7 +14,7 @@ public class ConfiguracionSistema {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_config")
-    private Integer idConfig;
+    private Integer id;
 
     @NotBlank(message = "El parámetro no puede estar vacío")
     @Size(max = 50)

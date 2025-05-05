@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head th:replace="~{plantillas/plantilla :: head}"></head>
+<body>
+<header th:replace="~{plantillas/plantilla :: header}"></header>
+
+<!-- Contenido principal -->
+<div class="container container-custom mt-4">
+    <!-- Mensaje de éxito -->
+    <div id="alertSuccess" th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${exito}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <!-- Mensaje de error -->
+    <div id="alertError" th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Encabezado -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 text-center">
+            <i class="bi bi-sliders" style="font-size: 3rem; color: #1976d2"></i>
+            <h2 class="mt-2">Configuración del Sistema</h2>
+            <p class="text-muted">
+                Modifique los parámetros globales del sistema, como la activación de
+                notificaciones y la periodicidad de envío.
+            </p>
+        </div>
+    </div>
+
+    <!-- Campo de Búsqueda -->
+    <form id="searchForm" th:action="@{/configuracion}" method="get">
+        <div class="row mb-3">
+            <div class="col-md-12 ">
+                <div class="input-group">
+                    <input type="text" id="searchInput" name="q" class="form-control"
+                           placeholder="Buscar parámetro, valor o descripción." th:value="${q}" aria-label="Buscar"
+                           aria-describedby="search-addon"/>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <!-- Botón de limpiar, inicialmente oculto -->
+                    <button type="button" id="clearSearch" class="btn btn-outline-secondary" style="display: none;">
+                        <i class="bi bi-x"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de Actividades -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead style="background-color: #e9f5ff; color: #0d6efd">
+            <tr>
+                <th>ID</th>
+                <th>Parámetro</th>
+                <th>Descripción</th>
+                <th>Valor</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="config : ${configuraciones}">
+                <td th:text="${config.id}"></td>
+                <td th:text="${config.parametro}"></td>
+                <td th:text="${config.descripcion}"></td>
+                <td>
+                    <!-- Formulario inline para actualizar el campo "valor" -->
+                    <form
+                            th:action="@{'/configuracion/actualizar/' + ${config.id}}"
+                            method="post"
+                            class="d-flex align-items-center"
+                            id="form-config-[[${config.id}]]"
+                    >
+                        <input
+                                type="text"
+                                class="form-control me-2 editable-input"
+                                name="valor"
+                                th:value="${config.valor}"
+                                readonly
+                                th:attr="data-original-value=${config.valor}"
+                        />
+                        <button
+                                type="button"
+                                class="btn btn-warning btn-sm me-2"
+                                onclick="toggleEdit(this)"
+                                data-config-id="[[${config.id}]]"
+                        >
+                            Editar
+                        </button>
+                        <button
+                                type="button"
+                                class="btn btn-outline-secondary btn-sm cancel-btn"
+                                onclick="cancelEdit(this)"
+                                style="display: none"
+                        >
+                            Cancelar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(configuraciones)}">
+                <td colspan="4" class="text-center">
+                    No se encontraron registros.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+<script>
+    // Espera 5 segundos y oculta el alert automáticamente
+    document.addEventListener("DOMContentLoaded", function () {
+        var alertEl = document.getElementById("alertSuccess");
+        if (alertEl) {
+            setTimeout(function () {
+                // Usa el metodo de Bootstrap para cerrar el alert
+                var bsAlert = new bootstrap.Alert(alertEl);
+                bsAlert.close();
+            }, 5000);
+        }
+    });
+    // Muestra el botón de limpiar si hay texto en el campo de búsqueda
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+        const clearButton = document.getElementById("clearSearch");
+        const searchForm = document.getElementById("searchForm");
+
+        // Mostrar botón de limpiar si el campo tiene contenido al cargar la página
+        if (searchInput.value.trim() !== "") {
+            clearButton.style.display = "inline-block";
+        }
+
+        // Actualizar visibilidad del botón a medida que se escribe
+        searchInput.addEventListener("input", function () {
+            clearButton.style.display = this.value.trim() !== "" ? "inline-block" : "none";
+        });
+
+        // Al hacer clic en "Limpiar", se borra el campo y se envía el formulario sin filtro
+        clearButton.addEventListener("click", function () {
+            searchInput.value = "";
+            searchForm.submit();
+        });
+    });
+
+    // Alterna entre modo lectura y edición
+    function toggleEdit(btn) {
+        var form = btn.closest("form");
+        var input = form.querySelector("input[name='valor']");
+        var cancelBtn = form.querySelector(".cancel-btn");
+
+        if (input.hasAttribute("readonly")) {
+            // Pasar a modo edición
+            input.removeAttribute("readonly");
+            input.focus();
+            btn.textContent = "Guardar";
+            cancelBtn.style.display = "inline-block";
+        } else {
+            // Enviar formulario para guardar cambios
+            form.submit();
+        }
+    }
+
+    // Revertir cambios y volver a modo lectura
+    function cancelEdit(cancelBtn) {
+        var form = cancelBtn.closest("form");
+        var input = form.querySelector("input[name='valor']");
+        var toggleButton = form.querySelector("button.btn-warning");
+
+        // Reiniciar el valor a lo original almacenado en data-original-value
+        input.value = input.getAttribute("data-original-value");
+        // Volver a poner el atributo readonly y actualizar el botón
+        input.setAttribute("readonly", "");
+        toggleButton.textContent = "Editar";
+        cancelBtn.style.display = "none";
+    }
+
+</script>
+</body>
+</html>
