@@ -7,11 +7,13 @@ import com.sgdc.core.security.handler.CustomAuthSuccessHandler;
 import com.sgdc.core.security.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -50,8 +52,26 @@ public class SecurityConfiguration {
         return p;
     }
 
+    // 1) Filtro para API REST
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/api/**")
+                .csrf(csrf -> csrf.disable())                     // APIs suelen desactivar CSRF
+//                .sessionManagement(sm -> sm
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // stateless para APIs
+//                )
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().hasAnyAuthority("ADMIN")
+                )
+                .httpBasic(Customizer.withDefaults());            // Basic Auth para APIs
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain uiSecurity(HttpSecurity http) throws Exception {
         http
 
                 // Configurar formLogin primero, con los handlers
