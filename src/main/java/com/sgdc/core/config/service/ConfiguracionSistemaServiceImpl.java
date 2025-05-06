@@ -1,5 +1,6 @@
 package com.sgdc.core.config.service;
 
+import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.config.domain.ConfiguracionSistema;
 import com.sgdc.core.config.repository.ConfiguracionSistemaRepository;
 import com.sgdc.core.config.validator.ConfigValidationService;
@@ -71,21 +72,33 @@ public class ConfiguracionSistemaServiceImpl implements ConfiguracionSistemaServ
         return repository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "configuracion_sistema",
+            entidadId = "#result.id",
+            descripcion = "'Creación de configuración del sistema '+#result.parametro + ' con valor: '+#result.valor"
+    )
     @Override
     public ConfiguracionSistema save(ConfiguracionSistema configuracionSistema) {
         log.debug("Saving configuracionSistema: {}", configuracionSistema);
         return repository.save(configuracionSistema);
     }
 
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "configuracion_sistema",
+            entidadId = "#result.id",
+            descripcion = "'Actualización de configuración del sistema '+#result.parametro + ' con valor: '+#result.valor"
+    )
     @Override
-    public void update(Integer id, String valor) {
+    public ConfiguracionSistema update(Integer id, String valor) {
         ConfiguracionSistema configuracionSistema = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("ConfiguracionSistema not found with id: " + id));
         // Validar el valor según el tipo de configuración
         configValidationService.validate(configuracionSistema.getParametro(), valor);
         // Actualizar el valor
         configuracionSistema.setValor(valor);
-        repository.save(configuracionSistema);
+        return repository.save(configuracionSistema);
     }
 
     private List<Integer> parsePeriods(String csv) {

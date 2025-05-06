@@ -14,5 +14,5 @@ public interface ConfiguracionSistemaService {
 
     ConfiguracionSistema save(ConfiguracionSistema configuracionSistema);
 
-    void update(Integer id, String valor);
+    ConfiguracionSistema update(Integer id, String valor);
 }
