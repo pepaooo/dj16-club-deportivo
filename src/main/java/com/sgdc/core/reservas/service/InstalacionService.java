@@ -16,6 +16,8 @@ public interface InstalacionService {
 
     List<InstalacionDTO> findByMembresiaId(Integer membresiaId);
 
-    void save(Instalacion instalacion);
+    Instalacion save(Instalacion instalacion);
+
+    Instalacion update(Instalacion instalacion);
 
 }

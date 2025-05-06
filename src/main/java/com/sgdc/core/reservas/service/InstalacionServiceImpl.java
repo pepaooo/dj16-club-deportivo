@@ -1,9 +1,12 @@
 package com.sgdc.core.reservas.service;
 
+import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.dto.InstalacionDTO;
 import com.sgdc.core.reservas.repository.InstalacionRepository;
 import jakarta.persistence.criteria.Expression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,8 @@ import java.util.Optional;
 
 @Service
 public class InstalacionServiceImpl implements InstalacionService {
+
+    private static final Logger log = LoggerFactory.getLogger(InstalacionServiceImpl.class);
 
     private final InstalacionRepository repository;
 
@@ -63,8 +68,27 @@ public class InstalacionServiceImpl implements InstalacionService {
                 .toList();
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "instalacion",
+            entidadId = "#result.id",
+            descripcion = "'Creación de instalación '+#result.nombre + ' con descripción: '+#result.descripcion"
+    )
     @Override
-    public void save(Instalacion instalacion) {
-        repository.save(instalacion);
+    public Instalacion save(Instalacion instalacion) {
+        log.info("Agregando nueva instalación: {}", instalacion);
+        return repository.save(instalacion);
+    }
+
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "instalacion",
+            entidadId = "#result.id",
+            descripcion = "'Actualización de instalación '+#result.nombre + ' con descripción: '+#result.descripcion"
+    )
+    @Override
+    public Instalacion update(Instalacion instalacion) {
+        log.info("Actualizando instalación: {}", instalacion);
+        return repository.save(instalacion);
     }
 }
