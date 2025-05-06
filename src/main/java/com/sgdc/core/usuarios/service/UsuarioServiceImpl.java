@@ -88,6 +88,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (dto.getEstatus() == null || dto.getEstatus().isBlank()) {
             usuario.setEstatus("Activo");
         }
+        // Intentos fallidos
+        usuario.setFailedAttempt(0);
         return toDTO(repository.save(usuario));
     }
 
