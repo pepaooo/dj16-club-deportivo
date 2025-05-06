@@ -89,7 +89,7 @@ public class MiembroServiceImpl implements MiembroService {
     @Override
     public Miembro update(Miembro miembro) {
         log.info("Actualizando miembro {}: {} {} {}", miembro.getId(), miembro.getNombre(), miembro.getApellidoPaterno(), miembro.getApellidoMaterno());
-        Miembro existingMiembro = repository.findById(miembro.getId()).orElseThrow(() -> new EntityNotFoundException("No se encontró el miembro con ID: " + miembro.getId()));
+        repository.findById(miembro.getId()).orElseThrow(() -> new EntityNotFoundException("No se encontró el miembro con ID: " + miembro.getId()));
         return repository.save(miembro);
     }
 

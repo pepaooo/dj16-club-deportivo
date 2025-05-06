@@ -1,5 +1,6 @@
 package com.sgdc.core.membresia.service;
 
+import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.membresia.domain.Beneficio;
 import com.sgdc.core.membresia.domain.Membresia;
 import com.sgdc.core.membresia.domain.dto.BeneficioInfo;
@@ -9,15 +10,16 @@ import com.sgdc.core.membresia.repository.BeneficioRepository;
 import com.sgdc.core.membresia.repository.MembresiaRepository;
 import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.repository.InstalacionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,7 +75,7 @@ public class MembresiaServiceImpl implements MembresiaService {
     @Override
     public List<Membresia> search(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return repository.findAll();
+            return repository.findAllByOrderByIdDesc();
         }
         String pattern = "%" + keyword.toLowerCase() + "%";
 
@@ -95,40 +97,67 @@ public class MembresiaServiceImpl implements MembresiaService {
             );
         };
 
-        return repository.findAll(spec);
+        return repository.findAll(spec, Sort.by(Sort.Direction.DESC, "id"));
     }
 
+    @Auditable(
+            tipoAccion = "CREATE",
+            tabla = "membresia",
+            entidadId = "#result.id",
+            descripcion = "'Creación de membresía '+#result.nombre + ' con tarifa de '+#result.tarifa + ' y duración de '+#result.duracionDias"
+    )
     @Override
-    public void save(MembresiaDTO dto) {
+    public MembresiaDTO save(MembresiaDTO dto) {
         Membresia membresia = this.toEntity(dto);
-        log.info("Membresia save " + membresia);
+        log.info("Agregando nueva membresía: {} {} {} {}",
+                membresia.getNombre(), membresia.getTarifa(), membresia.getDuracionDias(), membresia.getEstatus());
         // Si no se especifica estatus, se asigna "Activo" por defecto
         if (membresia.getEstatus() == null || membresia.getEstatus().isEmpty()) {
             membresia.setEstatus("Activo");
         }
-        repository.save(membresia);
+        Membresia newMembresia = repository.save(membresia);
+        return this.toDTO(newMembresia);
     }
 
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "membresia",
+            entidadId = "#result.id",
+            descripcion = "'Actualización de membresía '+#result.nombre + ' con tarifa de '+#result.tarifa + ' y duración de '+#result.duracionDias"
+    )
     @Override
-    public Optional<Membresia> activateMembresia(Integer id) {
-        Optional<Membresia> membresia = repository.findById(id);
-        if (membresia.isPresent()) {
-            Membresia m = membresia.get();
-            m.setEstatus("Activo");
-            return Optional.of(repository.save(m));
-        }
-        return Optional.empty();
+    public MembresiaDTO update(MembresiaDTO dto) {
+        Membresia m = this.toEntity(dto);
+        log.info("Actualizando membresía: {} {} {} {}",
+                m.getId(), m.getNombre(), m.getTarifa(), m.getDuracionDias());
+        Membresia updatedMembresia = repository.save(m);
+        return this.toDTO(updatedMembresia);
     }
 
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "membresia",
+            entidadId = "#id",
+            descripcion = "'Activación de membresía'"
+    )
     @Override
-    public Optional<Membresia> deactivateMembresia(Integer id) {
-        Optional<Membresia> membresia = repository.findById(id);
-        if (membresia.isPresent()) {
-            Membresia m = membresia.get();
-            m.setEstatus("Inactivo");
-            return Optional.of(repository.save(m));
-        }
-        return Optional.empty();
+    public void activateMembresia(Integer id) {
+        Membresia m = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("No se encontró la membresía con ID: " + id));
+        m.setEstatus("Activo");
+        repository.save(m);
+    }
+
+    @Auditable(
+            tipoAccion = "UPDATE",
+            tabla = "membresia",
+            entidadId = "#id",
+            descripcion = "'Inactivación de membresía'"
+    )
+    @Override
+    public void deactivateMembresia(Integer id) {
+        Membresia m = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("No se encontró la membresía con ID: " + id));
+        m.setEstatus("Inactivo");
+        repository.save(m);
     }
 
     public Membresia toEntity(MembresiaDTO dto) {

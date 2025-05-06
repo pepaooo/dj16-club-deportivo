@@ -16,10 +16,12 @@ public interface MembresiaService {
 
     List<Membresia> search(String keyword);
 
-    void save(MembresiaDTO membresia);
+    MembresiaDTO save(MembresiaDTO membresia);
 
-    Optional<Membresia> activateMembresia(Integer id);
+    MembresiaDTO update(MembresiaDTO membresia);
 
-    Optional<Membresia> deactivateMembresia(Integer id);
+    void activateMembresia(Integer id);
+
+    void deactivateMembresia(Integer id);
 
 }

@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 public interface MembresiaRepository extends JpaRepository<Membresia, Integer>, JpaSpecificationExecutor<Membresia> {
+    List<Membresia> findAllByOrderByIdDesc();
     List<Membresia> findByEstatus(String estatus);
 }

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("membresias")
@@ -119,7 +118,7 @@ public class MembresiaController {
 
         try {
             log.info("Membresía a guardar: {}", membresia);
-            membresiaService.save(membresia);
+            membresiaService.update(membresia);
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.rejectValue("nombre", "nombre", "El nombre de la membresía ya existe. Por favor, use otro.");
@@ -134,14 +133,14 @@ public class MembresiaController {
 
     @PostMapping("activate")
     public String activarMembresia(@RequestParam(value = "id") Integer idMembresia, RedirectAttributes redirectAttributes) {
-        Optional<Membresia> membresia = membresiaService.activateMembresia(idMembresia);
+        membresiaService.activateMembresia(idMembresia);
         redirectAttributes.addFlashAttribute("exito", "La membresía se ha guardado correctamente");
         return "redirect:/membresias";
     }
 
     @PostMapping("deactivate")
     public String desactivarMembresia(@RequestParam(value = "id") Integer idMembresia, RedirectAttributes redirectAttributes) {
-        Optional<Membresia> membresia = membresiaService.deactivateMembresia(idMembresia);
+        membresiaService.deactivateMembresia(idMembresia);
         redirectAttributes.addFlashAttribute("exito", "La membresía se ha guardado correctamente");
         return "redirect:/membresias";
     }
