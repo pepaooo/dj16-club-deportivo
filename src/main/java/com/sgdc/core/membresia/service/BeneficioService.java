@@ -12,7 +12,9 @@ public interface BeneficioService {
 
     List<Beneficio> search(String keyword);
 
-    void save(Beneficio beneficio);
+    Beneficio save(Beneficio beneficio);
+
+    Beneficio update(Beneficio beneficio);
 
     void delete(Integer id);
 

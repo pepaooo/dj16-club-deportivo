@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface BeneficioRepository extends JpaRepository<Beneficio, Integer>, JpaSpecificationExecutor<Beneficio> {
+    // Lista todos los beneficios en orden descendente por ID
+    List<Beneficio> findAllByOrderByIdDesc();
 
     @Query("""
               SELECT b
