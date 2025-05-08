@@ -2,6 +2,7 @@ package com.sgdc.core.reservas.service;
 
 import com.sgdc.core.auditoria.aop.Auditable;
 import com.sgdc.core.miembro.domain.Miembro;
+import com.sgdc.core.miembro.repository.MiembroRepository;
 import com.sgdc.core.reportes.utils.PdfGenerator;
 import com.sgdc.core.reservas.domain.EstadoReserva;
 import com.sgdc.core.reservas.domain.Instalacion;
@@ -9,6 +10,7 @@ import com.sgdc.core.reservas.domain.Reserva;
 import com.sgdc.core.reservas.domain.dto.ReservaDTO;
 import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
+import com.sgdc.core.reservas.repository.InstalacionRepository;
 import com.sgdc.core.reservas.repository.ReservaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Join;
@@ -33,10 +35,16 @@ public class ReservaServiceImpl implements ReservaService {
 
     private final ReservaRepository repository;
 
+    private final MiembroRepository miembroRepository;
+
+    private final InstalacionRepository instalacionRepository;
+
     private final ModelMapper modelMapper;
 
-    public ReservaServiceImpl(ReservaRepository repository, ModelMapper modelMapper) {
+    public ReservaServiceImpl(ReservaRepository repository, MiembroRepository miembroRepository, InstalacionRepository instalacionRepository, ModelMapper modelMapper) {
         this.repository = repository;
+        this.miembroRepository = miembroRepository;
+        this.instalacionRepository = instalacionRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -109,8 +117,9 @@ public class ReservaServiceImpl implements ReservaService {
             tipoAccion = "CREATE",
             tabla = "reserva",
             entidadId = "#result.id",
-            descripcion = "'Creación de la reserva '+#result.id "
+            descripcion = "'Creación de reserva '+#result.id + ' para el miembro ' + #result.miembro + ' en la instalación ' + #result.instalacion + ' desde ' + #result.fechaHoraInicio + ' hasta ' + #result.fechaHoraFin"
     )
+    @Transactional
     @Override
     public ReservaDTO save(ReservaDTO dto) {
         // 1. Convertir DTO a entidad
@@ -138,18 +147,35 @@ public class ReservaServiceImpl implements ReservaService {
         if (solapadas != null && solapadas > 0) {
             throw new ReservaSolapadaException("Ya existe una reserva confirmada en esta franja horaria para la instalación.");
         }
+
+        // Recuperamos el Miembro y la Instalación desde sus repositorios
+        Miembro miembro = miembroRepository
+                .findById(dto.getIdMiembro())
+                .orElseThrow(() -> new EntityNotFoundException("Miembro no existe: " + dto.getIdMiembro()));
+        reserva.setMiembro(miembro);
+
+        Instalacion instalacion = instalacionRepository
+                .findById(dto.getIdInstalacion())
+                .orElseThrow(() -> new EntityNotFoundException("Instalación no existe: " + dto.getIdInstalacion()));
+        reserva.setInstalacion(instalacion);
+
         // 3. Guardar la reserva
         Reserva newReserva = repository.save(reserva);
         return toDTO(newReserva);
     }
 
-    private ReservaDTO toDTO(Reserva newReserva) {
+    private ReservaDTO toDTO(Reserva reserva) {
         return ReservaDTO.builder()
-                .id(newReserva.getId())
-                .idInstalacion(newReserva.getInstalacion().getId())
-                .fechaHoraInicio(newReserva.getFechaHoraInicio())
-                .fechaHoraFin(newReserva.getFechaHoraFin())
-                .estadoReserva(newReserva.getEstadoReserva())
+                .id(reserva.getId())
+                .idMiembro(reserva.getMiembro().getId())
+                .miembro(reserva.getMiembro().getNombre() + " " +
+                        reserva.getMiembro().getApellidoPaterno() + " " +
+                        reserva.getMiembro().getApellidoMaterno())
+                .idInstalacion(reserva.getInstalacion().getId())
+                .instalacion(reserva.getInstalacion().getNombre())
+                .fechaHoraInicio(reserva.getFechaHoraInicio())
+                .fechaHoraFin(reserva.getFechaHoraFin())
+                .estadoReserva(reserva.getEstadoReserva())
                 .build();
     }
 
@@ -157,7 +183,7 @@ public class ReservaServiceImpl implements ReservaService {
             tipoAccion = "UPDATE",
             tabla = "reserva",
             entidadId = "#id",
-            descripcion = "'Confirmación de reserva'"
+            descripcion = "'Confirmación de reserva ' + #id"
     )
     @Transactional
     @Override
@@ -189,7 +215,7 @@ public class ReservaServiceImpl implements ReservaService {
             tipoAccion = "UPDATE",
             tabla = "reserva",
             entidadId = "#id",
-            descripcion = "'Cancelación de reserva'"
+            descripcion = "'Cancelación de reserva ' + #id"
     )
     @Override
     public void cancelarReserva(Integer id) {

@@ -21,8 +21,12 @@ public class ReservaDTO {
     @NotNull(message = "El id del miembro no puede estar vacío" )
     private Integer idMiembro;
 
+    private String miembro;
+
     @NotNull(message = "El id de la instalación no puede estar vacío")
     private Integer idInstalacion;
+
+    private String instalacion;
 
     @NotNull
     private LocalDateTime fechaHoraInicio;

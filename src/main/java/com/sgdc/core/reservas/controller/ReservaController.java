@@ -160,7 +160,7 @@ public class ReservaController {
         }
 
         try {
-            log.info("Membresía a guardar: {}", reservaDTO);
+            log.info("Reserva a guardar: {}", reservaDTO);
             reservaService.save(reservaDTO);
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
