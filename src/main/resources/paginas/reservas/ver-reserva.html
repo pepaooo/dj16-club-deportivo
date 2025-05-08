@@ -76,7 +76,7 @@
             </div>
             <div th:if="${reserva.estadoReserva != 'Cancelada'}" style="display:inline-block">
                 <a class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelarReservaModal">
-                    <i class="bi bi-trash"></i> Eliminar Reserva
+                    <i class="bi bi-trash"></i> Cancelar Reserva
                 </a>
             </div>
         </div>
@@ -153,23 +153,23 @@
         <div class="modal-content" style="border-radius: 1rem">
             <div class="modal-header" style="background-color: #f8d7da; border-bottom: none; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
                 <h5 class="modal-title" id="cancelarReservaModalLabel" style="color: #842029">
-                    <i class="bi bi-exclamation-circle-fill"></i> Eliminar Reserva
+                    <i class="bi bi-exclamation-circle-fill"></i> Cancelar Reserva
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body" style="font-size: 1.1rem">
                 <p class="text-left mb-0">
-                    ¿Está seguro de que desea eliminar esta reserva?
+                    ¿Está seguro de que desea cancelar esta reserva?
                 </p>
             </div>
             <div class="modal-footer" style="border-top: none; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle"></i> Cancelar
+                    <i class="bi bi-x-circle"></i> No
                 </button>
                 <form th:action="@{'/reservas/cancelar?id=' + ${reserva.id}}" method="post">
                     <!-- Incluir token CSRF si es necesario -->
                     <button type="submit" class="btn btn-outline-danger">
-                        <i class="bi bi-trash"></i> Eliminar
+                        <i class="bi bi-trash"></i> Sí, Cancelar
                     </button>
                 </form>
             </div>
