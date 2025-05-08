@@ -36,7 +36,7 @@ public class PagoAjusteServiceImpl implements PagoAjusteService {
             tipoAccion = "CREATE",
             tabla = "pago_ajuste",
             entidadId = "#result.id",
-            descripcion = "'Creación de ajuste al pago de membresía '+#result.pagoMembresia.id + ' con monto de '+#result.montoAjuste + '. Razón: '+#result.descripcion"
+            descripcion = "'Creación de ajuste al pago '+#result.pagoMembresia.id + ' de membresía con monto de '+#result.montoAjuste + '. Razón: '+#result.descripcion"
     )
     @Override
     public PagoAjuste save(PagoAjuste pagoAjuste) {

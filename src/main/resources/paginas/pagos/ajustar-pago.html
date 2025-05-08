@@ -23,7 +23,7 @@
             </div>
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <form th:action="@{/pagos/ajustar-pago}" th:object="${ajuste}" method="post">
+                    <form id="pagoForm" th:action="@{/pagos/ajustar-pago}" th:object="${ajuste}" method="post">
                         <!-- Campo oculto para el ID del pago -->
                         <!--                        <input type="hidden" th:field="*{pagoMembresia}" />-->
                         <!--                        <input type="hidden" th:field="*{pagoMembresia.id}" />-->
@@ -83,7 +83,7 @@
                             <div class="input-group mb-3">
                                 <span class="input-group-text">$</span>
                                 <input type="number" step="0.01" class="form-control" id="montoAjuste"
-                                       th:field="*{montoAjuste}" placeholder="Ingrese el monto de ajuste" required/>
+                                       th:field="*{montoAjuste}" placeholder="Ingrese el monto de ajuste. Para devolución colocar el valor con el signo menos (-)" required/>
                             </div>
                             <div class="text-danger" th:if="${#fields.hasErrors('montoAjuste')}"
                                  th:errors="*{montoAjuste}"></div>
@@ -96,11 +96,13 @@
                             <div class="text-danger" th:if="${#fields.hasErrors('descripcion')}"
                                  th:errors="*{descripcion}"></div>
                         </div>
+
+                        <!-- Botones -->
                         <div class="d-flex justify-content-end">
                             <a th:href="@{/pagos}" class="btn btn-secondary me-2">
                                 <i class="bi bi-arrow-left-circle"></i> Cancelar
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button id="btnAbrirModal" type="button" class="btn btn-primary">
                                 <i class="bi bi-check-circle"></i> Confirmar Ajuste
                             </button>
                         </div>
@@ -111,6 +113,55 @@
     </div>
 </div>
 
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="confirmPagoModal" tabindex="-1"
+     aria-labelledby="confirmPagoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-3 shadow">
+            <div class="modal-header bg-primary text-white border-0 rounded-top">
+                <h5 class="modal-title" id="confirmPagoLabel">
+                    <i class="bi bi-credit-card-2-front-fill me-2"></i> Confirmar Ajuste en Pago
+                </h5>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="fs-6">
+                    ¿Seguro que deseas registrar el ajuste?
+                </p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <!-- Este botón dispara el submit del form sin código extra -->
+                <button type="submit" form="pagoForm" class="btn btn-primary">
+                    <i class="bi bi-check-circle-fill"></i> Sí, registrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <footer th:replace="~{plantillas/plantilla :: footer}"></footer>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    document.getElementById('btnAbrirModal').addEventListener('click', function() {
+        var form = document.getElementById('pagoForm');
+        // checkValidity(): true si pasa todas las validaciones HTML5
+        if (form.checkValidity()) {
+            // abrir modal manualmente
+            new bootstrap.Modal(document.getElementById('confirmPagoModal')).show();
+        } else {
+            // mostrar mensajes de validación nativa
+            form.reportValidity();
+        }
+    });
+    /*]]>*/
+</script>
+
 </body>
 </html>

@@ -157,7 +157,7 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
             tipoAccion = "CREATE",
             tabla = "pago_membresia",
             entidadId = "#result.id",
-            descripcion = "'Creación de pago de membresía '+#result.membresiaId + ' con monto de '+#result.monto + ' del miembro '+#result.idMiembro"
+            descripcion = "'Creación de pago ' + #result.id + ' de membresía ('+#result.membresiaId + ') ' + #result.membresia + ' con monto de '+#result.monto + ' del miembro '+#result.miembro"
     )
     @Transactional
     @Override
@@ -247,7 +247,9 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         return PagoMembresiaDTO.builder()
                 .id(nuevo.getId())
                 .idMiembro(nuevo.getMiembro().getId())
+                .miembro(nuevo.getMiembro().getNombre() + " " + nuevo.getMiembro().getApellidoPaterno() + " " + nuevo.getMiembro().getApellidoMaterno())
                 .membresiaId(nuevo.getMembresia().getId())
+                .membresia(nuevo.getMembresia().getNombre())
                 .monto(nuevo.getMonto())
                 .fechaInicio(nuevo.getFechaInicio())
                 .build();
@@ -257,7 +259,7 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
             tipoAccion = "UPDATE",
             tabla = "pago_membresia",
             entidadId = "#idPago",
-            descripcion = "'Cancelación de pago. Razón:  '+#motivo"
+            descripcion = "'Cancelación de pago ' + #idPago + '. Razón:  '+#motivo"
     )
     @Override
     @Transactional

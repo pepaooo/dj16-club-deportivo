@@ -142,8 +142,7 @@
                             <a th:href="@{/pagos}" class="btn btn-secondary me-2">
                                 <i class="bi bi-arrow-left-circle"></i> Cancelar
                             </a>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#confirmPagoModal">
+                            <button id="btnAbrirModal" type="button" class="btn btn-primary">
                                 <i class="bi bi-check-circle"></i> Registrar Pago
                             </button>
                         </div>
@@ -323,6 +322,18 @@
             });
             // Inyectarlo en el <strong id="modalMonto">
             $('#modalMonto').text(texto);
+        });
+
+        // Botón “Registrar Pago” validará antes de abrir el modal
+        $('#btnAbrirModal').on('click', function() {
+            var form = document.getElementById('pagoForm');
+            if (form.checkValidity()) {
+                // Si todo ok, muestra el modal
+                new bootstrap.Modal(document.getElementById('confirmPagoModal')).show();
+            } else {
+                // Si hay campos invalidos, muestra mensajes nativos
+                form.reportValidity();
+            }
         });
 
     });
