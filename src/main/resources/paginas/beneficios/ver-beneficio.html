@@ -34,14 +34,32 @@
                         <strong>Nombre:</strong>
                         <span th:text="${beneficio.nombre}">Descuento Tienda</span>
                     </p>
-                </div>
-                <!-- Segunda Columna -->
-                <div class="col-md-6">
                     <p>
                         <strong>Descripción:</strong>
                         <span th:text="${beneficio.descripcion}"
                         >5% de descuento en productos de la tienda.</span
                         >
+                    </p>
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>Creado por:</strong>
+                        <span th:text="${beneficio.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(beneficio.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${beneficio.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${beneficio.fechaModificacion != null
+                              ? #temporals.format(beneficio.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
                     </p>
                 </div>
             </div>

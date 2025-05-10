@@ -1,5 +1,6 @@
 package com.sgdc.core.membresia.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Table(name = "beneficio")
 @Data
 @ToString
-public class Beneficio {
+public class Beneficio extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_beneficio", nullable = false)
