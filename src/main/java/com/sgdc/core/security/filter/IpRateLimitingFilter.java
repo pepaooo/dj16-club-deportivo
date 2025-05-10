@@ -27,7 +27,7 @@ public class IpRateLimitingFilter extends OncePerRequestFilter {
 
     private Bucket newBucket(String ip) {
         // 5 tokens cada minuto, refill 5 en 1 minuto
-        Bandwidth limit = Bandwidth.classic(7, Refill.greedy(5, Duration.ofMinutes(1)));
+        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)));
         return Bucket.builder()
                 .addLimit(limit)
                 .build();
