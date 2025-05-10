@@ -36,14 +36,6 @@ public class MiembroApiController {
         return miembroService.searchActive(term);
     }
 
-//    @GetMapping("detail")
-//    @ResponseBody
-//    public MiembroDetalleDTO getMiembroDetalle(@RequestParam("id") Integer id) {
-//        ModelMapper customMapper = new ModelMapper();
-//        Miembro miembro = miembroService.findById(id);
-//        return customMapper.map(miembro, MiembroDetalleDTO.class);
-//    }
-
     private MiembroDTO convertToDto(Miembro miembro) {
         return modelMapper.map(miembro, MiembroDTO.class);
     }

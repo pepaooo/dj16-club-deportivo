@@ -17,14 +17,10 @@ public interface MiembroRepository extends JpaRepository<Miembro, Integer>, JpaS
     @Query("""
             SELECT DISTINCT m
               FROM Miembro m
-              JOIN PagoMembresia p
-                ON p.miembro.id = m.id
              WHERE (:idMembresia IS NULL
-                    OR p.membresia.id = :idMembresia)
-               AND p.fechaInicio <= CURRENT_DATE
-               AND p.fechaFin    >= CURRENT_DATE
-               AND (:fechaInicio IS NULL OR m.fechaInscripcion >= :fechaInicio)
-               AND (:fechaFin    IS NULL OR m.fechaInscripcion <= :fechaFin)
+                    OR m.id = :idMembresia)
+               AND (:fechaInicio IS NULL OR m.fechaCreacion >= :fechaInicio)
+               AND (:fechaFin    IS NULL OR m.fechaCreacion <= :fechaFin)
              ORDER BY m.id DESC
             """)
     List<Miembro> findByFilters(

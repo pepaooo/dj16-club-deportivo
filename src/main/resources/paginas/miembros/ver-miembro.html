@@ -46,28 +46,43 @@
                         <strong>Género:</strong>
                         <span th:text="${miembro.genero.label}"></span>
                     </p>
-                </div>
-                <!-- Segunda Columna -->
-                <div class="col-md-6">
                     <p>
                         <strong>Correo electrónico:</strong>
                         <span th:text="${miembro.correoElectronico}"></span>
                     </p>
+
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
                     <p>
                         <strong>Teléfono:</strong>
                         <span th:text="${miembro.telefono}"></span>
-                    </p>
-                    <p>
-                        <strong>Fecha de nacimiento:</strong>
-                        <span th:text="${miembro.fechaNacimiento}"></span>
                     </p>
                     <p>
                         <strong>Dirección:</strong>
                         <span th:text="${miembro.direccion}"></span>
                     </p>
                     <p>
-                        <strong>Fecha inscripción:</strong>
-                        <span th:text="${#temporals.format(miembro.fechaInscripcion, 'yyyy-MM-dd HH:mm')}"></span>
+                        <strong>Fecha de nacimiento:</strong>
+                        <span th:text="${miembro.fechaNacimiento}"></span>
+                    </p>
+                    <p>
+                        <strong>Creado por:</strong>
+                        <span th:text="${miembro.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(miembro.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${miembro.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${miembro.fechaModificacion != null
+                              ? #temporals.format(miembro.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
                     </p>
                 </div>
             </div>

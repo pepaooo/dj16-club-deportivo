@@ -2,10 +2,8 @@ package com.sgdc.core.miembro.controller;
 
 import com.sgdc.core.membresia.domain.Beneficio;
 import com.sgdc.core.membresia.domain.HistorialMembresia;
-import com.sgdc.core.membresia.domain.Membresia;
 import com.sgdc.core.membresia.service.BeneficioService;
 import com.sgdc.core.membresia.service.HistorialMembresiaService;
-import com.sgdc.core.membresia.service.MembresiaService;
 import com.sgdc.core.miembro.domain.Genero;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.miembro.service.MiembroService;
@@ -25,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,7 +98,6 @@ public class MiembroController {
         }
 
         try {
-            miembro.setFechaInscripcion(LocalDateTime.now());
             log.info("Miembro a guardar: {}", miembro);
             miembroService.save(miembro);
         } catch (DataIntegrityViolationException e) {

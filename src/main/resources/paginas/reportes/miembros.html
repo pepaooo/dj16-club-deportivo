@@ -54,7 +54,7 @@
                 <th>Nombre</th>
 <!--                <th>Tipo de Membresía</th>-->
                 <th>Correo</th>
-                <th>Fecha de Inscripción</th>
+                <th>Fecha de creación</th>
 <!--                <th>Estatus</th>-->
             </tr>
             </thead>
@@ -65,7 +65,7 @@
                 <td th:text="${miembro.nombre + ' ' + miembro.apellidoPaterno + ' ' + miembro.apellidoMaterno}"></td>
                 <td th:text="${miembro.correoElectronico}"></td>
 <!--                <td th:text="${miembro.membresia.nombre}"></td>-->
-                <td th:text="${#temporals.format(miembro.fechaInscripcion, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${#temporals.format(miembro.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
 <!--                <td th:text="${miembro.estatus}"></td>-->
             </tr>
             <!-- Si no existen resultados, se muestra un mensaje informativo -->

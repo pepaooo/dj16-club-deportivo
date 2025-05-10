@@ -1,6 +1,6 @@
 package com.sgdc.core.miembro.domain;
 
-import com.sgdc.core.membresia.domain.Membresia;
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "miembro")
@@ -18,7 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Miembro {
+public class Miembro extends AuditableBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,9 +67,5 @@ public class Miembro {
     @Column(name = "genero", nullable = false, length = 1)
     @Enumerated(EnumType.STRING)
     private Genero genero;
-
-    //@NotBlank(message = "La fecha de inscripción del miembro no puede estar vacía")
-    @Column(name = "fecha_inscripcion", nullable = false)
-    private LocalDateTime fechaInscripcion;
 
 }

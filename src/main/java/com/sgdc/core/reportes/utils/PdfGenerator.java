@@ -33,7 +33,7 @@ public class PdfGenerator {
         // 1. Definir encabezados y anchos
         List<String> headers = List.of(
                 "ID Miembro", "Nombre Completo", "Correo Electrónico",
-                "Fecha Inscripción"
+                "Fecha de Creación"
         );
         float[] widths = {50f, 150f, 100f, 100f};
 
@@ -43,8 +43,8 @@ public class PdfGenerator {
                 String.valueOf(m.getId()),
                 m.getNombre() + " " + m.getApellidoPaterno() + " " + m.getApellidoMaterno(),
                 m.getCorreoElectronico() != null ? m.getCorreoElectronico() : "",
-                m.getFechaInscripcion() != null
-                        ? m.getFechaInscripcion().format(formatter) : ""
+                m.getFechaCreacion() != null
+                        ? m.getFechaCreacion().format(formatter) : ""
         )).toList();
 
         // 3. Llamar al metodo genérico
