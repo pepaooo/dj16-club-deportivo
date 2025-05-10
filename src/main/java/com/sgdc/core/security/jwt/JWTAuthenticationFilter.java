@@ -56,7 +56,8 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 // 1) Recuperar UserDetails completo
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 CredentialsDTO credentials = CredentialsDTO.builder()
-                        .sub(tokenProvider.getSubject(jwt)).aud(tokenProvider.getAudience(jwt))
+                        .sub(tokenProvider.getSubject(jwt))
+                        .aud(tokenProvider.getAudience(jwt))
                         .exp(tokenProvider.getTokenExpiryFromJWT(jwt).getTime())
                         .iat(tokenProvider.getTokenIatFromJWT(jwt).getTime())
                         .build();

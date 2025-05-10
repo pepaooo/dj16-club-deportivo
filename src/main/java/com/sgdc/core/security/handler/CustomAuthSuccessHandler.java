@@ -39,8 +39,8 @@ public class CustomAuthSuccessHandler
                                         Authentication authentication)
             throws ServletException, IOException {
         // Lógica adicional (reset de contador de fallos)
-        UsuarioDTO usuarioDTO = loginAttemptService.loginSucceeded(authentication.getName());
         log.info("Login success for user {}", authentication.getName());
+        UsuarioDTO usuarioDTO = loginAttemptService.loginSucceeded(authentication.getName());
 
         // Generar el token JWT
         String jwtToken = jwtTokenProvider.generateJwtToken(authentication, usuarioDTO);

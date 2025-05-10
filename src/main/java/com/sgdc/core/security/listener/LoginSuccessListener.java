@@ -49,8 +49,6 @@ public class LoginSuccessListener
             usuarioRepo.save(usuario);
             log.info("Login success. {}", up.getUsuario());
         }
-
-
     }
 
     private String extractClientIp() {
