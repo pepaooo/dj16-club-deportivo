@@ -1,7 +1,7 @@
-package com.sgdc.core.auditoria.service;
+package com.sgdc.core.actividades.service;
 
 
-import com.sgdc.core.auditoria.model.Actividad;
+import com.sgdc.core.actividades.model.Actividad;
 
 import java.util.List;
 

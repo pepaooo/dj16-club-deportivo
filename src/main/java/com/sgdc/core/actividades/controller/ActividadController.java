@@ -1,7 +1,7 @@
-package com.sgdc.core.auditoria.controller;
+package com.sgdc.core.actividades.controller;
 
-import com.sgdc.core.auditoria.model.Actividad;
-import com.sgdc.core.auditoria.service.ActividadService;
+import com.sgdc.core.actividades.model.Actividad;
+import com.sgdc.core.actividades.service.ActividadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;

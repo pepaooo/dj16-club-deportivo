@@ -1,7 +1,7 @@
-package com.sgdc.core.auditoria.service;
+package com.sgdc.core.actividades.service;
 
-import com.sgdc.core.auditoria.model.Actividad;
-import com.sgdc.core.auditoria.repository.ActividadRepository;
+import com.sgdc.core.actividades.model.Actividad;
+import com.sgdc.core.actividades.repository.ActividadRepository;
 import com.sgdc.core.reservas.domain.Reserva;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.EntityNotFoundException;

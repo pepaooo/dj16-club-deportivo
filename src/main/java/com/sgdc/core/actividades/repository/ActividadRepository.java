@@ -1,7 +1,6 @@
-package com.sgdc.core.auditoria.repository;
+package com.sgdc.core.actividades.repository;
 
-import com.sgdc.core.auditoria.model.Actividad;
-import com.sgdc.core.usuarios.domain.Usuario;
+import com.sgdc.core.actividades.model.Actividad;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
