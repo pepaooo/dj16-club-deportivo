@@ -38,19 +38,38 @@
                         <strong>Descripción:</strong>
                         <span th:text="${membresia.descripcion}"></span>
                     </p>
-                </div>
-                <!-- Segunda Columna -->
-                <div class="col-md-6">
+                    <p>
+                        <strong>Estatus:</strong>
+                        <span th:text="${membresia.estatus}"></span>
+                    </p>
                     <p>
                         <strong>Tarifa:</strong> $<span th:text="${membresia.tarifa}"></span>
                     </p>
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
+
                     <p>
                         <strong>Duración (días):</strong>
                         <span th:text="${membresia.duracionDias}"></span>
                     </p>
                     <p>
-                        <strong>Estatus:</strong>
-                        <span th:text="${membresia.estatus}"></span>
+                        <strong>Creado por:</strong>
+                        <span th:text="${membresia.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(membresia.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${membresia.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${membresia.fechaModificacion != null
+                              ? #temporals.format(membresia.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
                     </p>
                 </div>
             </div>

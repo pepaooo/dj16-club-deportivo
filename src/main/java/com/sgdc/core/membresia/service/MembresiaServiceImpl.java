@@ -193,6 +193,11 @@ public class MembresiaServiceImpl implements MembresiaService {
         Set<Integer> instalacionesIds = m.getInstalaciones().stream()
                 .map(Instalacion::getId).collect(Collectors.toSet());
         dto.setInstalacionesIds(instalacionesIds);
+        // Asignar datos de auditoría
+        dto.setCreadoPor(m.getCreadoPor());
+        dto.setModificadoPor(m.getModificadoPor());
+        dto.setFechaCreacion(m.getFechaCreacion());
+        dto.setFechaModificacion(m.getFechaModificacion());
         return dto;
     }
 

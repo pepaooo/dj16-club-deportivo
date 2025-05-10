@@ -1,5 +1,6 @@
 package com.sgdc.core.membresia.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import com.sgdc.core.reservas.domain.Instalacion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -28,7 +29,7 @@ import java.util.Set;
 })
 @Data
 @ToString
-public class Membresia {
+public class Membresia extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_membresia", nullable = false)

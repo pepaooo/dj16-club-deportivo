@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,11 @@ public class MembresiaDTO {
     /** Para detalle: lista de objetos con nombre+descripción */
     private List<BeneficioInfo> beneficios = new ArrayList<>();
     private List<InstalacionInfo> instalaciones = new ArrayList<>();
+
+    private String creadoPor;
+    private String modificadoPor;
+    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaModificacion;
 
 }
 
