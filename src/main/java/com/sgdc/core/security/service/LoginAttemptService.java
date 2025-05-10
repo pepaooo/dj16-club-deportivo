@@ -1,10 +1,14 @@
 package com.sgdc.core.security.service;
 
+import com.sgdc.core.usuarios.domain.Usuario;
+import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import com.sgdc.core.usuarios.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 public class LoginAttemptService {
@@ -23,12 +27,24 @@ public class LoginAttemptService {
     }
 
     @Transactional
-    public void loginSucceeded(String username) {
-        usuarioRepo.findByNombre(username).ifPresent(u -> {
-            u.resetFailedAttempts();
-            u.setLockTime(null);
-            usuarioRepo.save(u);
-        });
+    public UsuarioDTO loginSucceeded(String username) {
+//        usuarioRepo.findByNombre(username).ifPresent(u -> {
+//            u.resetFailedAttempts();
+//            u.setLockTime(null);
+//            usuarioRepo.save(u);
+//            log.info("El usuario {} ha iniciado sesión correctamente.", username);
+//        });
+        Usuario usuario = usuarioRepo.findByNombre(username).orElseThrow(
+                () -> new IllegalArgumentException("Usuario no encontrado: " + username)
+        );
+        usuario.resetFailedAttempts();
+        usuario.setLockTime(null);
+        usuarioRepo.save(usuario);
+        log.info("El usuario {} ha iniciado sesión correctamente.", username);
+        return UsuarioDTO.builder()
+                .id(usuario.getId())
+                .nombre(usuario.getNombre())
+                .build();
     }
 
     @Transactional

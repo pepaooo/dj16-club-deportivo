@@ -25,17 +25,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        log.info("Cargando usuario por nombre: {}", username);
         Usuario u = usuarioRepository.findByNombre(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el nombre: " + username));
-
         // Si está bloqueado pero expiró el tiempo, lo desbloqueamos
         loginAttemptService.unlockIfNeeded(username);
-
-        // Releer tras posible desbloqueo
-//        if (loginAttemptService.isLocked(username)) {
-//            throw new LockedException("Cuenta bloqueada temporalmente");
-//        }
-
         return UserPrincipal.build(u);
     }
 }
