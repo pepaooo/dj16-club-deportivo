@@ -3,6 +3,7 @@ package com.sgdc.core.security.model;
 import com.sgdc.core.security.service.LoginAttemptService;
 import com.sgdc.core.usuarios.domain.Usuario;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserPrincipal implements UserDetails {
+
+    @Value("${login.attempts.lockDurationMin:5}")
+    private long LOCK_DURATION_MIN;
+
     @Getter
     private final Usuario usuario;
     private final Collection<? extends GrantedAuthority> authorities;
@@ -102,7 +107,7 @@ public class UserPrincipal implements UserDetails {
         // si no hay lockTime → está desbloqueado
         if (usuario.getLockTime() == null) return true;
         // si ya expiró el lock → también
-        if (usuario.isLockTimeExpired(LoginAttemptService.LOCK_DURATION_MIN)) {
+        if (usuario.isLockTimeExpired(LOCK_DURATION_MIN)) {
             return true;
         }
         // caso contrario → bloqueado

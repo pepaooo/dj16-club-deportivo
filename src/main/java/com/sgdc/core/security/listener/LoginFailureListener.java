@@ -32,11 +32,10 @@ public class LoginFailureListener
         Object principal = event.getAuthentication().getPrincipal();
 
         // TODO Pseudocódigo
-//        if (yaGrabéUnFallo(username, last30Min)) {
+//        if (yaGuardeUnFallo(username, last30Min)) {
 //            return; // omito duplicados
 //        }
 //        grabarActividad();
-
 
         if (principal instanceof UserPrincipal up) {
             // TODO Este código no es funcional

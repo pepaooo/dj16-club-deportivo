@@ -5,20 +5,23 @@ import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import com.sgdc.core.usuarios.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class LoginAttemptService {
 
     private static final Logger log = LoggerFactory.getLogger(LoginAttemptService.class);
 
-    // TODO : Cambiar a propiedades (application.properties)
-    static final int MAX_FAILED_ATTEMPTS = 5; // 5 intentos
-    static final int CAPTCHA_THRESHOLD   = 3; // 3 intentos
-    public static final long LOCK_DURATION_MIN = 5; // 5 minutos
+    @Value("${login.attempts.maxAttempts:5}")
+    private int MAX_FAILED_ATTEMPTS;
+
+    @Value("${login.attempts.captchaThreshold:3}")
+    private int CAPTCHA_THRESHOLD;
+
+    @Value("${login.attempts.lockDurationMin:5}")
+    private long LOCK_DURATION_MIN;
 
     private final UsuarioRepository usuarioRepo;
 

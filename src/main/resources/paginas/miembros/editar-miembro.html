@@ -22,9 +22,6 @@
                     <form th:action="@{/miembros/change-miembro}" th:object="${miembro}" method="post">
                         <!-- Campo oculto para el ID -->
                         <input type="hidden" th:field="*{id}" />
-                        <!-- Campo oculto para propiedades que no están en el formulario. fechaCreacion -->
-                        <!-- TODO. Revisar. Cuando se modifica la información, en la base de datos se eliminan los segundos de este campo -->
-<!--                        <input type="hidden" th:field="*{fechaCreacion}" />-->
 
                         <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
                             Verifique los siguientes inconvenientes

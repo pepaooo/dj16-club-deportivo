@@ -328,7 +328,6 @@
         $('#btnAbrirModal').on('click', function() {
             var form = document.getElementById('pagoForm');
             if (form.checkValidity()) {
-                // Si todo ok, muestra el modal
                 new bootstrap.Modal(document.getElementById('confirmPagoModal')).show();
             } else {
                 // Si hay campos invalidos, muestra mensajes nativos
