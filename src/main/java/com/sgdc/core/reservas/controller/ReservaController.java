@@ -106,11 +106,8 @@ public class ReservaController {
         }
 
         try {
-            log.info("Guardando Reserva: {}", reservaDTO);
+            // Guardar la reserva
             reservaDTO.setEstadoReserva(EstadoReserva.PENDIENTE.getLabel());
-            // TODO. Ajustar con el usuario de la sesión.
-            reservaDTO.setRegistradoPor(UsuarioDTO.builder().id(1).build());
-            log.info("Reserva a guardar: {}", reservaDTO);
             reservaService.save(reservaDTO);
         } catch (ReservaInvalidaException e) {
             String message = e.getMessage();

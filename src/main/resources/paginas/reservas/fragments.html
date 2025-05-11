@@ -16,9 +16,6 @@
                         </a>
                     </p>
                     <p><strong>Instalación:</strong> <span th:text="${reserva.instalacion.nombre}"></span></p>
-                    <p><strong>Registrado por:</strong> <span th:text="${reserva.registradoPor.nombre}"></span></p>
-                </div>
-                <div class="col-md-6">
                     <p>
                         <strong>Inicio:</strong>
                         <span th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></span>
@@ -27,7 +24,27 @@
                         <strong>Fin:</strong>
                         <span th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}"></span>
                     </p>
-                    <p><strong>Estado:</strong> <span th:text="${reserva.estadoReserva}"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p>
+                        <strong>Creado por:</strong>
+                        <span th:text="${reserva.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(reserva.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${reserva.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${reserva.fechaModificacion != null
+                              ? #temporals.format(reserva.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
+                    </p>
+                    <p><strong>Estado de reserva:</strong> <span th:text="${reserva.estadoReserva}"></span></p>
                 </div>
             </div>
         </div>
@@ -45,7 +62,7 @@
             <form th:action="@{'/reservas/cancelar?id=' + ${reserva.id}}" method="post"
                   th:if="${reserva.estadoReserva!='Cancelada' and reserva.fechaHoraFin.isAfter(T(java.time.LocalDateTime).now())}" style="display:inline">
                 <button type="submit" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Eliminar Reserva
+                    <i class="bi bi-trash"></i> Cancelar Reserva
                 </button>
             </form>
         </div>

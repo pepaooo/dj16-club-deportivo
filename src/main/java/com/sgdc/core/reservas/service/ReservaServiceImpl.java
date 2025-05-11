@@ -122,6 +122,10 @@ public class ReservaServiceImpl implements ReservaService {
     @Transactional
     @Override
     public ReservaDTO save(ReservaDTO dto) {
+        // Establecemos el estado de la reserva a PENDIENTE
+//        dto.setEstadoReserva(EstadoReserva.PENDIENTE.getLabel());
+        log.info("Reserva a guardar: {}", dto);
+
         // 1. Convertir DTO a entidad
         Reserva reserva = modelMapper.map(dto, Reserva.class);
 

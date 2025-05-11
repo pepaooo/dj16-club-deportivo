@@ -1,18 +1,21 @@
 package com.sgdc.core.reservas.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import com.sgdc.core.miembro.domain.Miembro;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reserva")
 @Data
-public class Reserva {
+@EqualsAndHashCode(callSuper = true)
+public class Reserva extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reserva")
@@ -40,11 +43,6 @@ public class Reserva {
     @Pattern(regexp = "Pendiente|Confirmada|Cancelada")
     @Column(name = "estado_reserva", nullable = false, length = 20)
     private String estadoReserva;
-
-    //@NotNull
-    @ManyToOne
-    @JoinColumn(name = "registrado_por", nullable = false)
-    private Usuario registradoPor;
 
     public boolean isCancelada() {
         return estadoReserva != null && estadoReserva.equals("Cancelada");

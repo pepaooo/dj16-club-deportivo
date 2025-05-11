@@ -41,13 +41,6 @@
                         <span th:text="${reserva.instalacion.nombre}"></span>
                     </p>
                     <p>
-                        <strong>Registrado por:</strong>
-                        <span th:text="${reserva.registradoPor.nombre}"></span>
-                    </p>
-                </div>
-                <!-- Columna Derecha -->
-                <div class="col-md-6">
-                    <p>
                         <strong>Fecha y Hora Inicio:</strong>
                         <span
                                 th:text="${#temporals.format(reserva.fechaHoraInicio, 'yyyy-MM-dd HH:mm')}"></span>
@@ -57,8 +50,29 @@
                         <span
                                 th:text="${#temporals.format(reserva.fechaHoraFin, 'yyyy-MM-dd HH:mm')}"></span>
                     </p>
+                </div>
+                <!-- Columna Derecha -->
+                <div class="col-md-6">
                     <p>
-                        <strong>Estado:</strong>
+                        <strong>Creado por:</strong>
+                        <span th:text="${reserva.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(reserva.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${reserva.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${reserva.fechaModificacion != null
+                              ? #temporals.format(reserva.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Estado de reserva:</strong>
                         <span th:text="${reserva.estadoReserva}"></span>
                     </p>
                 </div>

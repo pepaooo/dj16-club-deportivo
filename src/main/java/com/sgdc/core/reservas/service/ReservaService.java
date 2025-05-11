@@ -16,6 +16,8 @@ public interface ReservaService {
 
     ReservaDTO save(ReservaDTO reserva);
 
+//    ReservaDTO update(ReservaDTO reserva);
+
     void confirmarReserva(Integer id);
 
     void cancelarReserva(Integer id);
