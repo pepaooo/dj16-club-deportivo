@@ -76,9 +76,8 @@ public class InstalacionController {
         }
 
         try {
-            instalacion.setEstado(EstadoInstalacion.DISPONIBLE.getLabel());
             log.info("Instalacion a guardar: {}", instalacion);
-            instalacionService.update(instalacion);
+            instalacionService.save(instalacion);
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.rejectValue("nombre", "nombre", "El nombre de la instalación ya existe. Por favor, use otro.");
@@ -109,7 +108,7 @@ public class InstalacionController {
 
         try {
             log.info("Membresía a guardar: {}", instalacion);
-            instalacionService.save(instalacion);
+            instalacionService.update(instalacion);
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.rejectValue("nombre", "nombre", "El nombre de la membresía ya existe. Por favor, use otro.");

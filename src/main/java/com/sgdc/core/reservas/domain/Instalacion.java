@@ -1,5 +1,6 @@
 package com.sgdc.core.reservas.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import com.sgdc.core.membresia.domain.Membresia;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -27,7 +28,8 @@ import java.util.Set;
 })
 @Data
 @ToString
-public class Instalacion {
+@EqualsAndHashCode(callSuper = true)
+public class Instalacion extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_instalacion", nullable = false)

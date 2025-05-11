@@ -43,7 +43,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         String jwt = extractToken(request, response, filterChain);
         if (jwt == null) return;
         try {
-            log.info("JWT token encontrado : {}", jwt);
+            //log.info("JWT token encontrado : {}", jwt);
             if (tokenProvider.validateJwtToken(jwt)) {
                 log.info("JWT token válido");
                 Claims body = tokenProvider.getClaims(jwt);

@@ -1,6 +1,7 @@
 package com.sgdc.core.reservas.service;
 
 import com.sgdc.core.auditoria.aop.Auditable;
+import com.sgdc.core.reservas.domain.EstadoInstalacion;
 import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.dto.InstalacionDTO;
 import com.sgdc.core.reservas.repository.InstalacionRepository;
@@ -76,6 +77,7 @@ public class InstalacionServiceImpl implements InstalacionService {
     )
     @Override
     public Instalacion save(Instalacion instalacion) {
+        instalacion.setEstado(EstadoInstalacion.DISPONIBLE.getLabel());
         log.info("Agregando nueva instalación: {}", instalacion);
         return repository.save(instalacion);
     }

@@ -34,9 +34,6 @@
                         <strong>Nombre:</strong>
                         <span th:text="${instalacion.nombre}">Cancha 1</span>
                     </p>
-                </div>
-                <!-- Segunda Columna -->
-                <div class="col-md-6">
                     <p>
                         <strong>Descripción:</strong>
                         <span th:text="${instalacion.descripcion}"
@@ -46,6 +43,27 @@
                     <p>
                         <strong>Estado:</strong>
                         <span th:text="${instalacion.estado}">Disponible</span>
+                    </p>
+                </div>
+                <!-- Segunda Columna -->
+                <div class="col-md-6">
+                    <p>
+                        <strong>Creado por:</strong>
+                        <span th:text="${instalacion.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(instalacion.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${instalacion.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${instalacion.fechaModificacion != null
+                              ? #temporals.format(instalacion.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
                     </p>
                 </div>
             </div>
