@@ -101,7 +101,7 @@
 <!--                </div>-->
 
                 <!-- Solo mostrar CAPTCHA tras X fallos -->
-                <div th:if="${param.captcha}">
+                <div th:if="${showCaptcha}">
                     <div class="g-recaptcha"
                          th:data-sitekey="${@environment.getProperty('recaptcha.siteKey')}">
                     </div>

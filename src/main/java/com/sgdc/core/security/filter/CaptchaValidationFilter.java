@@ -29,30 +29,33 @@ public class CaptchaValidationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest req) {
+        // Solo filtrar POST a /doLogin
+        return !("/doLogin".equals(req.getServletPath())
+                && "POST".equalsIgnoreCase(req.getMethod()));
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
                                     FilterChain chain)
             throws ServletException, IOException {
+        // Si no se requiere captcha, continuar
+        String username = req.getParameter("username");
+        if (loginAttemptService.isCaptchaRequired(username)) {
+            log.info("Captcha requerido para el usuario: {}", username);
 
-        if ("/doLogin".equals(req.getServletPath())
-                && "POST".equalsIgnoreCase(req.getMethod())) {
+            String token = req.getParameter("g-recaptcha-response");
 
-            String username = req.getParameter("username");
-            if (loginAttemptService.isCaptchaRequired(username)) {
-                log.info("Captcha requerido para el usuario: {}", username);
-
-                String token = req.getParameter("g-recaptcha-response");
-
-                // Falta token voy a login?captcha
-                if (token == null || token.isBlank()) {
-                    res.sendRedirect("/login?captcha");
-                    return;
-                }
-                // Token inválido voy a login?captchaError
-                if (!captchaService.verify(token)) {
-                    res.sendRedirect("/login?captchaError");
-                    return;
-                }
+            // Falta token voy a login?captcha
+            if (token == null || token.isBlank()) {
+                res.sendRedirect("/login?captcha");
+                return;
+            }
+            // Token inválido voy a login?captchaError
+            if (!captchaService.verify(token)) {
+                res.sendRedirect("/login?captchaError");
+                return;
             }
         }
         chain.doFilter(req, res);

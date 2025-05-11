@@ -42,6 +42,17 @@ public class CustomAuthFailureHandler
         } else if (exception instanceof LockedException) {
             redirectUrl = "/login?locked";
         }
+
+        boolean showCaptcha = false;
+        if (loginAttemptService.isCaptchaRequired(user)) {
+            log.info("Captcha requerido para el usuario: {}", user);
+            showCaptcha = true;
+        }
+        // Agregar captcha a la URL
+        if (showCaptcha) {
+            redirectUrl += "&captcha";
+        }
+
         // Redirigir una sola vez
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
