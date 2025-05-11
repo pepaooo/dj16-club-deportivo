@@ -1,16 +1,19 @@
 package com.sgdc.core.config.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @Entity
 @Table(name = "configuracion_sistema")
 @Data
 @ToString
-public class ConfiguracionSistema {
+@EqualsAndHashCode(callSuper = true)
+public class ConfiguracionSistema extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_config")
