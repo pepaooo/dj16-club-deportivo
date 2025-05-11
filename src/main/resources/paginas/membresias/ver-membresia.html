@@ -43,7 +43,7 @@
                         <span th:text="${membresia.estatus}"></span>
                     </p>
                     <p>
-                        <strong>Tarifa:</strong> $<span th:text="${membresia.tarifa}"></span>
+                        <strong>Tarifa:</strong> <span th:text="${#numbers.formatCurrency(membresia.tarifa)}"></span>
                     </p>
                 </div>
                 <!-- Segunda Columna -->

@@ -109,7 +109,7 @@ public class PdfGenerator {
                 (p.getMembresia() != null ? p.getMembresia() : ""),
                 p.getMontoOriginal().toString(),
                 p.getMontoReal().toString(),
-                p.getFechaPago() != null ? p.getFechaPago().format(fmtDateTime) : "",
+                p.getFechaCreacion() != null ? p.getFechaCreacion().format(fmtDateTime) : "",
                 p.getFechaInicio() != null
                         ? p.getFechaInicio().format(fmtDate) : "",
                 p.getFechaFin() != null ? p.getFechaFin().format(fmtDate) : "",

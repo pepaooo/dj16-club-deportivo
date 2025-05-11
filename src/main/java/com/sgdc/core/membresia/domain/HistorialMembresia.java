@@ -1,16 +1,18 @@
 package com.sgdc.core.membresia.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBaseCreate;
 import com.sgdc.core.miembro.domain.Miembro;
-import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "historial_membresia")
 @Data
-public class HistorialMembresia {
+@EqualsAndHashCode(callSuper = true)
+public class HistorialMembresia extends AuditableBaseCreate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_historial")
@@ -33,10 +35,5 @@ public class HistorialMembresia {
     //@NotNull
     @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
     private String descripcion;
-
-    //@NotNull
-    @ManyToOne
-    @JoinColumn(name = "registrado_por", nullable = false)
-    private Usuario registradoPor;
 
 }

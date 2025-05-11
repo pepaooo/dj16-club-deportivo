@@ -104,8 +104,6 @@ public class PagoMembresiaController {
         }
 
         try {
-            // TODO. Ajustar con el usuario de la sesión.
-            pagoDTO.setUsuarioDTO(UsuarioDTO.builder().id(1).build());
             pagoMembresiaService.save(pagoDTO);
         } catch (MembresiaInactivaException e) {
             bindingResult.reject("global.error", "Al momento de registrar el pago, la membresía está inactiva.");
@@ -157,9 +155,6 @@ public class PagoMembresiaController {
         }
 
         try {
-            ajuste.setFechaAjuste(LocalDateTime.now());
-            // TODO. Ajustar con el usuario de la sesión.
-            ajuste.setRegistradoPor(usuarioService.findById(1));
             pagoAjusteService.save(ajuste);
         } catch (DataIntegrityViolationException e) {
             String errorMessage = e.getMessage();

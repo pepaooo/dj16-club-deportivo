@@ -19,7 +19,7 @@ public class PagoReportDTO {
     private String membresia;
     private BigDecimal montoOriginal;
     private BigDecimal montoReal;
-    private LocalDateTime fechaPago;
+    private LocalDateTime fechaCreacion;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private boolean cancelado;

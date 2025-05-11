@@ -1,5 +1,6 @@
 package com.sgdc.core.pagos.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBaseCreate;
 import com.sgdc.core.usuarios.domain.Usuario;
 import com.sgdc.core.validation.NotZero;
 import jakarta.persistence.*;
@@ -16,7 +17,8 @@ import java.time.LocalDateTime;
 @Table(name = "pago_ajuste")
 @Data
 @ToString
-public class PagoAjuste {
+@EqualsAndHashCode(callSuper = true)
+public class PagoAjuste extends AuditableBaseCreate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pago_ajuste")
@@ -40,11 +42,6 @@ public class PagoAjuste {
     @NotNull
     @Column(name = "descripcion", nullable = false, columnDefinition = "TEXT")
     private String descripcion;
-
-    //@NotNull
-    @ManyToOne
-    @JoinColumn(name = "registrado_por", nullable = false)
-    private Usuario registradoPor;
 
 //    @AssertTrue(message = "El monto de ajuste debe ser distinto de 0")
 //    public boolean isMontoAjusteValido() {

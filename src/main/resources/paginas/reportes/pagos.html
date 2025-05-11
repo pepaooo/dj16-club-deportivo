@@ -84,7 +84,7 @@
                 <td th:text="${p.membresia}"></td>
                 <td th:text="${#numbers.formatCurrency(p.montoOriginal)}"></td>
                 <td th:text="${#numbers.formatCurrency(p.montoReal)}"></td>
-                <td th:text="${#temporals.format(p.fechaPago, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${#temporals.format(p.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
                 <td th:text="${#temporals.format(p.fechaInicio, 'dd/MM/yyyy')}"></td>
                 <td th:text="${#temporals.format(p.fechaFin, 'dd/MM/yyyy')}"></td>
                 <td th:text="${p.cancelado}? 'Sí' : 'No'"></td>

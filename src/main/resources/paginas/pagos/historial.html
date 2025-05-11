@@ -67,7 +67,7 @@
                 <td th:text="${pago.id}"></td>
                 <td th:text="${pago.membresia.nombre}"></td>
                 <td th:text="${#numbers.formatCurrency(pago.monto)}"></td>
-                <td th:text="${#temporals.format(pago.fechaPago, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${#temporals.format(pago.fechaCreacion, 'yyyy-MM-dd HH:mm')}"></td>
                 <td th:text="${#temporals.format(pago.fechaInicio, 'yyyy-MM-dd')}"></td>
                 <td th:text="${#temporals.format(pago.fechaFin, 'yyyy-MM-dd')}"></td>
                 <td th:text="${pago.estatus}"></td>

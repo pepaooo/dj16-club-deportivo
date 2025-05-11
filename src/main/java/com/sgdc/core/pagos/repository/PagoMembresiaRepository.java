@@ -190,8 +190,8 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
               SELECT p FROM PagoMembresia p
                WHERE (:idMiembro   IS NULL OR p.miembro.id = :idMiembro)
                  AND (:idMembresia IS NULL OR p.membresia.id = :idMembresia)
-                 AND (:fechaInicio IS NULL OR p.fechaPago    >= :fechaInicio)
-                 AND (:fechaFin    IS NULL OR p.fechaPago    <= :fechaFin)
+                 AND (:fechaInicio IS NULL OR p.fechaCreacion >= :fechaInicio)
+                 AND (:fechaFin    IS NULL OR p.fechaCreacion <= :fechaFin)
             """)
     List<PagoMembresia> findByFilters(
             @Param("idMiembro") Integer idMiembro,

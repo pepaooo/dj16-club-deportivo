@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,7 @@ public class PagoAjusteServiceImpl implements PagoAjusteService {
     @Override
     public PagoAjuste save(PagoAjuste pagoAjuste) {
         // Validamos que el estatus del pago sea "Activo" o "Pendiente"
+        pagoAjuste.setFechaAjuste(LocalDateTime.now());
         log.debug("save {}", pagoAjuste);
         if (!pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Activo")
                 && !pagoAjuste.getPagoMembresia().getEstatus().equalsIgnoreCase("Pendiente")) {

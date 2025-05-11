@@ -24,10 +24,6 @@
                         <strong>ID de pago:</strong>
                         <span th:text="${pago.id}"></span>
                     </p>
-<!--                    <p>-->
-<!--                        <strong>ID de miembro:</strong>-->
-<!--                        <span th:text="${pago.miembro.id}"></span>-->
-<!--                    </p>-->
                     <p>
                         <strong>Miembro:</strong>
                         <a th:href="@{'/miembros/get?id=' + ${pago.miembro.id}}">
@@ -35,24 +31,13 @@
                         </a>
                     </p>
                     <p>
+                        <strong>Monto:</strong> <span th:text="${#numbers.formatCurrency(pago.monto)}"></span>
+                    </p>
+                    <p>
                         <strong>Membresía:</strong>
                         <a th:href="@{'/membresias/get?id=' + ${pago.membresia.id}}">
                             <span th:text="${pago.membresia.nombre}"></span>
                         </a>
-                    </p>
-                    <p>
-                        <strong>Monto:</strong> $<span th:text="${pago.monto}"></span>
-                    </p>
-                    <p>
-                        <strong>Vigencia:</strong>
-                        <span th:text="${pago.estatus}"></span>
-                    </p>
-                </div>
-                <!-- Columna Derecha -->
-                <div class="col-md-6">
-                    <p>
-                        <strong>Fecha de pago:</strong>
-                        <span th:text="${#temporals.format(pago.fechaPago, 'yyyy-MM-dd HH:mm')}"></span>
                     </p>
                     <p>
                         <strong>Fecha de inicio:</strong>
@@ -62,9 +47,30 @@
                         <strong>Fecha fin:</strong>
                         <span th:text="${#temporals.format(pago.fechaFin, 'yyyy-MM-dd')}"></span>
                     </p>
+                </div>
+                <!-- Columna Derecha -->
+                <div class="col-md-6">
                     <p>
-                        <strong>Registrado por:</strong>
-                        <span th:text="${pago.registradoPor.nombre}"></span>
+                        <strong>Vigencia del pago:</strong>
+                        <span th:text="${pago.estatus}"></span>
+                    </p>
+                    <p>
+                        <strong>Creado por:</strong>
+                        <span th:text="${pago.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(pago.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${pago.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${pago.fechaModificacion != null
+                              ? #temporals.format(pago.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
                     </p>
                 </div>
             </div>
@@ -105,7 +111,7 @@
                         <th>ID</th>
                         <th>Monto Ajuste</th>
                         <th>Fecha Ajuste</th>
-                        <th>Registrado por</th>
+                        <th>Creado por</th>
                         <th>Descripción</th>
                     </tr>
                     </thead>
@@ -116,7 +122,7 @@
                         <td
                                 th:text="${#temporals.format(ajuste.fechaAjuste, 'yyyy-MM-dd HH:mm')}">
                         </td>
-                        <td th:text="${ajuste.registradoPor.nombre}">Usuario2</td>
+                        <td th:text="${ajuste.creadoPor}">Usuario2</td>
                         <td th:text="${ajuste.descripcion}">
                         </td>
                     </tr>

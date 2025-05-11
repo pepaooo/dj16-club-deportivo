@@ -98,14 +98,14 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
             Expression<String> montoExpr = cb.function("concat", String.class, root.get("monto"), cb.literal(""));
 
             // Para las fechas, podemos usar una función de formateo. Por ejemplo, en MariaDB se puede usar DATE_FORMAT.
-            Expression<String> fechaPagoExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaPago"), cb.literal("%Y-%m-%d"));
+            Expression<String> fechaCreacionExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaCreacion"), cb.literal("%Y-%m-%d"));
             Expression<String> fechaInicioExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaInicio"), cb.literal("%Y-%m-%d"));
             Expression<String> fechaFinExpr = cb.function("DATE_FORMAT", String.class, root.get("fechaFin"), cb.literal("%Y-%m-%d"));
 
             Predicate keywordPredicate = cb.or(
                     cb.like(nombreMembresiaExpr, pattern),
                     cb.like(cb.lower(montoExpr), pattern),
-                    cb.like(cb.lower(fechaPagoExpr), pattern),
+                    cb.like(cb.lower(fechaCreacionExpr), pattern),
                     cb.like(cb.lower(fechaInicioExpr), pattern),
                     cb.like(cb.lower(fechaFinExpr), pattern)
             );
@@ -277,10 +277,8 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
                 .miembro(ex.getMiembro())
                 .membresia(ex.getMembresia())
                 .monto(ex.getMonto())
-                .fechaPago(ex.getFechaPago())
                 .fechaInicio(ex.getFechaInicio())
                 .fechaFin(ex.getFechaFin())
-                .registradoPor(ex.getRegistradoPor())
                 .cancelado(ex.isCancelado())
                 .build();
     }
@@ -311,10 +309,8 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
                 .miembro(miembro)
                 .membresia(planNuevo)
                 .monto(dto.getMonto())
-                .fechaPago(LocalDateTime.now())
                 .fechaInicio(inicioNuevo)
                 .fechaFin(finNuevo)
-                .registradoPor(buildUsuario(dto))
                 .build();
         pagoMembresiaRepository.save(nuevo);
         // -------------------------------------------------------
@@ -326,7 +322,6 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         hist.setFechaCambio(LocalDateTime.now());
         hist.setDescripcion((primerPago ? "Primera suscripción a " : "Renovación a ")
                 + planNuevo.getNombre());
-        hist.setRegistradoPor(buildUsuario(dto));
         historialMembresiaService.save(hist);
 
         return nuevo;
@@ -348,7 +343,6 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
                     .map(PagoAjuste::getMontoAjuste)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             dto.setMontoReal(p.getMonto().add(sumaAjustes));
-            dto.setFechaPago(p.getFechaPago());
             dto.setFechaInicio(p.getFechaInicio());
             dto.setFechaFin(p.getFechaFin());
             dto.setCancelado(p.isCancelado());
@@ -371,7 +365,4 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
         return pagoMembresiaRepository.findByFilters(idMiembro, idMembresia, inicio, fin);
     }
 
-    private static Usuario buildUsuario(PagoMembresiaDTO dto) {
-        return Usuario.builder().id(dto.getUsuarioDTO().getId()).build();
-    }
 }
