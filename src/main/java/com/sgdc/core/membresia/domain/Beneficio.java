@@ -15,6 +15,7 @@ import java.util.Set;
 @Table(name = "beneficio")
 @Data
 @ToString
+@EqualsAndHashCode(callSuper = true)
 public class Beneficio extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

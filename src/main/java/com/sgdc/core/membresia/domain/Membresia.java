@@ -29,6 +29,7 @@ import java.util.Set;
 })
 @Data
 @ToString
+@EqualsAndHashCode(callSuper = true)
 public class Membresia extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
