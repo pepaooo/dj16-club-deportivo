@@ -1,5 +1,6 @@
 package com.sgdc.core.usuarios.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import com.sgdc.core.miembro.domain.Miembro;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +18,8 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {
+@EqualsAndHashCode(callSuper = true)
+public class Usuario extends AuditableBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +41,6 @@ public class Usuario {
     @Pattern(regexp = "Activo|Inactivo")
     @Column(name = "estatus", nullable = false, length = 20)
     private String estatus;
-
-    @NotNull
-    @Column(name = "fecha_creacion", nullable = false)
-    private LocalDateTime fechaCreacion;
 
     @Column(name = "ultimo_acceso")
     private LocalDateTime ultimoAcceso;

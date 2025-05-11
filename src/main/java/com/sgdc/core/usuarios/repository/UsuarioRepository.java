@@ -23,13 +23,16 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, JpaS
                 u.nombre,
                 null,
                 u.estatus,
-                u.fechaCreacion,
                 u.ultimoAcceso,
                 m.id,
                 COALESCE(CONCAT(m.nombre, ' ', m.apellidoPaterno, ' ', m.apellidoMaterno )) ,
                 m.correoElectronico,
                 null,
-                null
+                null,
+                u.creadoPor,
+                u.modificadoPor,
+                u.fechaCreacion,
+                u.fechaModificacion
               )
                FROM Usuario u
                 LEFT JOIN u.miembro m
@@ -43,13 +46,16 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer>, JpaS
                 u.nombre,
                 null,
                 u.estatus,
-                u.fechaCreacion,
                 u.ultimoAcceso,
                 m.id,
                 COALESCE(CONCAT(m.nombre, ' ', m.apellidoPaterno, ' ', m.apellidoMaterno )) ,
                 m.correoElectronico,
                 null,
-                null
+                null,
+                u.creadoPor,
+                u.modificadoPor,
+                u.fechaCreacion,
+                u.fechaModificacion
               )
                 FROM Usuario u
                 LEFT JOIN u.miembro m

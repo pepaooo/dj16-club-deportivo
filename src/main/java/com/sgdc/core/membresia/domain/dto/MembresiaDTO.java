@@ -48,6 +48,7 @@ public class MembresiaDTO {
     private List<BeneficioInfo> beneficios = new ArrayList<>();
     private List<InstalacionInfo> instalaciones = new ArrayList<>();
 
+    // Campos de auditoría
     private String creadoPor;
     private String modificadoPor;
     private LocalDateTime fechaCreacion;

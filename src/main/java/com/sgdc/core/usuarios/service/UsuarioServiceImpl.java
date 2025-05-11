@@ -55,16 +55,25 @@ public class UsuarioServiceImpl implements UsuarioService {
         // Obtenemos el DTO
         UsuarioDetalleDTO dto = repository.searchById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+
         // Obtenemos el detalle de los roles del usuario
         Usuario usuario = repository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
         Set<Integer> rolesIds = usuario.getRoles().stream()
                 .map(Rol::getId).collect(Collectors.toSet());
+
         // Asignar los IDs de los roles
         dto.setRolesIds(rolesIds);
         Set<RolInfo> roles = usuario.getRoles().stream()
                 .map(rol -> new RolInfo(rol.getNombre(), rol.getDescripcion())
                 ).collect(Collectors.toSet());
         dto.setRoles(roles);
+
+        // Campos de auditoría
+        dto.setFechaCreacion(usuario.getFechaCreacion());
+        dto.setCreadoPor(usuario.getCreadoPor());
+        dto.setFechaModificacion(usuario.getFechaModificacion());
+        dto.setModificadoPor(usuario.getModificadoPor());
+
         return dto;
     }
 

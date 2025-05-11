@@ -84,7 +84,6 @@ public class UsuarioController {
         }
 
         try {
-            usuario.setFechaCreacion(LocalDateTime.now());
             log.info("UsuarioDetalleDTO a guardar: {}", usuario);
             usuarioService.save(usuario);
         } catch (DataIntegrityViolationException e) {

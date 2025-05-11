@@ -33,7 +33,6 @@ public class UsuarioDetalleDTO {
     private String contrasena;
 
     private String estatus;
-    private LocalDateTime fechaCreacion;
     private LocalDateTime ultimoAcceso;
 
     private Integer idMiembro;
@@ -51,4 +50,11 @@ public class UsuarioDetalleDTO {
     @EqualsAndHashCode.Exclude  // <-- excluir de equals/hashCode
     @ToString.Exclude
     private Set<RolInfo> roles = new HashSet<>();
+
+    // Campos de auditoría
+    private String creadoPor;
+    private String modificadoPor;
+    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaModificacion;
+
 }
