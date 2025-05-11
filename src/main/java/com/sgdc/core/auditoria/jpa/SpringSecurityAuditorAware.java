@@ -17,6 +17,6 @@ public class SpringSecurityAuditorAware implements AuditorAware<String> {
                 && auth.getPrincipal() instanceof UserDetails ud) {
             return Optional.of(ud.getUsername());
         }
-        return Optional.empty();
+        return Optional.of("system");
     }
 }
