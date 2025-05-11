@@ -1,7 +1,7 @@
-package com.sgdc.core.config.controller;
+package com.sgdc.core.sistema.controller;
 
-import com.sgdc.core.config.service.NotificacionEnvioService;
-import com.sgdc.core.config.service.NotificacionService;
+import com.sgdc.core.sistema.service.NotificacionEnvioService;
+import com.sgdc.core.sistema.service.NotificacionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;

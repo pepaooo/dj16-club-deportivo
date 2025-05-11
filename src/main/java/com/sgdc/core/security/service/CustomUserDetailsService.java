@@ -5,6 +5,7 @@ import com.sgdc.core.usuarios.domain.Usuario;
 import com.sgdc.core.usuarios.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,8 +29,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("Cargando usuario por nombre: {}", username);
         Usuario u = usuarioRepository.findByNombre(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el nombre: " + username));
+
         // Si está bloqueado pero expiró el tiempo, lo desbloqueamos
         loginAttemptService.unlockIfNeeded(username);
-        return UserPrincipal.build(u);
+
+        return UserPrincipal.build(u, loginAttemptService);
     }
 }

@@ -1,6 +1,6 @@
-package com.sgdc.core.config.repository;
+package com.sgdc.core.sistema.repository;
 
-import com.sgdc.core.config.domain.ConfiguracionSistema;
+import com.sgdc.core.sistema.domain.ConfiguracionSistema;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

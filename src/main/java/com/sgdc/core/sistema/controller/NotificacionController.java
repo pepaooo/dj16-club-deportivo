@@ -1,9 +1,9 @@
-package com.sgdc.core.config.controller;
+package com.sgdc.core.sistema.controller;
 
-import com.sgdc.core.config.domain.Notificacion;
-import com.sgdc.core.config.domain.dto.NotificacionSearchDTO;
-import com.sgdc.core.config.service.NotificacionEnvioService;
-import com.sgdc.core.config.service.NotificacionService;
+import com.sgdc.core.sistema.domain.Notificacion;
+import com.sgdc.core.sistema.domain.dto.NotificacionSearchDTO;
+import com.sgdc.core.sistema.service.NotificacionEnvioService;
+import com.sgdc.core.sistema.service.NotificacionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;

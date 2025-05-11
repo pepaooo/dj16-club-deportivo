@@ -1,7 +1,7 @@
-package com.sgdc.core.config.repository;
+package com.sgdc.core.sistema.repository;
 
-import com.sgdc.core.config.domain.Notificacion;
-import com.sgdc.core.config.domain.dto.NotificacionSearchDTO;
+import com.sgdc.core.sistema.domain.Notificacion;
+import com.sgdc.core.sistema.domain.dto.NotificacionSearchDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

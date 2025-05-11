@@ -1,4 +1,4 @@
-package com.sgdc.core.config.domain;
+package com.sgdc.core.sistema.domain;
 
 import com.sgdc.core.auditoria.jpa.AuditableBase;
 import jakarta.persistence.*;

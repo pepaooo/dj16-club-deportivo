@@ -1,4 +1,4 @@
-package com.sgdc.core.config.service;
+package com.sgdc.core.sistema.service;
 
 public interface NotificacionEnvioService {
     void enviarNotificacionesPendientes();

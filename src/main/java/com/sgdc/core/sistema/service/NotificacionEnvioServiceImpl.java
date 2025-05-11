@@ -1,7 +1,7 @@
-package com.sgdc.core.config.service;
+package com.sgdc.core.sistema.service;
 
-import com.sgdc.core.config.domain.Notificacion;
-import com.sgdc.core.config.repository.NotificacionRepository;
+import com.sgdc.core.sistema.domain.Notificacion;
+import com.sgdc.core.sistema.repository.NotificacionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.sgdc.core.config.domain.dto;
+package com.sgdc.core.sistema.domain.dto;
 
 import lombok.Data;
 

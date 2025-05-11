@@ -1,4 +1,4 @@
-package com.sgdc.core.config.service;
+package com.sgdc.core.sistema.service;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

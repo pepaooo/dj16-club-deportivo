@@ -1,4 +1,4 @@
-package com.sgdc.core.config.validator;
+package com.sgdc.core.sistema.validator;
 
 import org.springframework.stereotype.Component;
 

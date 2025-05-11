@@ -1,11 +1,10 @@
-package com.sgdc.core.config.service;
+package com.sgdc.core.sistema.service;
 
-import com.sgdc.core.config.domain.Notificacion;
-import com.sgdc.core.config.domain.dto.NotificacionSearchDTO;
-import com.sgdc.core.config.repository.NotificacionRepository;
+import com.sgdc.core.sistema.domain.Notificacion;
+import com.sgdc.core.sistema.domain.dto.NotificacionSearchDTO;
+import com.sgdc.core.sistema.repository.NotificacionRepository;
 import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.pagos.repository.PagoMembresiaRepository;
-import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service

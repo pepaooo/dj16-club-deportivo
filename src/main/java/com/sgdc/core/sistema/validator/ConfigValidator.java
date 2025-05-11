@@ -1,4 +1,4 @@
-package com.sgdc.core.config.validator;
+package com.sgdc.core.sistema.validator;
 
 public interface ConfigValidator {
     boolean supports(String key);

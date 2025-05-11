@@ -1,9 +1,9 @@
-package com.sgdc.core.config.service;
+package com.sgdc.core.sistema.service;
 
 import com.sgdc.core.auditoria.aop.Auditable;
-import com.sgdc.core.config.domain.ConfiguracionSistema;
-import com.sgdc.core.config.repository.ConfiguracionSistemaRepository;
-import com.sgdc.core.config.validator.ConfigValidationService;
+import com.sgdc.core.sistema.domain.ConfiguracionSistema;
+import com.sgdc.core.sistema.repository.ConfiguracionSistemaRepository;
+import com.sgdc.core.sistema.validator.ConfigValidationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.Expression;
 import org.slf4j.Logger;

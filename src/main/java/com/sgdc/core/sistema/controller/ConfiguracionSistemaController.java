@@ -1,7 +1,7 @@
-package com.sgdc.core.config.controller;
+package com.sgdc.core.sistema.controller;
 
-import com.sgdc.core.config.domain.ConfiguracionSistema;
-import com.sgdc.core.config.service.ConfiguracionSistemaService;
+import com.sgdc.core.sistema.domain.ConfiguracionSistema;
+import com.sgdc.core.sistema.service.ConfiguracionSistemaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -38,6 +38,7 @@ public class ConfiguracionSistemaController {
                           @RequestParam("valor") String valor,
                           RedirectAttributes redirectAttributes) {
         try {
+            log.info("Guardando configuracion por id {}", id);
             configuracionSistemaService.update(id, valor);
             redirectAttributes.addFlashAttribute("exito", "Configuración guardada correctamente del parámetro con el identificador " + id);
         } catch (IllegalStateException | IllegalArgumentException e) {

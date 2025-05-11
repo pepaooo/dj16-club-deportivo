@@ -1,6 +1,6 @@
-package com.sgdc.core.config.service;
+package com.sgdc.core.sistema.service;
 
-import com.sgdc.core.config.domain.ConfiguracionSistema;
+import com.sgdc.core.sistema.domain.ConfiguracionSistema;
 
 import java.util.List;
 
