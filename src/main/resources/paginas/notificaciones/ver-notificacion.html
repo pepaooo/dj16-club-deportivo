@@ -44,9 +44,6 @@
                         <strong>Membresía:</strong>
                         <span th:text="${notificacion.pagoMembresia.membresia.nombre}"></span>
                     </p>
-                </div>
-                <!-- Segunda columna -->
-                <div class="col-md-6">
                     <p>
                         <strong>Fecha de Vencimiento:</strong>
                         <span th:text="${#temporals.format(notificacion.fechaVencimiento, 'yyyy-MM-dd')}"></span>
@@ -55,6 +52,9 @@
                         <strong>Días Restantes:</strong>
                         <span th:text="${notificacion.diasRestantes}"></span>
                     </p>
+                </div>
+                <!-- Segunda columna -->
+                <div class="col-md-6">
                     <p>
                         <strong>Estatus:</strong>
                         <span th:text="${notificacion.estado}"></span>
@@ -65,6 +65,24 @@
                                 th:if="${notificacion.fechaEnvio != null}"
                                 th:text="${#temporals.format(notificacion.fechaEnvio, 'yyyy-MM-dd HH:mm')}"></span>
                         <span th:if="${notificacion.fechaEnvio == null}">-</span>
+                    </p>
+                    <p>
+                        <strong>Creado por:</strong>
+                        <span th:text="${notificacion.creadoPor}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(notificacion.fechaCreacion,'yyyy-MM-dd HH:mm')}"/>
+                    </p>
+                    <p>
+                        <strong>Modificado por:</strong>
+                        <span th:text="${notificacion.modificadoPor ?: '-'}"/>
+                    </p>
+                    <p>
+                        <strong>Fecha Modificación:</strong>
+                        <span th:text="${notificacion.fechaModificacion != null
+                              ? #temporals.format(notificacion.fechaModificacion,'yyyy-MM-dd HH:mm')
+                              : '-'}"/>
                     </p>
                 </div>
             </div>

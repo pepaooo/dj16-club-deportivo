@@ -57,9 +57,6 @@ public class NotificacionServiceImpl implements NotificacionService {
                 n.setEstado("Pendiente");
                 n.setMensaje("Su membresía vence en "
                         + diasAntes + " día(s).");
-                n.setCreadoEn(LocalDateTime.now());
-                Usuario usuario = Usuario.builder().id(1).build();
-                n.setRegistradoPor(usuario); // TODO: Cambiar por el usuario real
                 notiRepo.save(n);
             });
         }

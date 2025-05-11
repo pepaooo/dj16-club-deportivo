@@ -1,12 +1,12 @@
 package com.sgdc.core.config.domain;
 
+import com.sgdc.core.auditoria.jpa.AuditableBase;
 import com.sgdc.core.pagos.domain.PagoMembresia;
 import com.sgdc.core.usuarios.domain.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,7 +16,8 @@ import java.time.temporal.ChronoUnit;
 @Table(name = "notificacion")
 @Data
 @ToString
-public class Notificacion {
+@EqualsAndHashCode(callSuper = true)
+public class Notificacion extends AuditableBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_notificacion")
@@ -43,13 +44,13 @@ public class Notificacion {
     @Column(name = "mensaje", columnDefinition = "TEXT")
     private String mensaje;
 
-    @ManyToOne
-    @JoinColumn(name = "registrado_por")
-    private Usuario registradoPor;
-
-    @NotNull
-    @Column(name = "creado_en", nullable = false)
-    private LocalDateTime creadoEn;
+//    @ManyToOne
+//    @JoinColumn(name = "registrado_por")
+//    private Usuario registradoPor;
+//
+//    @NotNull
+//    @Column(name = "creado_en", nullable = false)
+//    private LocalDateTime creadoEn;
 
     /**
      * Obtiene el número de días restantes hasta la fecha de vencimiento.
