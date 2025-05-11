@@ -11,8 +11,12 @@ import com.sgdc.core.security.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -57,17 +62,26 @@ public class SecurityConfiguration {
         return p;
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return new ProviderManager(authenticationProvider());
+    }
+
     // 1) Filtro para API REST
     @Bean
     @Order(1)
     public SecurityFilterChain apiSecurity(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/**")
-                .csrf(csrf -> csrf.disable())                     // APIs suelen desactivar CSRF
+                .csrf(AbstractHttpConfigurer::disable)                     // APIs suelen desactivar CSRF
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // stateless para APIs
                 )
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/login").permitAll()   // <-- permitir login
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(new JWTAuthenticationFilter(tokenProvider, uds), UsernamePasswordAuthenticationFilter.class);
 //                .authorizeHttpRequests(auth -> auth
 //                        .anyRequest().hasAnyAuthority("ADMIN")
@@ -101,10 +115,10 @@ public class SecurityConfiguration {
                 .authenticationProvider(authenticationProvider())
 
                 // Configuración de CSRF/CORS
-//                .csrf(csrf -> csrf
-//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .csrf(AbstractHttpConfigurer::disable)
-                //.cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                //.csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )

@@ -40,10 +40,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        String jwt = getTokenFromCookie(request, response, filterChain);
+        String jwt = extractToken(request, response, filterChain);
         if (jwt == null) return;
         try {
-            log.info("JWT token encontrado en cookies: {}", jwt);
+            log.info("JWT token encontrado : {}", jwt);
             if (tokenProvider.validateJwtToken(jwt)) {
                 log.info("JWT token válido");
                 Claims body = tokenProvider.getClaims(jwt);
@@ -73,16 +73,22 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private static String getTokenFromCookie(HttpServletRequest request, HttpServletResponse response,
+    private static String extractToken(HttpServletRequest request, HttpServletResponse response,
                                              FilterChain filterChain) throws IOException, ServletException {
         String jwt = "";
+        // 1) Header Authorization
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            return bearer.substring(7);
+        }
+        // 2) Cookie “token”
         if (request.getCookies() != null)
             for (Cookie cookie : request.getCookies())
                 if (cookie.getName().equals("token"))
                     jwt = cookie.getValue();
         if (jwt == null || jwt.isEmpty()) {
             filterChain.doFilter(request, response);
-            log.info("No se ha encontrado el JWT token en cookies");
+            log.info("No se ha encontrado el JWT token");
             return null;
         }
         return jwt;
