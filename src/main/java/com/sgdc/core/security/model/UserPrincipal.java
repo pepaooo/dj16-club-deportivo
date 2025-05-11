@@ -3,7 +3,6 @@ package com.sgdc.core.security.model;
 import com.sgdc.core.security.service.LoginAttemptService;
 import com.sgdc.core.usuarios.domain.Usuario;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,38 +13,34 @@ import java.util.stream.Collectors;
 
 public class UserPrincipal implements UserDetails {
 
-    @Value("${login.attempts.lockDurationMin:5}")
-    private long LOCK_DURATION_MIN;
-
     @Getter
     private final Usuario usuario;
     private final Collection<? extends GrantedAuthority> authorities;
+    private final boolean accountNonLocked;
 
-    public UserPrincipal(Usuario usuario, Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Usuario usuario, Collection<? extends GrantedAuthority> authorities, boolean accountNonLocked) {
         this.usuario = usuario;
         this.authorities = authorities;
+        this.accountNonLocked = accountNonLocked;
     }
 
-    public static UserPrincipal build(Usuario usuario) {
+    public static UserPrincipal build(Usuario usuario, LoginAttemptService attemptService) {
         List<GrantedAuthority> authorities = usuario.getRoles().stream().map(role ->
                 new SimpleGrantedAuthority(role.getNombre())
         ).collect(Collectors.toList());
+
+        // Aquí pedimos al servicio si aún está bloqueado
+        boolean nonLocked = !attemptService.isLocked(usuario.getNombre());
+
         return new UserPrincipal(
                 usuario,
-                authorities
+                authorities,
+                nonLocked
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        if (null == usuario.getRoles()) {
-//            return Collections.emptySet();
-//        }
-//        Set<SimpleGrantedAuthority> grantedAuthorities = new HashSet<>();
-//        for (Rol role : usuario.getRoles()) {
-//            grantedAuthorities.add(new SimpleGrantedAuthority(role.getNombre()));
-//        }
-//        return grantedAuthorities;
         return authorities;
     }
 
@@ -104,14 +99,7 @@ public class UserPrincipal implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        // si no hay lockTime → está desbloqueado
-        if (usuario.getLockTime() == null) return true;
-        // si ya expiró el lock → también
-        if (usuario.isLockTimeExpired(LOCK_DURATION_MIN)) {
-            return true;
-        }
-        // caso contrario → bloqueado
-        return false;
+        return this.accountNonLocked;
     }
 
     /**

@@ -18,7 +18,7 @@ public interface NotificacionRepository extends JpaRepository<Notificacion, Inte
     List<Notificacion> findByEstado(String estado);
 
     @Query("""
-              SELECT new com.sgdc.core.config.domain.dto.NotificacionSearchDTO(
+              SELECT new com.sgdc.core.sistema.domain.dto.NotificacionSearchDTO(
                 n.id,
                 CONCAT(m.nombre, ' ', m.apellidoPaterno, ' ', m.apellidoMaterno),
                 mb.nombre,
