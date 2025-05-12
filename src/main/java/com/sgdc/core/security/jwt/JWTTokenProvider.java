@@ -7,11 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -39,6 +41,10 @@ public class JWTTokenProvider {
 //        claims.put("principal", authentication.getPrincipal());
         claims.put("auth", authentication.getAuthorities().stream().map(s -> new SimpleGrantedAuthority(s.getAuthority()))
                 .collect(Collectors.toList()));
+//        List<String> roles = authentication.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)      // p. ej. "ROLE_ADMIN"
+//                .collect(Collectors.toList());
+//        claims.put("roles", roles);
         claims.put("issid", user.getId());
         claims.put("issname", user.getNombre());
         key = Keys.hmacShaKeyFor(secret.getBytes());

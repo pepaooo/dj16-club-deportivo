@@ -1,14 +1,14 @@
 package com.sgdc.core.security.model;
 
 import com.sgdc.core.security.service.LoginAttemptService;
+import com.sgdc.core.usuarios.domain.Rol;
 import com.sgdc.core.usuarios.domain.Usuario;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UserPrincipal implements UserDetails {

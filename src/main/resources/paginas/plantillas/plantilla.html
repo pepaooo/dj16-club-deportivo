@@ -44,27 +44,32 @@
                         ><i class="bi bi-house-door-fill"></i> Inicio</a
                         >
                     </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" th:href="@{/miembros}"
-                        ><i class="bi bi-people-fill"></i> Miembros</a
-                        >
-                    </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
-                        <a class="nav-link" th:href="@{/pagos}">
-                            <i class="bi bi-currency-dollar"></i> Pagos de Membresía
-                        </a>
-                    </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <li class="nav-item"
+                        sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
                         <a class="nav-link" th:href="@{/reservas}"
                         ><i class="bi bi-calendar-check"></i> Reservas</a
                         >
                     </li>
-                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <li class="nav-item"
+                        sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
+                        <a class="nav-link" th:href="@{/pagos}">
+                            <i class="bi bi-currency-dollar"></i> Pagos de Membresía
+                        </a>
+                    </li>
+                    <li class="nav-item"
+                        sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
+                        <a class="nav-link" th:href="@{/miembros}"
+                        ><i class="bi bi-people-fill"></i> Miembros</a
+                        >
+                    </li>
+                    <li class="nav-item"
+                        sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
                         <a class="nav-link" th:href="@{/reportes}"
                         ><i class="bi bi-bar-chart-line-fill"></i> Reportes</a
                         >
                     </li>
-                    <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <li class="nav-item dropdown"
+                        sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'GERENTE')">
                         <a
                                 class="nav-link dropdown-toggle"
                                 href="#"
@@ -80,36 +85,50 @@
                                 aria-labelledby="adminDropdown"
                                 style="min-width: 300px"
                         >
-                            <h6 class="dropdown-header">Membresías</h6>
-                            <a class="dropdown-item" th:href="@{/membresias}">
-                                <i class="bi bi-card-checklist"></i> Membresías
-                            </a>
-                            <a class="dropdown-item" th:href="@{/beneficios}">
-                                <i class="bi bi-award"></i> Beneficios
-                            </a>
-                            <a class="dropdown-item" th:href="@{/notificaciones}">
-                                <i class="bi bi-bell"></i> Notificaciones
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <h6 class="dropdown-header">Instalaciones</h6>
-                            <a class="dropdown-item" th:href="@{/instalaciones}">
-                                <i class="bi bi-building"></i> Instalación
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <h6 class="dropdown-header">Gestión de Accesos</h6>
-                            <a class="dropdown-item" th:href="@{/usuarios}">
-                                <i class="bi bi-person-lines-fill"></i> Usuarios
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <h6 class="dropdown-header">Monitoreo</h6>
-                            <a class="dropdown-item" th:href="@{/auditoria/actividades}">
-                                <i class="bi bi-clock-history"></i> Auditoría y Actividades
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <h6 class="dropdown-header">Configuración</h6>
-                            <a class="dropdown-item" th:href="@{/configuracion}">
-                                <i class="bi bi-sliders"></i> Configuración del sistema
-                            </a>
+                            <div sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'GERENTE')">
+                                <h6 class="dropdown-header">Membresías</h6>
+                                <a class="dropdown-item" th:href="@{/membresias}">
+                                    <i class="bi bi-card-checklist"></i> Membresías
+                                </a>
+                            </div>
+                            <div sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'GERENTE')">
+                                <a class="dropdown-item" th:href="@{/beneficios}">
+                                    <i class="bi bi-award"></i> Beneficios
+                                </a>
+                            </div>
+                            <div sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'GERENTE')">
+                                <a class="dropdown-item" th:href="@{/notificaciones}">
+                                    <i class="bi bi-bell"></i> Notificaciones
+                                </a>
+                            </div>
+                            <div sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'GERENTE')">
+                                <div class="dropdown-divider"></div>
+                                <h6 class="dropdown-header">Instalaciones</h6>
+                                <a class="dropdown-item" th:href="@{/instalaciones}">
+                                    <i class="bi bi-building"></i> Instalación
+                                </a>
+                            </div>
+                            <div sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN')">
+                                <div class="dropdown-divider"></div>
+                                <h6 class="dropdown-header">Gestión de Accesos</h6>
+                                <a class="dropdown-item" th:href="@{/usuarios}">
+                                    <i class="bi bi-person-lines-fill"></i> Usuarios
+                                </a>
+                            </div>
+                            <div sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'GERENTE')">
+                                <div class="dropdown-divider"></div>
+                                <h6 class="dropdown-header">Monitoreo</h6>
+                                <a class="dropdown-item" th:href="@{/auditoria/actividades}">
+                                    <i class="bi bi-clock-history"></i> Auditoría y Actividades
+                                </a>
+                            </div>
+                            <div sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN')">
+                                <div class="dropdown-divider"></div>
+                                <h6 class="dropdown-header">Configuración</h6>
+                                <a class="dropdown-item" th:href="@{/configuracion}">
+                                    <i class="bi bi-sliders"></i> Configuración del sistema
+                                </a>
+                            </div>
                         </div>
                     </li>
                 </ul>

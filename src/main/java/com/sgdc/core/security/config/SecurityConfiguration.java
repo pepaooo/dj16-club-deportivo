@@ -129,15 +129,25 @@ public class SecurityConfiguration {
 
                 // Autorizar rutas
                 .authorizeHttpRequests(auth -> auth
-                                // recursos estáticos
-                                //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers("/bootstrap/**", "/iconos/**", "/themes/**", "/images/**",
-                                        "/", "/index", "/login", "/doLogin", "/captcha", "/captcha/**",
-                                        "/error", "/error/**", "/.well-known/appspecific/**")
-                                .permitAll()
-//                        .requestMatchers("/user").hasAnyAuthority("USER")
-//                        .requestMatchers("/admin").hasAnyAuthority("ADMIN")
-                                .anyRequest().authenticated()
+                        // recursos estáticos
+                        //.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/bootstrap/**", "/iconos/**", "/themes/**", "/images/**",
+                                "/", "/index", "/login", "/doLogin", "/captcha", "/captcha/**",
+                                "/error", "/error/**", "/.well-known/appspecific/**")
+                        .permitAll()
+                        .requestMatchers("/miembros/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
+                        .requestMatchers("/pagos/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
+                        .requestMatchers("/reservas/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
+                        .requestMatchers("/reportes/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
+                        .requestMatchers("/membresias/**").hasAnyAuthority("ADMIN", "GERENTE")
+                        .requestMatchers("/beneficios/**").hasAnyAuthority("ADMIN", "GERENTE")
+                        .requestMatchers("/notificaciones/**").hasAnyAuthority("ADMIN", "GERENTE")
+                        .requestMatchers("/membresias/**").hasAnyAuthority("ADMIN", "GERENTE")
+                        .requestMatchers("/instalaciones/**").hasAnyAuthority("ADMIN", "GERENTE")
+                        .requestMatchers("/usuarios/**").hasAnyAuthority("ADMIN")
+                        .requestMatchers("/auditoria/**").hasAnyAuthority("ADMIN", "GERENTE")
+                        .requestMatchers("/configuracion/**").hasAnyAuthority("ADMIN")
+                        .anyRequest().authenticated()
                 )
 
                 // Logout
