@@ -93,6 +93,13 @@ public class UsuarioController {
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("roles", rolService.findAll());
             return "usuarios/nuevo-usuario";
+        } catch (Exception e) {
+            log.error("Error inesperado: {}", e.getMessage());
+            // Agregamos un error global que no se asocia a un campo en particular
+            bindingResult.reject("global.error", "El usuario no se ha guardado. " + e.getMessage());
+            // Agregamos los atributos necesarios para la vista.
+            model.addAttribute("roles", rolService.findAll());
+            return "usuarios/nuevo-usuario";
         }
 
         redirectAttributes.addFlashAttribute("exito", "El usuario se ha guardado correctamente");
@@ -143,6 +150,13 @@ public class UsuarioController {
             log.error("Error inesperado: {}", e.getMessage());
             // Agregamos un error global que no se asocia a un campo en particular
             bindingResult.reject("global.error", "El usuario no se ha modificado. Verifique los datos ingresados.");
+            // Agregamos los atributos necesarios para la vista.
+            model.addAttribute("roles", rolService.findAll());
+            return "usuarios/editar-usuario";
+        } catch (Exception e) {
+            log.error("Error inesperado: {}", e.getMessage());
+            // Agregamos un error global que no se asocia a un campo en particular
+            bindingResult.reject("global.error", "El usuario no se ha modificado. " + e.getMessage());
             // Agregamos los atributos necesarios para la vista.
             model.addAttribute("roles", rolService.findAll());
             return "usuarios/editar-usuario";

@@ -90,6 +90,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     )
     @Override
     public UsuarioDetalleDTO save(UsuarioDetalleDTO dto) {
+        // Validar si el usuario tiene un miembro asignado en caso de tener rol de "Miembro"
+        Integer membRoleId = rolRepository.findByNombreIgnoreCase("Miembro")
+                .orElseThrow(() -> new EntityNotFoundException("Rol 'Miembro' no encontrado.")).getId();
+        if (dto.getRolesIds() != null && dto.getRolesIds().contains(membRoleId) && dto.getIdMiembro() == null) {
+            throw new IllegalArgumentException("Un usuario con rol MIEMBRO debe tener un Miembro asociado.");
+        }
+
         dto.setContrasena(passwordEncoder.encode(dto.getContrasena()));
         Usuario usuario = toEntity(dto);
         log.info("Usuario encontrado: " + usuario);
@@ -110,6 +117,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     )
     @Override
     public UsuarioDetalleDTO update(UsuarioDetalleDTO dto) {
+        // Validar si el usuario tiene un miembro asignado en caso de tener rol de "Miembro"
+        Integer membRoleId = rolRepository.findByNombreIgnoreCase("Miembro")
+                .orElseThrow(() -> new EntityNotFoundException("Rol 'Miembro' no encontrado.")).getId();
+        if (dto.getRolesIds() != null && dto.getRolesIds().contains(membRoleId) && dto.getIdMiembro() == null) {
+            throw new IllegalArgumentException("Un usuario con rol MIEMBRO debe tener un Miembro asociado.");
+        }
+
         Usuario usuario = findById(dto.getId());
         // Actualizar los campos del usuario
         if (dto.getContrasena() != null) {
