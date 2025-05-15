@@ -52,18 +52,22 @@
                         </div>
                         <!-- Contraseña del usuario -->
                         <div class="mb-3">
-                            <label for="contrasena" class="form-label"
-                            >Contraseña</label>
-                            <input
-                                    type="password"
-                                    class="form-control"
-                                    id="contrasena"
-                                    th:field="*{contrasena}"
-                                    name="contrasena"
-                                    placeholder="Ingrese la contraseña"
-                                    autocomplete="new-password"
-                                    required
-                            />
+                            <label for="contrasena" class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <input
+                                        type="password"
+                                        class="form-control"
+                                        id="contrasena"
+                                        th:field="*{contrasena}"
+                                        name="contrasena"
+                                        placeholder="Ingrese la contraseña"
+                                        autocomplete="new-password"
+                                        required
+                                />
+                                <button class="btn btn-outline-secondary" type="button" id="toggleContrasena">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                             <div class="text-danger" th:if="${#fields.hasErrors('contrasena')}"
                                  th:errors="*{contrasena}"></div>
                         </div>
@@ -140,6 +144,19 @@
                 cache: true
             },
             minimumInputLength: 1
+        });
+
+        // Toggle de contraseña:
+        $('#toggleContrasena').on('click', function() {
+            const $input = $('#contrasena');
+            const $icon  = $(this).find('i');
+            if ($input.attr('type') === 'password') {
+                $input.attr('type', 'text');
+                $icon.removeClass('bi-eye').addClass('bi-eye-slash');
+            } else {
+                $input.attr('type', 'password');
+                $icon.removeClass('bi-eye-slash').addClass('bi-eye');
+            }
         });
     });
 
