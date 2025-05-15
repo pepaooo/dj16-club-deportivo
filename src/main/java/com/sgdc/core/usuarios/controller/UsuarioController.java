@@ -5,7 +5,6 @@ import com.sgdc.core.usuarios.domain.OnUpdate;
 import com.sgdc.core.usuarios.domain.dto.UsuarioDetalleDTO;
 import com.sgdc.core.usuarios.service.RolService;
 import com.sgdc.core.usuarios.service.UsuarioService;
-import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +19,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("usuarios")

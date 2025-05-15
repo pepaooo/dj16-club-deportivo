@@ -11,7 +11,6 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, Integer>, JpaSpecificationExecutor<PagoMembresia> {
 
@@ -26,8 +25,9 @@ public interface PagoMembresiaRepository extends JpaRepository<PagoMembresia, In
                  AND p.cancelado = false
                  AND p.fechaInicio <= CURRENT_DATE
                  AND p.fechaFin    >= CURRENT_DATE
+               ORDER BY p.fechaInicio DESC
             """)
-    Optional<PagoMembresia> findActiveByMiembro(@Param("miembroId") Integer miembroId);
+    List<PagoMembresia> findActiveByMiembro(@Param("miembroId") Integer miembroId);
 
     @Query("""
               SELECT p 

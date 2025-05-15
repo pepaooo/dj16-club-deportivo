@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PagoMembresiaServiceImpl implements PagoMembresiaService {
@@ -72,6 +73,11 @@ public class PagoMembresiaServiceImpl implements PagoMembresiaService {
     @Override
     public List<PagoMembresia> findByMiembroId(Integer idMiembro) {
         return pagoMembresiaRepository.findByMiembro_IdOrderByIdDesc(idMiembro);
+    }
+
+    @Override
+    public Optional<PagoMembresia> findActiveByMiembro(Integer idMiembro) {
+        return pagoMembresiaRepository.findActiveByMiembro(idMiembro).stream().findFirst();
     }
 
     @Override

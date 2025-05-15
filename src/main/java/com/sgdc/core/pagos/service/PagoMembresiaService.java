@@ -9,6 +9,7 @@ import com.sgdc.core.reportes.domain.dto.PagoReportDTO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface PagoMembresiaService {
 
@@ -17,6 +18,8 @@ public interface PagoMembresiaService {
     PagoMembresia findById(Integer id);
 
     List<PagoMembresia> findByMiembroId(Integer idMiembro);
+
+    Optional<PagoMembresia> findActiveByMiembro(Integer idMiembro);
 
     List<PagoMembresia> search(Integer idMiembro, String keyword);
 

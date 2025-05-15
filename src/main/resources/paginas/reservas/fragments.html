@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<!-- Fragmento reutilizable -->
+<!-- Fragmento -->
 <div th:fragment="detalleReserva">
     <!-- Datos de la Reserva -->
     <div class="card mb-4">
@@ -11,9 +11,14 @@
                     <p><strong>ID de reserva:</strong> <span th:text="${reserva.id}"></span></p>
                     <p>
                         <strong>Miembro:</strong>
-                        <a th:href="@{'/miembros/get?id=' + ${reserva.miembro.id}}">
+                        <span sec:authorize="hasAnyAuthority('STAFF','ADMIN','GERENTE')">
+                            <a th:href="@{'/miembros/get?id=' + ${reserva.miembro.id}}">
+                                <span th:text="${reserva.miembro.nombre + ' ' + reserva.miembro.apellidoPaterno + ' ' + reserva.miembro.apellidoMaterno}"></span>
+                            </a>
+                        </span>
+                        <span sec:authorize ="!hasAnyAuthority('STAFF','ADMIN','GERENTE') and hasAuthority('MIEMBRO')">
                             <span th:text="${reserva.miembro.nombre + ' ' + reserva.miembro.apellidoPaterno + ' ' + reserva.miembro.apellidoMaterno}"></span>
-                        </a>
+                        </span>
                     </p>
                     <p><strong>Instalación:</strong> <span th:text="${reserva.instalacion.nombre}"></span></p>
                     <p>
@@ -49,52 +54,86 @@
             </div>
         </div>
 
-        <div class="card-footer text-end">
-<!--            <a class="btn btn-secondary" th:href="@{/reservas}"><i class="bi bi-arrow-left-circle"></i> Volver</a>-->
+        <div class="card-footer">
+            <div class="d-flex justify-content-end align-items-center gap-2">
+                <!-- Volver -->
+                <a class="btn btn-secondary" th:href="@{/reservas/calendario}">
+                    <i class="bi bi-arrow-left-circle"></i> Volver
+                </a>
+                <!-- STAFF / ADMIN / GERENTE -->
+                <span sec:authorize="hasAnyAuthority('STAFF','ADMIN','GERENTE')">
+                    <form th:if="${reserva.estadoReserva=='Pendiente'
+                                  and T(java.time.LocalDateTime).now().isBefore(reserva.fechaHoraFin)}"
+                          th:action="@{'/reservas/confirmar?id=' + ${reserva.id}}" method="post" class="d-inline">
+                      <button class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Confirmar Reserva
+                      </button>
+                    </form>
+                    <form th:if="${reserva.estadoReserva!='Cancelada'
+                                  and T(java.time.LocalDateTime).now().isBefore(reserva.fechaHoraFin)}"
+                          th:action="@{'/reservas/cancelar?id=' + ${reserva.id}}" method="post" class="d-inline">
+                      <button class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Cancelar Reserva
+                      </button>
+                    </form>
+                </span>
 
-            <form th:action="@{'/reservas/confirmar?id=' + ${reserva.id}}" method="post"
-                  th:if="${reserva.estadoReserva=='Pendiente' and reserva.fechaHoraFin.isAfter(T(java.time.LocalDateTime).now())}" style="display:inline">
-                <button type="submit" class="btn btn-success">
-                    <i class="bi bi-check-circle"></i> Confirmar Reserva
-                </button>
-            </form>
-
-            <form th:action="@{'/reservas/cancelar?id=' + ${reserva.id}}" method="post"
-                  th:if="${reserva.estadoReserva!='Cancelada' and reserva.fechaHoraFin.isAfter(T(java.time.LocalDateTime).now())}" style="display:inline">
-                <button type="submit" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Cancelar Reserva
-                </button>
-            </form>
+                <!-- MIEMBRO puro -->
+                <span sec:authorize="!hasAnyAuthority('STAFF','ADMIN','GERENTE') and hasAuthority('MIEMBRO')">
+                    <form th:if="${reserva.miembro.id == currentMiembroId
+                                  and reserva.estadoReserva=='Pendiente'
+                                  and T(java.time.LocalDateTime).now().isBefore(reserva.fechaHoraFin)}"
+                          th:action="@{'/reservas/confirmar?id=' + ${reserva.id}}" method="post" class="d-inline">
+                      <button class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Confirmar Reserva
+                      </button>
+                    </form>
+                    <form th:if="${reserva.miembro.id == currentMiembroId
+                                  and reserva.estadoReserva!='Cancelada'
+                                  and T(java.time.LocalDateTime).now().isBefore(reserva.fechaHoraFin)}"
+                          th:action="@{'/reservas/cancelar?id=' + ${reserva.id}}" method="post" class="d-inline">
+                      <button class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Cancelar Reserva
+                      </button>
+                    </form>
+                </span>
+            </div>
         </div>
-
     </div>
 
-    <!-- Lista de pendientes solapadas -->
-    <div th:if="${not #lists.isEmpty(pendientesSolapadas)}" class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            Otras reservas pendientes que solapan (se cancelarán si confirma)
-        </div>
-        <div class="card-body p-0">
-            <table class="table mb-0">
-                <thead class="table-light">
-                <tr><th>ID</th><th>Miembro</th><th>Inicio</th><th>Fin</th></tr>
-                </thead>
-                <tbody>
-                <tr th:each="r : ${pendientesSolapadas}">
-                    <td th:text="${r.id}"></td>
-                    <td>
-                        <a th:href="@{'/miembros/get?id=' + ${r.miembro.id}}">
-                            <span th:text="${r.miembro.nombre + ' ' + r.miembro.apellidoPaterno}"></span>
-                        </a>
-                    </td>
-                    <td th:text="${#temporals.format(r.fechaHoraInicio,'yyyy-MM-dd HH:mm')}"></td>
-                    <td th:text="${#temporals.format(r.fechaHoraFin,'yyyy-MM-dd HH:mm')}"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+</div>
+
+<!-- Lista de pendientes solapadas -->
+<div th:if="${not #lists.isEmpty(pendientesSolapadas)}" class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        Otras reservas pendientes que solapan (se cancelarán si confirma)
     </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Miembro</th>
+                <th>Inicio</th>
+                <th>Fin</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${pendientesSolapadas}">
+                <td th:text="${r.id}"></td>
+                <td>
+                    <a th:href="@{'/miembros/get?id=' + ${r.miembro.id}}">
+                        <span th:text="${r.miembro.nombre + ' ' + r.miembro.apellidoPaterno}"></span>
+                    </a>
+                </td>
+                <td th:text="${#temporals.format(r.fechaHoraInicio,'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${#temporals.format(r.fechaHoraFin,'yyyy-MM-dd HH:mm')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </div>
 </body>
 </html>

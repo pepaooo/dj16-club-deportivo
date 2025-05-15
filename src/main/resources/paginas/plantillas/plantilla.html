@@ -45,7 +45,7 @@
                         >
                     </li>
                     <li class="nav-item"
-                        sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
+                        sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE', 'MIEMBRO')">
                         <a class="nav-link" th:href="@{/reservas}"
                         ><i class="bi bi-calendar-check"></i> Reservas</a
                         >

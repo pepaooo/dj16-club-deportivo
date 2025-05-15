@@ -34,7 +34,7 @@
         <!-- Tarjetas de acceso a módulos -->
         <div class="row">
             <!-- Card para Miembros -->
-            <div class="col-md-4">
+            <div class="col-md-4" sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
                 <div class="card mb-4 shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">
@@ -50,7 +50,7 @@
                 </div>
             </div>
             <!-- Card para Membresías -->
-            <div class="col-md-4">
+            <div class="col-md-4" sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
                 <div class="card mb-4 shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">
@@ -65,8 +65,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Card para Reportes (en lugar de Reservas) -->
-            <div class="col-md-4">
+            <!-- Card para Reportes -->
+            <div class="col-md-4" sec:authorize="isAuthenticated() and hasAnyAuthority('ADMIN', 'STAFF', 'GERENTE')">
                 <div class="card mb-4 shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">

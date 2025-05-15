@@ -24,85 +24,180 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <!-- Formulario con binding de Thymeleaf -->
-                    <form th:action="@{/reservas/create-reserva}" th:object="${reservaDTO}" method="post">
-                        <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
-                            Verifique los siguientes inconvenientes
-                            <ul>
-                                <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
-                            </ul>
-                        </div>
-                        <!-- 1) Miembro -->
-                        <div class="mb-3">
-                            <label for="miembroSelect" class="form-label">Miembro</label>
-                            <select id="miembroSelect" name="idMiembro" th:field="*{idMiembro}" class="form-control"
-                                    style="width: 100%;">
-                                <!-- Las opciones se cargarán vía AJAX -->
-                            </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('idMiembro')}"
+
+                    <!-- Para MIEMBRO -->
+                    <div sec:authorize="!hasAnyAuthority('STAFF','ADMIN') and hasAuthority('MIEMBRO')">
+                        <form th:action="@{/reservas/create-reserva}" th:object="${reservaDTO}" method="post">
+                            <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
+                                Verifique los siguientes inconvenientes
+                                <ul>
+                                    <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+                                </ul>
+                            </div>
+                            <!-- 1) Miembro -->
+                            <!-- ocultamos el select y ponemos su propio ID -->
+                            <input type="hidden" th:field="*{idMiembro}" th:value="${currentMiembroId}"/>
+                            <div class="text-danger"
+                                 th:if="${#fields.hasErrors('idMiembro')}"
                                  th:errors="*{idMiembro}"></div>
-                        </div>
 
-                        <!-- 2) Membresía activa (sólo lectura) -->
-                        <div class="mb-3">
-                            <label for="membresiaActiva" class="form-label">Membresía Activa</label>
-                            <input type="text"
-                                   id="membresiaActiva"
-                                   class="form-control"
-                                   readonly>
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label">Miembro</label>
+                                <input type="text" class="form-control" readonly
+                                       th:value="${currentMiembroNombre}"/>
+                            </div>
 
-                        <!-- 3) Instalación -->
-                        <div class="mb-3">
-                            <label for="instalacionSelect" class="form-label">Instalación</label>
-                            <select id="instalacionSelect" name="idInstalacion" th:field="*{idInstalacion}"
-                                    class="form-control"
-                                    style="width: 100%;">
-                                <!-- Las opciones se cargarán vía AJAX -->
-                            </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('idInstalacion')}"
-                                 th:errors="*{idInstalacion}"></div>
-                        </div>
+                            <!-- 2) Membresía activa (sólo lectura) -->
+                            <div th:if="${noMembership}" class="alert alert-warning">
+                                No tienes ninguna membresía activa.
+                            </div>
+                            <div th:unless="${noMembership}">
+                                <div class="mb-3">
+                                    <label class="form-label">Membresía Activa</label>
+                                    <input type="text" class="form-control" readonly
+                                           th:value="${currentMembresiaName}"/>
+                                </div>
 
-                        <!-- 4) Fecha / Hora Inicio -->
-                        <div class="mb-3">
-                            <label for="fechaHoraInicio" class="form-label">Fecha y Hora de Inicio</label>
-                            <input
-                                    type="datetime-local"
-                                    class="form-control"
-                                    id="fechaHoraInicio"
-                                    th:field="*{fechaHoraInicio}"
-                                    name="fechaHoraInicio"
-                                    required
-                            />
-                            <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraInicio')}"
-                                 th:errors="*{fechaHoraInicio}"></div>
-                        </div>
+                                <!-- 3) Instalación -->
+                                <div class="mb-3">
+                                    <label class="form-label">Instalación</label>
+                                    <select th:field="*{idInstalacion}" class="form-control">
+                                        <option value="">-- Seleccione --</option>
+                                        <option th:each="inst : ${currentInstalaciones}"
+                                                th:value="${inst.id}"
+                                                th:text="${inst.nombre}"></option>
+                                    </select>
+                                    <div class="text-danger"
+                                         th:if="${#fields.hasErrors('idInstalacion')}"
+                                         th:errors="*{idInstalacion}"></div>
+                                </div>
 
-                        <!-- 5) Fecha / Hora Fin -->
-                        <div class="mb-3">
-                            <label for="fechaHoraFin" class="form-label">Fecha y Hora de Fin</label>
-                            <input
-                                    type="datetime-local"
-                                    class="form-control"
-                                    id="fechaHoraFin"
-                                    th:field="*{fechaHoraFin}"
-                                    name="fechaHoraFin"
-                                    required
-                            />
-                            <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraFin')}"
-                                 th:errors="*{fechaHoraFin}"></div>
-                        </div>
+                                <!-- 4) Fecha / Hora Inicio -->
+                                <div class="mb-3">
+                                    <label for="fechaHoraInicio" class="form-label">Fecha y Hora de Inicio</label>
+                                    <input
+                                            type="datetime-local"
+                                            class="form-control"
+                                            id="fechaHoraInicio"
+                                            th:field="*{fechaHoraInicio}"
+                                            name="fechaHoraInicio"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraInicio')}"
+                                         th:errors="*{fechaHoraInicio}"></div>
+                                </div>
 
-                        <!-- Botones de Acción -->
-                        <div class="d-flex justify-content-end">
-                            <a th:href="@{/reservas}" class="btn btn-secondary me-2">
-                                <i class="bi bi-arrow-left-circle"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Guardar
-                            </button>
-                        </div>
-                    </form>
+                                <!-- 5) Fecha / Hora Fin -->
+                                <div class="mb-3">
+                                    <label for="fechaHoraFin" class="form-label">Fecha y Hora de Fin</label>
+                                    <input
+                                            type="datetime-local"
+                                            class="form-control"
+                                            id="fechaHoraFin"
+                                            th:field="*{fechaHoraFin}"
+                                            name="fechaHoraFin"
+                                            required
+                                    />
+                                    <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraFin')}"
+                                         th:errors="*{fechaHoraFin}"></div>
+                                </div>
+
+                                <!-- Botones de Acción -->
+                                <div class="d-flex justify-content-end">
+                                    <a th:href="@{/reservas}" class="btn btn-secondary me-2">
+                                        <i class="bi bi-arrow-left-circle"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-check-circle"></i> Guardar
+                                    </button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <!-- Para ADMIN, GERENTE, etc. -->
+                    <div sec:authorize="hasAnyAuthority('STAFF','ADMIN','GERENTE')">
+                        <form th:action="@{/reservas/create-reserva}" th:object="${reservaDTO}" method="post">
+                            <div th:if="${#fields.hasGlobalErrors()}" class='alert alert-danger' role="alert">
+                                Verifique los siguientes inconvenientes
+                                <ul>
+                                    <li th:each="err : ${#fields.globalErrors()}" th:text="${err}"></li>
+                                </ul>
+                            </div>
+                            <!-- 1) Miembro -->
+                            <div class="mb-3">
+                                <label for="miembroSelect" class="form-label">Miembro</label>
+                                <select id="miembroSelect" name="idMiembro" th:field="*{idMiembro}" class="form-control"
+                                        style="width: 100%;">
+                                    <!-- Las opciones se cargarán vía AJAX -->
+                                </select>
+                                <div class="text-danger" th:if="${#fields.hasErrors('idMiembro')}"
+                                     th:errors="*{idMiembro}"></div>
+                            </div>
+
+                            <!-- 2) Membresía activa (sólo lectura) -->
+                            <div class="mb-3">
+                                <label for="membresiaActiva" class="form-label">Membresía Activa</label>
+                                <input type="text"
+                                       id="membresiaActiva"
+                                       class="form-control"
+                                       readonly>
+                            </div>
+
+                            <!-- 3) Instalación -->
+                            <div class="mb-3">
+                                <label for="instalacionSelect" class="form-label">Instalación</label>
+                                <select id="instalacionSelect" name="idInstalacion" th:field="*{idInstalacion}"
+                                        class="form-control"
+                                        style="width: 100%;">
+                                    <!-- Las opciones se cargarán vía AJAX -->
+                                </select>
+                                <div class="text-danger" th:if="${#fields.hasErrors('idInstalacion')}"
+                                     th:errors="*{idInstalacion}"></div>
+                            </div>
+
+                            <!-- 4) Fecha / Hora Inicio -->
+                            <div class="mb-3">
+                                <label for="fechaHoraInicio" class="form-label">Fecha y Hora de Inicio</label>
+                                <input
+                                        type="datetime-local"
+                                        class="form-control"
+                                        id="fechaHoraInicio"
+                                        th:field="*{fechaHoraInicio}"
+                                        name="fechaHoraInicio"
+                                        required
+                                />
+                                <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraInicio')}"
+                                     th:errors="*{fechaHoraInicio}"></div>
+                            </div>
+
+                            <!-- 5) Fecha / Hora Fin -->
+                            <div class="mb-3">
+                                <label for="fechaHoraFin" class="form-label">Fecha y Hora de Fin</label>
+                                <input
+                                        type="datetime-local"
+                                        class="form-control"
+                                        id="fechaHoraFin"
+                                        th:field="*{fechaHoraFin}"
+                                        name="fechaHoraFin"
+                                        required
+                                />
+                                <div class="text-danger" th:if="${#fields.hasErrors('fechaHoraFin')}"
+                                     th:errors="*{fechaHoraFin}"></div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="d-flex justify-content-end">
+                                <a th:href="@{/reservas}" class="btn btn-secondary me-2">
+                                    <i class="bi bi-arrow-left-circle"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

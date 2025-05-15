@@ -137,7 +137,7 @@ public class SecurityConfiguration {
                         .permitAll()
                         .requestMatchers("/miembros/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
                         .requestMatchers("/pagos/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
-                        .requestMatchers("/reservas/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
+                        .requestMatchers("/reservas/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE", "MIEMBRO")
                         .requestMatchers("/reportes/**").hasAnyAuthority("ADMIN", "STAFF", "GERENTE")
                         .requestMatchers("/membresias/**").hasAnyAuthority("ADMIN", "GERENTE")
                         .requestMatchers("/beneficios/**").hasAnyAuthority("ADMIN", "GERENTE")

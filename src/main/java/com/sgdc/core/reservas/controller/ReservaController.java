@@ -1,18 +1,25 @@
 package com.sgdc.core.reservas.controller;
 
 import com.sgdc.core.miembro.service.MiembroService;
+import com.sgdc.core.pagos.domain.PagoMembresia;
+import com.sgdc.core.pagos.service.PagoMembresiaService;
 import com.sgdc.core.reservas.domain.EstadoReserva;
+import com.sgdc.core.reservas.domain.Instalacion;
 import com.sgdc.core.reservas.domain.Reserva;
+import com.sgdc.core.reservas.domain.dto.InstalacionDTO;
 import com.sgdc.core.reservas.domain.dto.ReservaDTO;
 import com.sgdc.core.reservas.exception.ReservaInvalidaException;
 import com.sgdc.core.reservas.exception.ReservaSolapadaException;
 import com.sgdc.core.reservas.service.InstalacionService;
 import com.sgdc.core.reservas.service.ReservaService;
+import com.sgdc.core.security.model.UserPrincipal;
 import com.sgdc.core.usuarios.domain.dto.UsuarioDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("reservas")
@@ -36,10 +44,13 @@ public class ReservaController {
 
     private final InstalacionService instalacionService;
 
-    public ReservaController(ReservaService reservaService, MiembroService miembroService, InstalacionService instalacionService) {
+    private final PagoMembresiaService pagoService;
+
+    public ReservaController(ReservaService reservaService, MiembroService miembroService, InstalacionService instalacionService, PagoMembresiaService pagoService) {
         this.reservaService = reservaService;
         this.miembroService = miembroService;
         this.instalacionService = instalacionService;
+        this.pagoService = pagoService;
     }
 
     @GetMapping
@@ -64,10 +75,20 @@ public class ReservaController {
     }
 
     @GetMapping("get")
-    public String getReserva(@RequestParam(value = "id") Integer idReserva, Model model) {
+    public String getReserva(@RequestParam(value = "id") Integer idReserva, Model model, Authentication auth) {
         Reserva reserva = reservaService.findById(idReserva);
         model.addAttribute("reserva", reserva);
         addSolapadas(reserva, model);
+
+        boolean isMiembro = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("MIEMBRO"));
+        model.addAttribute("isMiembro", isMiembro);
+        log.info("isMiembro: {}", isMiembro);
+        if(isMiembro){
+            Integer miId = ((UserPrincipal)auth.getPrincipal()).getUsuario().getMiembro().getId();
+            model.addAttribute("currentMiembroId", miId);
+        }
+
         return "reservas/ver-reserva";
     }
 
@@ -77,31 +98,74 @@ public class ReservaController {
     }
 
     @GetMapping("modal-detail")
-    public String modalDetail(@RequestParam("id") Integer id, Model model) {
+    public String modalDetail(@RequestParam("id") Integer id, Model model, Authentication auth) {
         // Reserva principal
         Reserva reserva = reservaService.findById(id);
         model.addAttribute("reserva", reserva);
         // Lista de pendientes solapadas (cancela a confirmar)
         addSolapadas(reserva, model);
+
+        boolean isMiembro = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("MIEMBRO"));
+        model.addAttribute("isMiembro", isMiembro);
+        log.info("isMiembro: {}", isMiembro);
+        if(isMiembro){
+            Integer miId = ((UserPrincipal)auth.getPrincipal()).getUsuario().getMiembro().getId();
+            model.addAttribute("currentMiembroId", miId);
+        }
+
         // Apuntar al fragmento detalleReserva dentro de fragments.html
         return "reservas/fragments :: detalleReserva";
     }
 
     @GetMapping("new")
-    public String newReserva(Model model) {
-        model.addAttribute("reservaDTO", new ReservaDTO());
+    @PreAuthorize("hasAnyAuthority('ADMIN','STAFF','GERENTE','MIEMBRO')")
+    public String newReserva(Model model, Authentication auth) {
+        ReservaDTO reservaDTO = new ReservaDTO();
         // Agregar los posibles estados al modelo
-        model.addAttribute("miembros", miembroService.findAll());
-        model.addAttribute("instalaciones", instalacionService.findAll());
+//        model.addAttribute("miembros", miembroService.findAll());
+//        model.addAttribute("instalaciones", instalacionService.findAll());
+
+        boolean isMiembro = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("MIEMBRO"));
+        model.addAttribute("isMiembro", isMiembro);
+        log.info("isMiembro: {}", isMiembro);
+
+        if (isMiembro) {
+            UserPrincipal up = (UserPrincipal) auth.getPrincipal();
+            Integer miId = up.getUsuario().getMiembro().getId();
+            reservaDTO.setIdMiembro(miId);
+            // 1) Su propio ID
+            model.addAttribute("currentMiembroId", miId);
+            // 2) Su nombre completo
+            String nombre = up.getUsuario().getMiembro().getNombre() + " " +
+                    up.getUsuario().getMiembro().getApellidoPaterno() + " " +
+                    up.getUsuario().getMiembro().getApellidoMaterno();
+            model.addAttribute("currentMiembroNombre", nombre);
+            // 3) Su membresía activa (puedes obtenerlo de tu servicio de pagos)
+            Optional<PagoMembresia> pagoOpt = pagoService.findActiveByMiembro(miId);
+            if (pagoOpt.isPresent()) {
+                PagoMembresia pago = pagoOpt.get();
+                model.addAttribute("currentMembresiaName", pago.getMembresia().getNombre());
+                model.addAttribute("currentMembresiaId", pago.getMembresia().getId());
+                List<InstalacionDTO> insts = instalacionService.findByMembresiaId(pago.getMembresia().getId());
+                model.addAttribute("currentInstalaciones", insts);
+            } else {
+                // no tiene membresía activa
+                model.addAttribute("noMembership", true);
+            }
+        }
+        model.addAttribute("reservaDTO", reservaDTO);
         return "reservas/nueva-reserva";
     }
 
     @PostMapping("create-reserva")
+    @PreAuthorize("hasAnyAuthority('ADMIN','STAFF','GERENTE','MIEMBRO')")
     public String guardarReserva(@Valid ReservaDTO reservaDTO, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
         if (bindingResult.hasErrors()) {
             logErrors(bindingResult);
-            model.addAttribute("miembros", miembroService.findAll());
-            model.addAttribute("instalaciones", instalacionService.findAll());
+//            model.addAttribute("miembros", miembroService.findAll());
+//            model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
         }
 
@@ -119,20 +183,20 @@ public class ReservaController {
                         bindingResult.rejectValue("fechaHoraFin", "fechaHoraFin", "La fecha/hora fin debe ser posterior a la de inicio.");
                 default -> bindingResult.reject("global.error", message);
             }
-            model.addAttribute("miembros", miembroService.findAll());
-            model.addAttribute("instalaciones", instalacionService.findAll());
+//            model.addAttribute("miembros", miembroService.findAll());
+//            model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
         } catch (ReservaSolapadaException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.reject("global.error", "Ya existe una reserva confirmada en el espacio deseado. Por favor, vuelva a intentarlo en otro horario.");
-            model.addAttribute("miembros", miembroService.findAll());
-            model.addAttribute("instalaciones", instalacionService.findAll());
+//            model.addAttribute("miembros", miembroService.findAll());
+//            model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
         } catch (DataIntegrityViolationException e) {
             log.error("Error de integridad de datos: {}", e.getMessage());
             bindingResult.reject("global.error", "Se ha presentado un error al crear la reserva. Por favor, vuelva a intentarlo en otro horario.");
-            model.addAttribute("miembros", miembroService.findAll());
-            model.addAttribute("instalaciones", instalacionService.findAll());
+//            model.addAttribute("miembros", miembroService.findAll());
+//            model.addAttribute("instalaciones", instalacionService.findAll());
             return "reservas/nueva-reserva";
         }
 
