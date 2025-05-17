@@ -138,11 +138,10 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        //sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
                 .addFilterAfter(new JWTAuthenticationFilter(tokenProvider, uds), UsernamePasswordAuthenticationFilter.class)
-//                .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // Autorizar rutas
                 .authorizeHttpRequests(auth -> auth
