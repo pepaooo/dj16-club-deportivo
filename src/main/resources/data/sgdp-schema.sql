@@ -1,5 +1,4 @@
--- create database clubdep20;
-USE clubdep20;
+USE <tu_base_de_datos>;
 
 CREATE TABLE IF NOT EXISTS beneficio (
     id_beneficio INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

@@ -1,3 +1,5 @@
+USE <tu_base_de_datos>;
+
 INSERT INTO beneficio (nombre, descripcion)
 VALUES
     ('Piscina libre', 'Acceso ilimitado a la piscina del club'),
